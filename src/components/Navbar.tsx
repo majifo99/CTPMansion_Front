@@ -13,7 +13,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="w-full min-h-[80px] flex justify-between items-center fixed top-0 z-50 text-darkBlue bg-gradient-to-r bg-softGreen shadow-lg">
+      <div className="w-full min-h-[80px] flex justify-between items-center fixed top-0 z-50 text-white bg-gradient-to-r bg-darkBlue shadow-lg">
         <div className="flex items-center justify-between w-full px-4">
           <img src={ctp} alt="Logo" className="h-12 w-12" />
           <ul className="hidden sm:flex space-x-6 ml-auto">
@@ -27,12 +27,17 @@ const Navbar = () => {
               <a href='/ofertaAcademica' className="hover:text-[#B22222] transition duration-300">Oferta Académica</a>
               <ul className="absolute left-0 mt-2 w-48 bg-white text-gray-800 text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:visible transition-opacity duration-300 invisible">
                 <li className="px-4 py-2 hover:bg-transparentCustomGray rounded-t-lg"><Link to="/specialties">Especialidades</Link></li>
-                <li className="px-4 py-2 hover:bg-transparentCustomGray rounded-b-lg"><a href="#workshops">Talleres Exploratorios</a></li>
+                <li className="px-4 py-2 hover:bg-transparentCustomGray rounded-b-lg"><Link to="/workshops">Talleres Exploratorios</Link></li>
               </ul>
             </li>
             <li>
-              <a href='/gallery' className="hover:text-[#B22222] transition duration-300">Gallery</a>
+            <Link to="/Events" className="hover:text-[#B22222] transition duration-300">  Eventos </Link>
             </li>
+            <li>
+            <Link to="/Certificate" className="hover:text-[#B22222] transition duration-300"> Solicitud de Certificados </Link>
+            </li>
+
+
           </ul>
           <div className="flex items-center">
             <a className="hover:opacity-75" href="https://www.facebook.com/profile.php?id=100057725107781&locale=es_LA" target="_blank" rel="noreferrer">
