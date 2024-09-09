@@ -6,31 +6,31 @@ const OurServices = () => {
   const stats = [
     {
       id: 1,
-      icon: <BiBookReader className="text-[#fe593f] w-12 h-12 mb-3 inline-block" />,
+      icon: <BiBookReader className="text-[#0075A2] w-12 h-12 mb-3 inline-block" />,
       title: 'Biblioteca',
      
     },
     {
       id: 2,
-      icon: <BiBusSchool  className="text-burntOrange w-12 h-12 mb-3 inline-block" />,
+      icon: <BiBusSchool  className="text-[#0075A2] w-12 h-12 mb-3 inline-block" />,
       title: 'Transporte',
 
     },
     {
       id: 3,
-      icon: <TbBallFootball className="text-burntOrange w-12 h-12 mb-3 inline-block" />,
+      icon: <TbBallFootball className="text-[#0075A2] w-12 h-12 mb-3 inline-block" />,
       title: 'Deportes y Recreación',
   
     },
     {
       id: 4,
-      icon: <TbBowlSpoon  className="text-burntOrange w-12 h-12 mb-3 inline-block" />,
+      icon: <TbBowlSpoon  className="text-[#0075A2] w-12 h-12 mb-3 inline-block" />,
       title: 'Comedor',
 
     },
     {
         id: 5,
-        icon: <TbUserHeart  className="text-burntOrange w-12 h-12 mb-3 inline-block" />,
+        icon: <TbUserHeart  className="text-[#4EA5D9] w-12 h-12 mb-3 inline-block" />,
         title: 'Educación Especial',
   
       },
