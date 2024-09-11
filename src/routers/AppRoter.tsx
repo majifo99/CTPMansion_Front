@@ -6,6 +6,8 @@ import UsPage from '../components/UsPage';
 import Events from '../components/Events';
 import WorkshopsPage from '../components/WorkshopsPage';
 import CertificatesPage from '../pages/CertificatesPage';
+import Login from '../components/Login';
+import Register from '../components/Register';
 
 const AppRouter: React.FC = () => {
   return (
@@ -16,7 +18,9 @@ const AppRouter: React.FC = () => {
         <Route path="/Workshops" element={<WorkshopsPage />} />   
         <Route path="/Uspage" element={<UsPage />} /> 
         <Route path="/Events" element={<Events />} /> 
-        <Route path="/Certificate" element={<CertificatesPage />}   />       
+        <Route path="/Certificate" element={<CertificatesPage />}   />   
+        <Route path='/login' element={<Login/>} /> 
+        <Route path='/register' element={<Register/>} />
       </Routes>
     </Router>
   );
