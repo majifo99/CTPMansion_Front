@@ -45,14 +45,14 @@ const LocationSection = () => {
                 </div>
                 <div className="border-t border-gray-200 px-6 py-4">
                   <h3 className="text-lg font-medium text-gray-900">Horario</h3>
-                  <p className="mt-1 text-gray-600">Lunes - Viernes: 9am - 5pm</p>
-                  <p className="mt-1 text-gray-600">Sábado: 10am - 4pm</p>
-                  <p className="mt-1 text-gray-600">Domingo: Cerrado</p>
+                  <p className="mt-1 text-gray-600">Lunes - Viernes: 7:00am - 4:20pm</p>
+                  <p className="mt-1 text-gray-600">Sábado - Domingo: Cerrado</p>
+                  
                 </div>
                 <div className="border-t border-gray-200 px-6 py-4">
                   <h3 className="text-lg font-medium text-gray-900">Contacto</h3>
-                  <p className="mt-1 text-gray-600">Correo: info@example.com</p>
-                  <p className="mt-1 text-gray-600">Teléfono: +506 1234 5678</p>
+                  <p className="mt-1 text-gray-600">Correo: ctp.demansion@mep.go.cr</p>
+                  <p className="mt-1 text-gray-600">Teléfono: +506 2659-1472</p>
                 </div>
               </div>
             </div>
