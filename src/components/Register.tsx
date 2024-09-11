@@ -9,13 +9,17 @@ const Register = () => {
 
     return (
         <section
-            className="bg-cover bg-center h-screen relative"
-            style={{ backgroundImage: "url('https://i.ibb.co/dKVCLB2/ctp-m.jpg')" }}
+            className="bg-cover bg-center min-h-screen relative"
+            style={{
+                backgroundImage: "url('https://i.ibb.co/dKVCLB2/ctp-m.jpg')",
+                backgroundSize: "cover",  // Asegura que la imagen cubra toda el área
+                backgroundPosition: "center center",  // Centra la imagen
+            }}
         >
             {/* Filtro oscuro sobre la imagen */}
             <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-           
-            <div className="relative z-10 flex flex-col items-center justify-center px-4 py-8 mx-auto h-full lg:py-0">
+
+            <div className="relative z-10 flex flex-col items-center justify-center px-4 py-8 mx-auto min-h-screen lg:py-0">
                 {/* Contenedor del formulario ajustado */}
                 <div className="w-full max-w-3xl bg-white bg-opacity-10 backdrop-blur-lg rounded-lg shadow-lg dark:border dark:bg-opacity-20 dark:bg-gray-800 dark:border-gray-700">
                     <div className="p-8 space-y-6">
