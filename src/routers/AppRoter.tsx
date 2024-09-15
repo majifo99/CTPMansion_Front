@@ -8,6 +8,7 @@ import WorkshopsPage from '../components/WorkshopsPage';
 import CertificatesPage from '../pages/CertificatesPage';
 import Login from '../components/Login';
 import Register from '../components/Register';
+import VerificationForm from '../components/VerificationForm';
 
 const AppRouter: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const AppRouter: React.FC = () => {
         <Route path="/Certificate" element={<CertificatesPage />}   />   
         <Route path='/login' element={<Login/>} /> 
         <Route path='/register' element={<Register/>} />
+        <Route path="/verify-email" element={<VerificationForm />} />
       </Routes>
     </Router>
   );
