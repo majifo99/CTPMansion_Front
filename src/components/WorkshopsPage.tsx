@@ -1,29 +1,6 @@
 import Navbar from './Navbar'; // Asegúrate de tener este componente creado
 import Footer from './Footer'; // Asegúrate de tener este componente creado
-
-const talleres = [
-  {
-    id: 1,
-    title: "Taller de Programación",
-    description: "Introducción a los conceptos básicos de la programación en diferentes lenguajes.",
-    image: "https://via.placeholder.com/100", // Cambia esto por la ruta de tu imagen local
-    especialidad: "Informática",
-  },
-  {
-    id: 2,
-    title: "Taller de Contabilidad",
-    description: "Enseñanza de los principios contables y gestión de libros financieros.",
-    image: "https://via.placeholder.com/100", // Cambia esto por la ruta de tu imagen local
-    especialidad: "Contabilidad y Control Interno",
-  },
-  {
-    id: 3,
-    title: "Taller de Cocina Gourmet",
-    description: "Exploración de técnicas avanzadas de cocina y presentación de platos gourmet.",
-    image: "https://via.placeholder.com/100", // Cambia esto por la ruta de tu imagen local
-    especialidad: "Gerencia y Producción en Cocina",
-  },
-];
+import { useWorkshops } from '../hooks/useWorkshops'; // Importa el hook
 
 const TallerCard = ({ title, description, image, especialidad }) => (
   <a href="#" className="group relative block max-w-screen-sm mx-auto h-64 sm:h-80 lg:h-96 mb-8">
@@ -45,25 +22,32 @@ const TallerCard = ({ title, description, image, especialidad }) => (
   </a>
 );
 
-const TalleresExploratoriosPage = () => (
-  <>
-    <Navbar />
-    <div className="container mx-auto px-5 py-24">
-      <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-4">Talleres Exploratorios</h2>
-      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {talleres.map(taller => (
-          <TallerCard
-            key={taller.id}
-            title={taller.title}
-            description={taller.description}
-            image={taller.image}
-            especialidad={taller.especialidad}
-          />
-        ))}
+const TalleresExploratoriosPage = () => {
+  const { workshops, loading, error } = useWorkshops();
+
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>{error}</p>;
+
+  return (
+    <>
+      <Navbar />
+      <div className="container mx-auto px-5 py-24">
+        <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-4">Talleres Exploratorios</h2>
+        <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {workshops.map(workshop => (
+            <TallerCard
+              key={workshop.id}
+              title={workshop.title}
+              description={workshop.description}
+              image={workshop.url_image}
+              especialidad={workshop.especialidad}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-    <Footer />
-  </>
-);
+      <Footer />
+    </>
+  );
+};
 
 export default TalleresExploratoriosPage;

@@ -1,43 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaFacebookF, FaBars } from 'react-icons/fa';
-import logo from '../assets/images/image.png'; // Asegúrate de ajustar la ruta según tu estructura
 import { Link } from 'react-router-dom';
-import ctp from '../assets/images/LogoMansion.png'
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const handleNav = () => {
     setNav(!nav);
   };
 
+  const handleScroll = () => {
+    if (window.scrollY > 50) {
+      setScrolled(true);
+    } else {
+      setScrolled(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <>
-      <div className="w-full min-h-[80px] flex justify-between items-center fixed top-0 z-50 text-white bg-gradient-to-r bg-darkBlue shadow-lg">
+      <div className={`w-full min-h-[80px] flex justify-between items-center fixed top-0 z-50 text-gray-300 shadow-lg ${scrolled ? 'scrolled-navbar' : 'transparent-navbar'}`}>
         <div className="flex items-center justify-between w-full px-4">
-          <img src={ctp} alt="Logo" className="h-12 w-12" />
+          <img src="https://i.ibb.co/pdq8Pcj/La-Mansion.png" alt="Logo" className="h-12 w-12 object-cover" />
           <ul className="hidden sm:flex space-x-6 ml-auto">
             <li>
               <a href='/' className="hover:text-[#B22222] transition duration-300">Home</a>
             </li>
             <li>
-            <Link to="/Uspage" className="hover:text-[#B22222] transition duration-300">  Nosotros </Link>
+              <Link to="/us" className="hover:text-[#B22222] transition duration-300">Nosotros</Link>
             </li>
             <li className="relative group">
               <a href='/ofertaAcademica' className="hover:text-[#B22222] transition duration-300">Oferta Académica</a>
               <ul className="absolute left-0 mt-2 w-48 bg-white text-gray-800 text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:visible transition-opacity duration-300 invisible">
-                <li className="px-4 py-2 hover:bg-transparentCustomGray rounded-t-lg"><Link to="/specialties">Especialidades</Link></li>
+                <li className="px-4 py-2 hover:bg-transparentCustomGray rounded-t-lg"><Link to="/specialities">Especialidades</Link></li>
                 <li className="px-4 py-2 hover:bg-transparentCustomGray rounded-b-lg"><Link to="/workshops">Talleres Exploratorios</Link></li>
               </ul>
             </li>
             <li>
-            <Link to="/Events" className="hover:text-[#B22222] transition duration-300">  Eventos </Link>
+              <Link to="/events" className="hover:text-[#B22222] transition duration-300">Eventos</Link>
             </li>
             <li>
-            <Link to="/Certificate" className="hover:text-[#B22222] transition duration-300"> Solicitud de Certificados </Link>
+              <Link to="/certificates" className="hover:text-[#B22222] transition duration-300">Solicitud de Certificados</Link>
             </li>
-
-
+            <li>
+              <Link to="/dashboard" className="hover:text-[#B22222] transition duration-300">Admin</Link>
+            </li>
           </ul>
           <div className="flex items-center">
             <a className="hover:opacity-75" href="https://www.facebook.com/profile.php?id=100057725107781&locale=es_LA" target="_blank" rel="noreferrer">
@@ -69,12 +84,9 @@ const Navbar = () => {
             <li className='text-2xl py-8 relative group'>
               <a href='/ofertaAcademica'>Oferta Académica</a>
               <ul className={`absolute left-0 mt-2 w-full bg-white text-gray-800 text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:visible transition-opacity duration-300 ${nav ? 'block' : 'hidden'}`}>
-                <li className="px-4 py-2 hover:bg-gray-200 rounded-t-lg"><a href="#specialties">Especialidades</a></li>
+                <li className="px-4 py-2 hover:bg-gray-200 rounded-t-lg"><a href="#specialities">Especialidades</a></li>
                 <li className="px-4 py-2 hover:bg-gray-200 rounded-b-lg"><a href="#workshops">Talleres Exploratorios</a></li>
               </ul>
-            </li>
-            <li className='text-2xl py-8'>
-              <a href='/gallery'>Gallery</a>
             </li>
           </ul>
         </div>
