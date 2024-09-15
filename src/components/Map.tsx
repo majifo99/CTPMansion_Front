@@ -60,11 +60,13 @@ const LocationSection = () => {
                 </div>
                 <div className="border-t border-gray-200 px-6 py-4">
                   <h3 className="text-lg font-medium text-gray-900">Horario</h3>
+
                   <p className="mt-1 text-gray-600">{location.schedule}</p>
                 </div>
                 <div className="border-t border-gray-200 px-6 py-4">
                   <h3 className="text-lg font-medium text-gray-900">Contacto</h3>
                   <p className="mt-1 text-gray-600">{location.contact_Info}</p>
+
                 </div>
               </div>
             </div>
