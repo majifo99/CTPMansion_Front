@@ -1,29 +1,33 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from '../pages/HomePage';
-import SpecialitiesPage from '../components/SpecialitiesPage';
-import UsPage from '../components/UsPage';
-import Events from '../components/Events';
-import WorkshopsPage from '../components/WorkshopsPage';
-import CertificatesPage from '../pages/CertificatesPage';
-import Login from '../components/Login';
-import Register from '../components/Register';
-import VerificationForm from '../components/VerificationForm';
+
+// Lazy loading para las páginas
+const HomePage = React.lazy(() => import('../pages/HomePage'));
+const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
+const UsPage = React.lazy(() => import('../components/UsPage'));
+const Events = React.lazy(() => import('../components/Events'));
+const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
+const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
+const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
+
+
 
 const AppRouter: React.FC = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/specialties" element={<SpecialitiesPage />} />  
-        <Route path="/Workshops" element={<WorkshopsPage />} />   
-        <Route path="/Uspage" element={<UsPage />} /> 
-        <Route path="/Events" element={<Events />} /> 
-        <Route path="/Certificate" element={<CertificatesPage />}   />   
-        <Route path='/login' element={<Login/>} /> 
-        <Route path='/register' element={<Register/>} />
-        <Route path="/verify-email" element={<VerificationForm />} />
-      </Routes>
+
+      <Suspense fallback={<div>Cargando...</div>}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/specialities" element={<SpecialitiesPage />} />
+          <Route path="/workshops" element={<WorkshopsPage />} />
+          <Route path="/us" element={<UsPage />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/certificates" element={<CertificatesPage />} />
+          <Route path="/dashboard" element={<DashboardLayout />}/>
+        </Routes>
+      </Suspense>
+
     </Router>
   );
 };

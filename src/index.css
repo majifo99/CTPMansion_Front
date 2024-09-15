@@ -4,7 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
- 
+.transparent-navbar {
+  background-color: transparent;
+  transition: background-color 0.01s ease;
+}
+
+.scrolled-navbar {
+  background-color: rgba(19, 21, 42); /* Ajusta el color y la opacidad según tus necesidades */
+}
+
 @layer base{
     
 html {
