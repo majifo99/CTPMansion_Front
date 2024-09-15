@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 // Lazy loading para las páginas
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -10,9 +11,11 @@ const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
 const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
 
 
+
 const AppRouter: React.FC = () => {
   return (
     <Router>
+
       <Suspense fallback={<div>Cargando...</div>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -24,6 +27,7 @@ const AppRouter: React.FC = () => {
           <Route path="/dashboard" element={<DashboardLayout />}/>
         </Routes>
       </Suspense>
+
     </Router>
   );
 };
