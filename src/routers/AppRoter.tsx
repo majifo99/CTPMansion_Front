@@ -9,7 +9,15 @@ const Events = React.lazy(() => import('../components/Events'));
 const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
 const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
 const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
-
+const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
+const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
+const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
+const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
+const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
+const EspecialidadesPage = React.lazy(() => import('../pages/DashboardPages/EspecialidadesPage'));
+const TalleresPage = React.lazy(() => import('../pages/DashboardPages/TalleresPage'));
+const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
+const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
 
 
 const AppRouter: React.FC = () => {
@@ -18,13 +26,28 @@ const AppRouter: React.FC = () => {
 
       <Suspense fallback={<div>Cargando...</div>}>
         <Routes>
+          {/* Rutas de la página principal */}
           <Route path="/" element={<HomePage />} />
           <Route path="/specialities" element={<SpecialitiesPage />} />
           <Route path="/workshops" element={<WorkshopsPage />} />
           <Route path="/us" element={<UsPage />} />
           <Route path="/events" element={<Events />} />
           <Route path="/certificates" element={<CertificatesPage />} />
-          <Route path="/dashboard" element={<DashboardLayout />}/>
+
+          {/* Rutas del Dashboard */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route path="certificaciones" element={<CertificacionesPage />} />
+            {/* Rutas de Gestiones */}
+            <Route path="salas" element={<SalasPage />} />
+            <Route path="laboratorios" element={<LaboratoriosPage />} />
+            {/* Rutas de Creación */}
+            <Route path="eventos" element={<EventosPage />} />
+            <Route path="udps" element={<UDPsPage />} />
+            <Route path="especialidades" element={<EspecialidadesPage />} />
+            <Route path="talleres" element={<TalleresPage />} />
+            <Route path="elaborar-salas" element={<ElaborarSalasPage />} />
+            <Route path="elaborar-laboratorios" element={<ElaborarLaboratoriosPage />} />
+          </Route>
         </Routes>
       </Suspense>
 

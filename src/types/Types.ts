@@ -3,7 +3,7 @@ export interface Event {
     title: string;
     description: string;
     date: Date;
-    urlImage: string;
+    url_Image: string;
   }
 
   export interface AboutUsContent {
@@ -12,12 +12,13 @@ export interface Event {
     description: string;
     urlImage: string;
   }
-
   export interface Location {
-    Id_Location: number;
-    Address: string;
-    Schedule: string;
-    Contact_Info: string;
+    id: number;
+    id_Location: number;
+    addres: string;
+    schedule: string;
+    email: string;
+    phoneNumber: string;
   }
 
   export interface OurService {
@@ -31,12 +32,14 @@ export interface Event {
     id: number;
     title: string;
     description: string;
+    url_Image:string;
   }
   
   export interface Vision {
     id: number;
     title: string;
     description: string;
+    url_Image:string;
   }
   
   export interface Value {
