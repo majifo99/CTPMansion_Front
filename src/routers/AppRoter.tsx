@@ -8,18 +8,29 @@ const UsPage = React.lazy(() => import('../components/UsPage'));
 const Events = React.lazy(() => import('../components/Events'));
 const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
 const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
-const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
+const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'))
 const Register = React.lazy(() => import('../components/Register'));
 const VerificationForm = React.lazy(() => import('../components/VerificationForm'));
 const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
+const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
+const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
+const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
+const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
+const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
+const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
+const TalleresPage = React.lazy(() => import('../pages/DashboardPages/TalleresPage'));
+const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
+const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
+
 
 const AppRouter: React.FC = () => {
   return (
     <Router>
       <Suspense fallback={<div>Cargando...</div>}>
         <Routes>
+          {/* Rutas de la página principal */}
           <Route path="/" element={<HomePage />} />
           <Route path="/specialities" element={<SpecialitiesPage />} />
           <Route path="/workshops" element={<WorkshopsPage />} />
@@ -32,6 +43,20 @@ const AppRouter: React.FC = () => {
           <Route path="/request-password-reset" element={<RequestPasswordReset />} />
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/login" element={<LoginForm />} />
+          {/* Rutas del Dashboard */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route path="certificaciones" element={<CertificacionesPage />} />
+            {/* Rutas de Gestiones */}
+            <Route path="salas" element={<SalasPage />} />
+            <Route path="laboratorios" element={<LaboratoriosPage />} />
+            {/* Rutas de Creación */}
+            <Route path="eventos" element={<EventosPage />} />
+            <Route path="udps" element={<UDPsPage />} />
+            <Route path="especialidades" element={<SpecialitiesPageD />} />
+            <Route path="talleres" element={<TalleresPage />} />
+            <Route path="elaborar-salas" element={<ElaborarSalasPage />} />
+            <Route path="elaborar-laboratorios" element={<ElaborarLaboratoriosPage />} />
+          </Route>
         </Routes>
       </Suspense>
     </Router>

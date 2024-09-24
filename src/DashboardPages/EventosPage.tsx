@@ -1,0 +1,153 @@
+import React, { useState } from 'react';
+import { useEvents } from '../hooks/useEvents';
+import EditEventModal from '../modals/EditEventModal';
+import DeleteEventModal from '../modals/DeleteEventModal';
+import { Event } from '../types/Types';
+import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const EventosPage: React.FC = () => {
+  const { events, loading, error, handleAddEvent, handleEditEvent, handleDeleteEvent } = useEvents();
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [deletingEventId, setDeletingEventId] = useState<number | null>(null);
+
+  const handleOpenEditModal = (event?: Event) => {
+    setEditingEvent(event || null);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingEvent(null);
+  };
+
+  const handleSaveEvent = (event: Event) => {
+    if (editingEvent) {
+      handleEditEvent(editingEvent.id, event); // Editar evento
+      toast.success('Evento editado con éxito!');
+    } else {
+      handleAddEvent(event); // Agregar nuevo evento
+      toast.success('Evento creado con éxito!');
+    }
+    handleCloseEditModal();
+  };
+
+  const handleOpenDeleteModal = (id: number) => {
+    setDeletingEventId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeletingEventId(null);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingEventId !== null) {
+      handleDeleteEvent(deletingEventId); // Eliminar evento
+      toast.error('Evento eliminado');
+      handleCloseDeleteModal();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br bg-gray-600 text-white p-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">Gestión de Eventos</h1>
+
+      <div className="flex justify-end mb-6 mr-10">
+        <button
+          className="bg-softGreen hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg"
+          onClick={() => handleOpenEditModal()}
+        >
+         <AiTwotonePlusSquare size={30} />
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full text-center bg-white text-gray-800 rounded-lg shadow-lg">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2">Título</th>
+              <th className="px-4 py-2">Descripción</th>
+              <th className="px-4 py-2">Fecha</th>
+              <th className="px-4 py-2">Imagen</th>
+              <th className="px-4 py-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.id} className="border-t">
+                <td className="border px-4 py-2">{event.title}</td>
+                <td className="border px-4 py-2">{event.description}</td>
+                <td className="border px-4 py-2">{new Date(event.date).toLocaleDateString()}</td>
+                <td className="border px-4 py-2">
+                  <img
+                    src={event.url_Image}
+                    alt={event.title}
+                    className="h-16 w-16 object-cover mx-auto rounded-lg"
+                  />
+                </td>
+                <td className="border px-4 py-2">
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
+                    onClick={() => handleOpenEditModal(event)}
+                  >
+                    <AiTwotoneEdit size ={30} />
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                    onClick={() => handleOpenDeleteModal(event.id)}
+                  >
+                    <AiFillDelete size={30} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal para Agregar/Editar Evento */}
+      <EditEventModal
+        show={showEditModal}
+        event={editingEvent}
+        onClose={handleCloseEditModal}
+        onSave={handleSaveEvent}
+      />
+
+      {/* Modal para Confirmación de Eliminación */}
+      <DeleteEventModal
+        show={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
+
+      {/* Contenedor para Toasts */}
+      <ToastContainer />
+    </div>
+  );
+};
+
+export default EventosPage;
