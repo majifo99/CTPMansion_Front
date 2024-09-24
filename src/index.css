@@ -4,14 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
-.transparent-navbar {
-  background-color: transparent;
-  transition: background-color 0.01s ease;
+
+
+
+
+.sidebar {
+  height: 100vh;
+  overflow-y: auto;
 }
 
-.scrolled-navbar {
-  background-color: rgba(19, 21, 42); /* Ajusta el color y la opacidad según tus necesidades */
-}
+
+
+
+
+
 
 @layer base{
     

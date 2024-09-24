@@ -1,11 +1,11 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { PiMapPinSimpleDuotone } from 'react-icons/pi';
-import useLocation from '../hooks/useLocation'; // Ajusta la ruta según sea necesario
+import useLocation from '../hooks/useLocation'; // Asegúrate de ajustar la ruta correctamente
 
 const LocationSection = () => {
   const { location, loading, error } = useLocation();
-  const position = [10.098611822058782, -85.3739927038014];
+  const position = [10.098611822058782, -85.3739927038014]; // Coordenadas de ejemplo
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -30,6 +30,7 @@ const LocationSection = () => {
         </div>
         <div className="mt-16 lg:mt-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Mapa con el marcador */}
             <div className="rounded-lg overflow-hidden" style={{ zIndex: 20 }}>
               <div className="h-[480px] w-full">
                 <MapContainer 
@@ -49,6 +50,8 @@ const LocationSection = () => {
                 </MapContainer>
               </div>
             </div>
+
+            {/* Información de contacto */}
             <div>
               <div className="max-w-full mx-auto rounded-lg overflow-hidden">
                 <div className="px-6 py-4">
@@ -60,13 +63,12 @@ const LocationSection = () => {
                 </div>
                 <div className="border-t border-gray-200 px-6 py-4">
                   <h3 className="text-lg font-medium text-gray-900">Horario</h3>
-
                   <p className="mt-1 text-gray-600">{location.schedule}</p>
                 </div>
                 <div className="border-t border-gray-200 px-6 py-4">
                   <h3 className="text-lg font-medium text-gray-900">Contacto</h3>
-                  <p className="mt-1 text-gray-600">{location.contact_Info}</p>
-
+                  <p className="mt-1 text-gray-600">Email: {location.email}</p>
+                  <p className="mt-1 text-gray-600">Teléfono: {location.phoneNumber}</p>
                 </div>
               </div>
             </div>
