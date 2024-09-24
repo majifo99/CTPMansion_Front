@@ -1,17 +1,16 @@
-
 import 'leaflet/dist/leaflet.css';
 import 'flowbite/dist/flowbite.css';
-import AppRouter from "./routers/AppRoter";
+import AppRouter from './routers/AppRoter';
+import { ThemeProvider } from './components/ThemeContext';
+
+
 
 function App() {
-
-
   return (
-
-    <>
-     <AppRouter/>
-    </>
-  )
+    <ThemeProvider>
+      <AppRouter />
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;

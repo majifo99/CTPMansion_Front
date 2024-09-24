@@ -1,131 +1,132 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from './ThemeContext';
 
-// Define the form data type
-interface VerificationFormData {
-  email: string;
-  verificationCode: string;
-}
 
-const VerificationForm: React.FC = () => {
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm<VerificationFormData>();
+const VerificationForm = () => {
+  const [verificationCode, setVerificationCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const { isDarkMode, toggleDarkMode } = useTheme(); // Access theme state and toggle
+
+  // Retrieve userId from sessionStorage
+  const userId = sessionStorage.getItem('userId');
   const navigate = useNavigate();
 
-  const handleVerification = async (data: VerificationFormData) => {
-    setIsSubmitting(true);
+  const handleVerification = async () => {
+    if (!userId) {
+      setError('Falta el ID del usuario.');
+      return;
+    }
+
     try {
-      const response = await axios.post('https://localhost:7055/api/User/verify-email', data);
+      const response = await axios.post(`https://localhost:7055/api/User/verify-email?userId=${userId}&verificationCode=${verificationCode}`);
 
       if (response.status === 200) {
-        console.log('Verification successful', response.data);
-        navigate('/'); // Redirect to the home page or any other page
-      }
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        setErrorMessage('La información de verificación no es válida. Por favor, revisa los datos ingresados.');
+        setSuccess(true);
+        setError(null);
+        sessionStorage.removeItem('userId'); // Clear userId from sessionStorage after successful verification
       } else {
-        setErrorMessage('Ocurrió un error durante la verificación.');
+        setError('La verificación falló. Por favor, inténtalo de nuevo.');
+        setSuccess(false);
       }
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      setError('Error al verificar el código. Por favor, inténtalo de nuevo.');
+      setSuccess(false);
     }
   };
 
   const handleResendCode = async () => {
-    setIsSubmitting(true);
-    try {
-      const email = getValues('email'); // Usar React Hook Form para obtener el valor
-      if (!email) throw new Error('Correo electrónico no proporcionado');
+    if (!userId) {
+      setError('Falta el ID del usuario.');
+      return;
+    }
 
-      const response = await axios.post('https://localhost:7055/api/User/resend-verification-code', { email });
+    try {
+      const response = await axios.post(`https://localhost:7055/api/User/resend-verification-code?userId=${userId}`);
 
       if (response.status === 200) {
-        setSuccessMessage('Código de verificación reenviado exitosamente. Revisa tu correo electrónico.');
-        setErrorMessage('');
+        setResendMessage('El código de verificación ha sido reenviado a tu correo electrónico.');
+        setError(null);
+      } else {
+        setResendMessage(null);
+        setError('No se pudo reenviar el código. Por favor, inténtalo de nuevo.');
       }
-    } catch (error: any) {
-      setErrorMessage('Error al reenviar el código. Por favor, intenta de nuevo.');
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      setResendMessage(null);
+      setError('Error al reenviar el código. Por favor, inténtalo de nuevo.');
     }
   };
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
-          Verificar Correo Electrónico
-        </h1>
-        <form onSubmit={handleSubmit(handleVerification)} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              {...register('email', {
-                required: 'El correo electrónico es requerido',
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Correo electrónico inválido',
-                },
-              })}
-              id="email"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="nombre@empresa.com"
-            />
-            {errors.email && <span className="text-red-600 text-sm">{errors.email.message}</span>}
-          </div>
+  const handleLoginRedirect = () => {
+    navigate('/login'); // Redirect to login page
+  };
 
-          <div>
-            <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700">
-              Código de Verificación
+  return (
+    <div className={`${isDarkMode ? 'bg-[#13152A] text-gray-300' : 'bg-gray-100 text-gray-800'} flex justify-center items-center h-screen`}>
+      <div className="hidden lg:block w-1/2 h-screen">
+        <img
+          src="https://i.ibb.co/dKVCLB2/ctp-m.jpg"
+          alt="Background"
+          className={`object-cover w-full h-full ${isDarkMode ? 'opacity-60' : ''}`}
+        />
+      </div>
+
+      <div className={`lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2 h-full ${isDarkMode ? 'bg-[#13152A]' : 'bg-white'} shadow-lg rounded-lg`}>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-semibold">Verificación de Correo Electrónico</h1>
+          <div className="flex items-center">
+            <span className="text-sm mr-2">{isDarkMode ? 'Modo Noche' : 'Modo Día'}</span>
+            <label className="inline-flex relative items-center cursor-pointer">
+              <input type="checkbox" className="sr-only peer" checked={isDarkMode} onChange={toggleDarkMode} />
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
             </label>
+          </div>
+        </div>
+
+        {success ? (
+          <>
+            <p className="text-green-600">¡Verificación exitosa! Ahora puedes acceder a tu cuenta.</p>
+            <button
+              onClick={handleLoginRedirect}
+              className={`mt-4 px-4 py-2 rounded-lg w-full ${isDarkMode ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+            >
+              Iniciar sesión
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="mb-4">Por favor, introduce el código de verificación que fue enviado a tu correo electrónico.</p>
             <input
               type="text"
-              {...register('verificationCode', {
-                required: 'El código de verificación es requerido',
-              })}
-              id="verificationCode"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Ingrese el código de verificación"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value.trim())}
+              placeholder="Ingresa el código de verificación"
+              className={`w-full mb-4 p-2 border rounded ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'}`}
             />
-            {errors.verificationCode && <span className="text-red-600 text-sm">{errors.verificationCode.message}</span>}
-          </div>
+            <button
+              onClick={handleVerification}
+              className={`px-4 py-2 rounded-lg w-full ${isDarkMode ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+            >
+              Verificar
+            </button>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:outline-none"
-          >
-            Verificar
-          </button>
+            {error && <p className="text-red-500 mt-4">{error}</p>}
 
-          <button
-            type="button"
-            onClick={handleResendCode}
-            disabled={isSubmitting}
-            className="w-full bg-gray-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-600 focus:ring-4 focus:ring-gray-500 focus:outline-none mt-4"
-          >
-            Reenviar Código de Verificación
-          </button>
-
-          {errorMessage && (
-            <div className="mt-4 text-red-600 text-center">
-              {errorMessage}
+            <div className="mt-4">
+              <p>¿No recibiste el código?</p>
+              <button
+                onClick={handleResendCode}
+                className={`mt-2 px-4 py-2 rounded-lg ${isDarkMode ? 'bg-gray-600 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+              >
+                Reenviar código
+              </button>
+              {resendMessage && <p className="text-green-600 mt-2">{resendMessage}</p>}
             </div>
-          )}
-          {successMessage && (
-            <div className="mt-4 text-green-600 text-center">
-              {successMessage}
-            </div>
-          )}
-        </form>
+          </>
+        )}
       </div>
     </div>
   );
