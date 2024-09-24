@@ -14,7 +14,7 @@ const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
-const EspecialidadesPage = React.lazy(() => import('../pages/DashboardPages/EspecialidadesPage'));
+const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
 const TalleresPage = React.lazy(() => import('../pages/DashboardPages/TalleresPage'));
 const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
 const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
@@ -43,7 +43,7 @@ const AppRouter: React.FC = () => {
             {/* Rutas de Creación */}
             <Route path="eventos" element={<EventosPage />} />
             <Route path="udps" element={<UDPsPage />} />
-            <Route path="especialidades" element={<EspecialidadesPage />} />
+            <Route path="especialidades" element={<SpecialitiesPageD />} />
             <Route path="talleres" element={<TalleresPage />} />
             <Route path="elaborar-salas" element={<ElaborarSalasPage />} />
             <Route path="elaborar-laboratorios" element={<ElaborarLaboratoriosPage />} />
