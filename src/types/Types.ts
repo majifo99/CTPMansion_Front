@@ -54,8 +54,9 @@ export interface Event {
     id: number;
     title: string;
     description: string;
-    url_image: string;
-    especialidad: string;
+    especiality: string;
+    url_Image: string;
+  
   }
 
   export interface Speciality {

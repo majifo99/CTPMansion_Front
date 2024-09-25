@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 // Lazy loading para las páginas
 const HomePage = React.lazy(() => import('../pages/HomePage'));
@@ -15,7 +16,7 @@ const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/Labora
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
 const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
-const TalleresPage = React.lazy(() => import('../pages/DashboardPages/TalleresPage'));
+const TalleresPage = React.lazy(() => import('../DashboardPages/WorkshopsPageD'));
 const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
 const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
 
@@ -24,7 +25,9 @@ const AppRouter: React.FC = () => {
   return (
     <Router>
 
-      <Suspense fallback={<div>Cargando...</div>}>
+      <Suspense fallback={ <div className="flex justify-center items-center h-screen">
+        <ClipLoader color="#3b82f6" size={100} /> {/* Spinner personalizado */}
+      </div>}>
         <Routes>
           {/* Rutas de la página principal */}
           <Route path="/" element={<HomePage />} />
