@@ -9,7 +9,7 @@ const Events = React.lazy(() => import('../components/Events'));
 const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
 const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
 const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'))
-const Register = React.lazy(() => import('../components/Register'));
+const Register = React.lazy(() => import('../components/RegisterForm'));
 const VerificationForm = React.lazy(() => import('../components/VerificationForm'));
 const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
@@ -22,7 +22,12 @@ const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
 const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
 const TalleresPage = React.lazy(() => import('../pages/DashboardPages/TalleresPage'));
 const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
+
+const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
+const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
+
 const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
+
 
 
 const AppRouter: React.FC = () => {
@@ -49,6 +54,7 @@ const AppRouter: React.FC = () => {
             {/* Rutas de Gestiones */}
             <Route path="salas" element={<SalasPage />} />
             <Route path="laboratorios" element={<LaboratoriosPage />} />
+            <Route path="roles" element={<RolesManagement />} />
             {/* Rutas de Creación */}
             <Route path="eventos" element={<EventosPage />} />
             <Route path="udps" element={<UDPsPage />} />
@@ -56,6 +62,7 @@ const AppRouter: React.FC = () => {
             <Route path="talleres" element={<TalleresPage />} />
             <Route path="elaborar-salas" element={<ElaborarSalasPage />} />
             <Route path="elaborar-laboratorios" element={<ElaborarLaboratoriosPage />} />
+           
           </Route>
         </Routes>
       </Suspense>

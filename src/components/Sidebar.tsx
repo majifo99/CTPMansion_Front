@@ -6,6 +6,7 @@ import { GiTeacher } from 'react-icons/gi';
 import { IoIosConstruct } from 'react-icons/io';
 import { BsJournal } from 'react-icons/bs';
 import { FaCog } from 'react-icons/fa';
+import { FiUsers } from 'react-icons/fi';
 
 const Sidebar: React.FC = () => {
   // Estados para manejar los dropdowns
@@ -36,6 +37,10 @@ const Sidebar: React.FC = () => {
           </h3>
           {isGestionesOpen && (
             <div className="pl-4">
+              <Link to="/dashboard/roles" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+              <FiUsers className="mr-2" />
+              Gestion de Usuarios
+              </Link>
               <Link to="/dashboard/salas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <MdRoom className="mr-2" />
                 Salas
