@@ -22,8 +22,13 @@ const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
 const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
 const TalleresPage = React.lazy(() => import('../pages/DashboardPages/TalleresPage'));
 const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
+
 const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
 const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
+
+const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
+
+
 
 const AppRouter: React.FC = () => {
   return (
