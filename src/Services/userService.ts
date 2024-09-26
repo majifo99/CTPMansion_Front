@@ -1,31 +1,70 @@
 import axios from 'axios';
 
-const API_URL = 'https://localhost:7055/api/User'; // Asegúrate de usar la URL correcta del backend
+// URL base para tu API
+const BASE_URL = 'https://localhost:7055/api';
 
-export interface UserData {
-  name: string;
-  lastName: string;
-  lastName2: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-}
-
-export const registerUser = async (userData: UserData) => {
-  const response = await axios.post(`${API_URL}/register`, userData);
-  return response.data;
+// Obtener la lista de usuarios
+export const getUsers = async (token: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/User`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    throw error;
+  }
 };
 
-export const loginUser = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/login`, null, {
-    params: { email, password },
-  });
-  return response.data;
+// Obtener roles de un usuario
+export const getUserRoles = async (userId: number, token: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/UserRole/${userId}/roles`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener roles para el usuario ${userId}:`, error);
+    throw error;
+  }
 };
 
-export const verifyEmail = async (userId: string, verificationCode: string) => {
-  const response = await axios.post(`${API_URL}/verify-email`, null, {
-    params: { userId, verificationCode },
-  });
-  return response.data;
+// Agregar rol a un usuario
+export const addUserRole = async (userId: number, roleId: number, token: string) => {
+  try {
+    await axios.post(`${BASE_URL}/UserRole/add`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        userId,
+        roleId,
+      },
+    });
+  } catch (error) {
+    console.error(`Error al agregar rol ${roleId} al usuario ${userId}:`, error);
+    throw error;
+  }
+};
+
+// Quitar rol a un usuario
+export const removeUserRole = async (userId: number, roleId: number, token: string) => {
+  try {
+    await axios.post(`${BASE_URL}/UserRole/remove`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        userId,
+        roleId,
+      },
+    });
+  } catch (error) {
+    console.error(`Error al quitar rol ${roleId} del usuario ${userId}:`, error);
+    throw error;
+  }
 };

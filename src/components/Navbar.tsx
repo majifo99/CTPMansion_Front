@@ -65,7 +65,7 @@ const Navbar = () => {
 
           {/* Admin */}
           <li className="relative group">
-            <Link to="/dashboard" className="relative pb-1 transition-all duration-300 after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 after:bg-[#B22222] hover:after:w-full after:transition-all after:duration-300">
+            <Link to="/login" className="relative pb-1 transition-all duration-300 after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 after:bg-[#B22222] hover:after:w-full after:transition-all after:duration-300">
               Admin
             </Link>
           </li>
