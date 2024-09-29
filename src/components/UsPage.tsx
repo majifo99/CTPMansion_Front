@@ -34,7 +34,7 @@ const UsPage: React.FC = () => {
               <img
                 src={vision.url_Image}
                 alt="Visión"
-                className="inline-block rounded shadow-lg"
+                className="inline-block rounded "
                 loading="lazy"
               />
             </div>
@@ -55,7 +55,7 @@ const UsPage: React.FC = () => {
               <img
                 src={mission.url_Image}
                 alt="Misión"
-                className="inline-block rounded shadow-lg"
+                className="inline-block rounded "
                 loading="lazy"
               />
             </div>

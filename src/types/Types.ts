@@ -65,3 +65,22 @@ export interface Event {
     description: string;
     url_Image: string;
   }
+  
+  export interface CertificationRequest {
+    id: number;
+    status: number;
+    requestDate: string;
+    studentName: string;
+    studentLastName1: string;
+    studentLastName2: string;
+    studentIdentification: string;
+    guardianName: string;
+    guardianLastName1: string;
+    guardianLastName2: string;
+    guardianIdentification: string;
+    email: string;
+    phoneNumber: string;
+    deliveryMethod: number | string;
+    certificationName: string;
+  }
+  

@@ -1,17 +1,8 @@
 import axios from 'axios';
 import {
-  AboutUsContent,
-  Event,
-  Location,
-  Mission,
-  OurService,
-  Speciality,
-  Value,
-  Vision,
-  Workshop,
-} from '../types/Types';
+  AboutUsContent,  Event,  Location,  Mission,  OurService,  Speciality,  Value,  Vision,  Workshop,} from '../types/Types';
 
-const API_URL = 'https://localhost:7055/api'; // Asegúrate de cambiar a la URL correcta de la API
+const API_URL = 'https://localhost:7055/api'; // Cambia la URL según tu API
 
 // Crear una instancia de axios con la URL base y encabezados predeterminados
 const apiClient = axios.create({
@@ -33,7 +24,6 @@ const handleResponse = async <T>(url: string): Promise<T> => {
 };
 
 // === Servicios relacionados a eventos ===
-
 export const getEvents = (): Promise<Event[]> => {
   return handleResponse<Event[]>('/Events');
 };
@@ -68,7 +58,6 @@ export const deleteEvent = async (eventId: number): Promise<void> => {
 };
 
 // === Servicios relacionados a especialidades ===
-
 export const fetchSpecialities = (): Promise<Speciality[]> => {
   return handleResponse<Speciality[]>('/Especiality');
 };
@@ -102,13 +91,13 @@ export const deleteSpeciality = async (id: number): Promise<void> => {
   }
 };
 
-// === Otros servicios relacionados ===
-
+// === Servicios relacionados con el contenido "Sobre Nosotros" ===
 export const getAboutUsContent = async (): Promise<AboutUsContent | null> => {
   const data = await handleResponse<AboutUsContent[]>('/AboutUsContentManager');
   return data.length > 0 ? data[0] : null;
 };
 
+// === Servicios relacionados a la ubicación ===
 export const fetchLocation = async (): Promise<Location> => {
   try {
     const response = await apiClient.get<Location[]>('/Location');
@@ -119,10 +108,12 @@ export const fetchLocation = async (): Promise<Location> => {
   }
 };
 
+// === Servicios relacionados con nuestros servicios ===
 export const fetchOurServices = (): Promise<OurService[]> => {
   return handleResponse<OurService[]>('/OurService');
 };
 
+// === Servicios relacionados con la misión ===
 export const fetchMission = async (): Promise<Mission> => {
   try {
     const response = await apiClient.get<Mission[]>('/Missions');
@@ -133,6 +124,7 @@ export const fetchMission = async (): Promise<Mission> => {
   }
 };
 
+// === Servicios relacionados con la visión ===
 export const fetchVision = async (): Promise<Vision> => {
   try {
     const response = await apiClient.get<Vision[]>('/Vision');
@@ -143,13 +135,12 @@ export const fetchVision = async (): Promise<Vision> => {
   }
 };
 
+// === Servicios relacionados con valores ===
 export const fetchValues = (): Promise<Value[]> => {
   return handleResponse<Value[]>('/Value');
 };
 
 // === Servicios relacionados a talleres (Workshops) ===
-
-// Obtener todos los talleres (GET)
 export const getAllWorkshops = async (): Promise<Workshop[]> => {
   try {
     const response = await apiClient.get<Workshop[]>('/Workshop'); // Asegúrate que el endpoint sea correcto
@@ -160,7 +151,6 @@ export const getAllWorkshops = async (): Promise<Workshop[]> => {
   }
 };
 
-// Obtener un taller por ID (GET)
 export const getWorkshopById = async (id: number): Promise<Workshop> => {
   try {
     const response = await apiClient.get<Workshop>(`/Workshop/${id}`);
@@ -171,7 +161,6 @@ export const getWorkshopById = async (id: number): Promise<Workshop> => {
   }
 };
 
-// Crear un nuevo taller (POST)
 export const createWorkshop = async (workshopData: Omit<Workshop, 'id'>): Promise<Workshop> => {
   try {
     const response = await apiClient.post<Workshop>('/Workshop', workshopData);
@@ -182,7 +171,6 @@ export const createWorkshop = async (workshopData: Omit<Workshop, 'id'>): Promis
   }
 };
 
-// Actualizar un taller por ID (PUT)
 export const updateWorkshop = async (id: number, workshopData: Omit<Workshop, 'id'>): Promise<Workshop> => {
   try {
     const response = await apiClient.put<Workshop>(`/Workshop/${id}`, workshopData);
@@ -193,7 +181,6 @@ export const updateWorkshop = async (id: number, workshopData: Omit<Workshop, 'i
   }
 };
 
-// Eliminar un taller por ID (DELETE)
 export const deleteWorkshop = async (id: number): Promise<void> => {
   try {
     await apiClient.delete(`/Workshop/${id}`);
@@ -204,7 +191,6 @@ export const deleteWorkshop = async (id: number): Promise<void> => {
 };
 
 // === Servicios relacionados con los métodos de entrega y nombres de certificación ===
-
 export const getDeliveryMethods = async (): Promise<{ id: number; name: string }[]> => {
   try {
     const response = await apiClient.get<{ id: number; name: string }[]>('/Enums/deliveryMethods');
@@ -225,6 +211,42 @@ export const getCertificationNames = async (): Promise<{ id: number; name: strin
   }
 };
 
+// === Servicios relacionados con solicitudes de certificación ===
+export const getRequests = async (): Promise<any[]> => {
+  try {
+    const response = await apiClient.get('/CertificationRequests');
+    return response.data;
+  } catch (error) {
+    throw new Error('Error al obtener las solicitudes');
+  }
+};
+
+export const rejectRequest = async (id: number): Promise<void> => {
+  try {
+    await apiClient.post(`/CertificationRequests/${id}/reject`);
+  } catch (error) {
+    throw new Error('Error al rechazar la solicitud');
+  }
+};
+
+export const approveRequest = async (id: number): Promise<void> => {
+  try {
+    await apiClient.post(`/CertificationRequests/${id}/approve`);
+  } catch (error) {
+    throw new Error('Error al aprobar la solicitud');
+  }
+};
+
+export const setDeliveryDeadline = async (id: number, deliveryDays: number): Promise<void> => {
+  try {
+    await apiClient.post(`/CertificationRequests/${id}/set-delivery-deadline`, null, {
+      params: { deliveryDays },
+    });
+  } catch (error) {
+    throw new Error('Error al establecer la fecha límite de entrega');
+  }
+};
+
 // Enviar solicitud de certificado
 export const submitCertificateRequest = async (requestData: {
   studentName: string;
@@ -241,7 +263,7 @@ export const submitCertificateRequest = async (requestData: {
   certificationName: string;
 }): Promise<void> => {
   try {
-    console.log('Submitting certificate request:', requestData); // Verifica los datos antes de la solicitud
+    console.log('Submitting certificate request:', requestData);
     await apiClient.post('/CertificationRequests', requestData);
   } catch (error) {
     console.error('Error submitting certificate request:', error);

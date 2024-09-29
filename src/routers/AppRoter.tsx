@@ -10,7 +10,7 @@ const Events = React.lazy(() => import('../components/Events'));
 const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
 const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
 const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
-const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
+const CertificacionesPage = React.lazy(() => import('../DashboardPages/CertificationRequestsTable'));
 const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
