@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
 
-// Lazy loading para las páginas
+// Lazy loading for pages
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
 const UsPage = React.lazy(() => import('../components/UsPage'));
@@ -11,6 +11,12 @@ const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
 const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
 const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
 const CertificacionesPage = React.lazy(() => import('../DashboardPages/CertificationRequestsTable'));
+const Register = React.lazy(() => import('../components/RegisterForm'));
+const VerificationForm = React.lazy(() => import('../components/VerificationForm'));
+const LoginForm = React.lazy(() => import('../components/LoginForm'));
+const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
+const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
+const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
 const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
@@ -19,15 +25,22 @@ const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/Specialitie
 const TalleresPage = React.lazy(() => import('../DashboardPages/WorkshopsPageD'));
 const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
 const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
+const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
+const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
+
 
 
 const AppRouter: React.FC = () => {
   return (
     <Router>
 
+
       <Suspense fallback={ <div className="flex justify-center items-center h-screen">
         <ClipLoader color="#3b82f6" size={100} /> {/* Spinner personalizado */}
       </div>}>
+
+      <Suspense fallback={<div>Cargando...</div>}>
+
         <Routes>
           {/* Rutas de la página principal */}
           <Route path="/" element={<HomePage />} />
@@ -36,13 +49,19 @@ const AppRouter: React.FC = () => {
           <Route path="/us" element={<UsPage />} />
           <Route path="/events" element={<Events />} />
           <Route path="/certificates" element={<CertificatesPage />} />
-
+          <Route path="/dashboard" element={<DashboardLayout />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerificationForm />} />
+          <Route path="/request-password-reset" element={<RequestPasswordReset />} />
+          <Route path="/reset-password" element={<ResetPasswordForm />} />
+          <Route path="/login" element={<LoginForm />} />
           {/* Rutas del Dashboard */}
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route path="certificaciones" element={<CertificacionesPage />} />
             {/* Rutas de Gestiones */}
             <Route path="salas" element={<SalasPage />} />
             <Route path="laboratorios" element={<LaboratoriosPage />} />
+            <Route path="roles" element={<RolesManagement />} />
             {/* Rutas de Creación */}
             <Route path="eventos" element={<EventosPage />} />
             <Route path="udps" element={<UDPsPage />} />
@@ -50,10 +69,10 @@ const AppRouter: React.FC = () => {
             <Route path="talleres" element={<TalleresPage />} />
             <Route path="elaborar-salas" element={<ElaborarSalasPage />} />
             <Route path="elaborar-laboratorios" element={<ElaborarLaboratoriosPage />} />
+           
           </Route>
         </Routes>
       </Suspense>
-
     </Router>
   );
 };
