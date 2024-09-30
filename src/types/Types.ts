@@ -64,3 +64,12 @@ export interface Event {
     description: string;
     url_Image: string;
   }
+
+  export interface Room {
+    id_Room: number;      // Este es el identificador de la sala
+    name: string;
+    description: string;
+    capacity: number;
+    url_Image?: string;   // URL opcional para la imagen de la sala
+    isConferenceRoom: boolean;
+  }
