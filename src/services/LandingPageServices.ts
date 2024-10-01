@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   AboutUsContent,  Event,  Location,  Mission,  OurService,  Speciality,  Value,  Vision,  Workshop,} from '../types/Types';
+  import { RoomRequest } from '../types/RoomRequestType'
 
 const API_URL = 'https://localhost:7055/api'; // Cambia la URL según tu API
 
@@ -246,6 +247,17 @@ export const setDeliveryDeadline = async (id: number, deliveryDays: number): Pro
     throw new Error('Error al establecer la fecha límite de entrega');
   }
 };
+
+
+export const createRoomRequest = async (roomRequest: Omit<RoomRequest, 'id_RoomRequest' | 'status'>): Promise<void> => {
+  try {
+    await axios.post(`${API_URL}/RoomRequests`, roomRequest);
+  } catch (error) {
+    console.error('Error creating room request:', error);
+    throw error;
+  }
+};
+
 
 // Enviar solicitud de certificado
 export const submitCertificateRequest = async (requestData: {

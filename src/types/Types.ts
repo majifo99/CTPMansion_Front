@@ -96,3 +96,14 @@ export interface Event {
   }
   
 
+export interface Room {
+  id: number;               // Unique identifier for the room
+  id_Room: number;          // Room ID for internal use or reference
+  name: string;             // Name of the room
+  description: string;      // Description of the room
+  capacity: number;         // Capacity of the room
+  url_Image: string;        // URL for the room image
+  isConferenceRoom: boolean; // Flag indicating if the room is a conference room
+  roomRequests: any;  // Flag indicating if the room is a conference room
+}
+

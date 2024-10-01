@@ -96,3 +96,4 @@ export const deleteLaboratory = async (id: number): Promise<void> => {
     throw error;
   }
 };
+
