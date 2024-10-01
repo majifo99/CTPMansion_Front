@@ -5,7 +5,7 @@ const Hero: React.FC = () => {
     <div className="relative w-full h-[90vh]">
       {/* Imagen de fondo */}
       <img
-        src="https://i.ibb.co/dKVCLB2/ctp-m.jpg"
+        src="https://i.ibb.co/RCSMNPg/ctp-m.jpg"
         alt="Colegio Técnico Profesional La Mansión"
         className="w-full h-full object-cover"
       />
@@ -14,7 +14,7 @@ const Hero: React.FC = () => {
       {/* Contenido del Hero */}
       <div className="absolute top-[30%] left-0 md:left-[10%] max-w-[600px] h-full flex flex-col text-white p-4">
         <h1 className="font-bold text-7xl text-white font-playfair">Colegio Técnico Profesional</h1>
-        <h2 className="text-6xl py-4 italic">La Mansión</h2>
+        <h2 className="text-6xl py-4 text-[#4EA5c2] ">La Mansión</h2>
       </div>
     </div>
   );
