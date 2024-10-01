@@ -2,8 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
 
-
-// Lazy loading for pages
+// Lazy loading para páginas
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
 const UsPage = React.lazy(() => import('../components/UsPage'));
@@ -18,8 +17,7 @@ const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
 const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
-const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
-const RoomsPage =React.lazy(()=> import('../DashboardPages/RoomsPage'));
+const RoomsPage = React.lazy(() => import('../DashboardPages/RoomsPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
@@ -28,9 +26,8 @@ const TalleresPage = React.lazy(() => import('../DashboardPages/WorkshopsPageD')
 const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
 const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
 const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
-const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage')); // Add this import
-const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/RoomRequest')); // Add this import
-
+const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage'));
+const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/RoomRequest'));
 
 const AppRouter: React.FC = () => {
   return (
@@ -41,7 +38,7 @@ const AppRouter: React.FC = () => {
         </div>
       }>
         <Routes>
-          {/* Main Page Routes */}
+          {/* Rutas de Páginas Principales */}
           <Route path="/" element={<HomePage />} />
           <Route path="/specialities" element={<SpecialitiesPage />} />
           <Route path="/workshops" element={<WorkshopsPage />} />
@@ -53,19 +50,12 @@ const AppRouter: React.FC = () => {
           <Route path="/request-password-reset" element={<RequestPasswordReset />} />
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/login" element={<LoginForm />} />
-          
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route path="certificaciones" element={<CertificacionesPage />} />
-            <Route path="salas" element={<SalasPage />} />
 
-          <Route path="/verify" element={<VerificationForm />} />
           {/* Rutas del Dashboard */}
           <Route path="/dashboard" element={<DashboardLayout />}>
+            {/* Rutas específicas dentro del dashboard */}
             <Route path="certificaciones" element={<CertificacionesPage />} />
-            {/* Rutas de Gestiones */}
             <Route path="salas" element={<RoomsPage />} />
-
             <Route path="laboratorios" element={<LaboratoriosPage />} />
             <Route path="roles" element={<RolesManagement />} />
             <Route path="eventos" element={<EventosPage />} />
@@ -74,7 +64,7 @@ const AppRouter: React.FC = () => {
             <Route path="talleres" element={<TalleresPage />} />
             <Route path="elaborar-salas" element={<ElaborarSalasPage />} />
             <Route path="elaborar-laboratorios" element={<ElaborarLaboratoriosPage />} />
-            {/* New Routes for Solicitudes */}
+            {/* Nuevas rutas para Solicitudes */}
             <Route path="solicitar-sala" element={<SolicitarSala />} />
             <Route path="solicitar-laboratorio" element={<SolicitarLaboratorio />} />
           </Route>
