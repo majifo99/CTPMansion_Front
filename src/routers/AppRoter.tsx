@@ -27,7 +27,7 @@ const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/Elabo
 const ElaborarLaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/ElaborarLaboratoriosPage'));
 const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
 
-const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
+
 
 
 
