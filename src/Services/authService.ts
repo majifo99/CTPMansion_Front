@@ -1,4 +1,4 @@
-// services/authService.ts
+
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 
