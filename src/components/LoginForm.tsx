@@ -1,46 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { useAuth } from '../hooks/useAuth'; 
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
-import { jwtDecode } from 'jwt-decode'; 
-import { useTheme } from './ThemeContext'; 
-
+import { useTheme } from './ThemeContext';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'; // Importamos íconos para mostrar/ocultar contraseña
 
 Modal.setAppElement('#root');
 
 const LoginForm: React.FC = () => {
+  const { handleLogin, errorMessage } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Estado para controlar mostrar/ocultar contraseña
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  
+  const navigate = useNavigate();
 
-  // Función para manejar el inicio de sesión
-  const handleLogin = async (e: React.FormEvent) => {
+  // Manejar el submit del formulario
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        'https://localhost:7055/api/User/login',
-        { email, password },
-        { headers: { 'Content-Type': 'application/json-patch+json' } }
-      );
-
-      if (response.status === 200) {
-        const { token } = response.data; // Suponemos que el token JWT viene en la respuesta
-        localStorage.setItem('token', token); // Guardar el token en el localStorage
-        const decodedUser = jwtDecode(token); // Decodificar el token
-        console.log("Usuario decodificado", decodedUser); // Puedes manejar la información del usuario aquí
-        navigate('/dashboard'); // Redirigir al usuario a la página principal
-      }
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        setErrorMessage('La información de usuario no corresponde a ningún usuario en nuestro sistema');
-      } else {
-        setErrorMessage('Ocurrió un error durante el inicio de sesión');
-      }
-      setIsModalOpen(true);
+    await handleLogin(email, password);
+    if (errorMessage) {
+      setIsModalOpen(true);  // Mostrar el modal si hay error
     }
+  };
+
+  // Alternar la visibilidad de la contraseña
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   // Cerrar el modal de error
@@ -65,12 +53,12 @@ const LoginForm: React.FC = () => {
             <span className="text-sm mr-2">{isDarkMode ? 'Modo Noche' : 'Modo Día'}</span>
             <label className="inline-flex relative items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" checked={isDarkMode} onChange={toggleDarkMode} />
-              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
             </label>
           </div>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block mb-2">Correo Electrónico</label>
             <input
@@ -84,17 +72,24 @@ const LoginForm: React.FC = () => {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label htmlFor="password" className="block mb-2">Contraseña</label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'} // Alternar entre texto y contraseña
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+              className={`w-full border rounded-md py-2 px-3 pr-10 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`} 
               placeholder="••••••••"
             />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-2 top-3/4 transform -translate-y-1/2 text-gray-500" // Ajuste para top-3/4
+            >
+              {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
+            </button>
           </div>
 
           <button
@@ -105,7 +100,6 @@ const LoginForm: React.FC = () => {
           </button>
         </form>
 
-        {/* Enlaces de registro y olvidé mi contraseña */}
         <div className="text-center mt-4">
           <button onClick={() => navigate('/register')} className="text-sm text-blue-500 hover:underline">
             ¿No tienes una cuenta? Regístrate

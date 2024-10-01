@@ -31,6 +31,7 @@ const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/Labo
 
 
 
+
 const AppRouter: React.FC = () => {
   return (
     <Router>
