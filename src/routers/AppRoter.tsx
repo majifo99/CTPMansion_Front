@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
 
+
 // Lazy loading for pages
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -17,6 +18,8 @@ const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
 const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
+const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
+const RoomsPage =React.lazy(()=> import('../DashboardPages/RoomsPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
@@ -27,6 +30,7 @@ const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/Labo
 const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
 const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage')); // Add this import
 const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/RoomRequest')); // Add this import
+
 
 const AppRouter: React.FC = () => {
   return (
@@ -54,6 +58,14 @@ const AppRouter: React.FC = () => {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route path="certificaciones" element={<CertificacionesPage />} />
             <Route path="salas" element={<SalasPage />} />
+
+          <Route path="/verify" element={<VerificationForm />} />
+          {/* Rutas del Dashboard */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route path="certificaciones" element={<CertificacionesPage />} />
+            {/* Rutas de Gestiones */}
+            <Route path="salas" element={<RoomsPage />} />
+
             <Route path="laboratorios" element={<LaboratoriosPage />} />
             <Route path="roles" element={<RolesManagement />} />
             <Route path="eventos" element={<EventosPage />} />

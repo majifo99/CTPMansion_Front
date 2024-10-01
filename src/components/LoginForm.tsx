@@ -1,45 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// components/LoginForm.tsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
-import { jwtDecode } from 'jwt-decode'; 
-import { useTheme } from './ThemeContext'; 
-
+import { useTheme } from './ThemeContext';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 Modal.setAppElement('#root');
 
 const LoginForm: React.FC = () => {
+  const { login } = useAuthContext(); // Usamos el contexto de autenticación
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const navigate = useNavigate();
 
-  // Función para manejar el inicio de sesión
-  const handleLogin = async (e: React.FormEvent) => {
+  // Manejar el submit del formulario
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        'https://localhost:7055/api/User/login',
-        { email, password },
-        { headers: { 'Content-Type': 'application/json-patch+json' } }
-      );
-
-      if (response.status === 200) {
-        const { token } = response.data; // Suponemos que el token JWT viene en la respuesta
-        localStorage.setItem('token', token); // Guardar el token en el localStorage
-        const decodedUser = jwtDecode(token); // Decodificar el token
-        console.log("Usuario decodificado", decodedUser); // Puedes manejar la información del usuario aquí
-        navigate('/dashboard'); // Redirigir al usuario a la página principal
-      }
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        setErrorMessage('La información de usuario no corresponde a ningún usuario en nuestro sistema');
-      } else {
-        setErrorMessage('Ocurrió un error durante el inicio de sesión');
-      }
+    const loginSuccess = await login(email, password);
+    if (!loginSuccess) {
+      setErrorMessage('Credenciales inválidas. Por favor, intenta de nuevo.');
       setIsModalOpen(true);
+    } else {
+      navigate('/dashboard'); // Redirigir al usuario en caso de éxito
     }
   };
 
@@ -65,12 +51,12 @@ const LoginForm: React.FC = () => {
             <span className="text-sm mr-2">{isDarkMode ? 'Modo Noche' : 'Modo Día'}</span>
             <label className="inline-flex relative items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" checked={isDarkMode} onChange={toggleDarkMode} />
-              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
             </label>
           </div>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block mb-2">Correo Electrónico</label>
             <input
@@ -84,10 +70,10 @@ const LoginForm: React.FC = () => {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label htmlFor="password" className="block mb-2">Contraseña</label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -95,6 +81,19 @@ const LoginForm: React.FC = () => {
               className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
               placeholder="••••••••"
             />
+            <button
+              type="button"
+              className="absolute top-3/4 right-3 transform -translate-y-1/2 focus:outline-none"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              <svg className="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                {showPassword ? (
+                  <path d="M10 2C5.445 2 1.734 4.943.172 9.278c-.115.323-.115.678 0 1.001C1.734 15.057 5.445 18 10 18s8.266-2.943 9.828-7.278a1.007 1.007 0 000-1.001C18.266 4.943 14.555 2 10 2zm0 12c-2.411 0-4.373-1.94-4.373-4.333S7.589 5.333 10 5.333c2.411 0 4.373 1.94 4.373 4.334S12.411 14 10 14zm0-7.333a3.02 3.02 0 00-3 3.333 3.02 3.02 0 003 3.333 3.02 3.02 0 003-3.333 3.02 3.02 0 00-3-3.333z" />
+                ) : (
+                  <path d="M.172 9.278a.905.905 0 010-1.001C1.734 4.943 5.445 2 10 2s8.266 2.943 9.828 7.278a.905.905 0 010 1.001C18.266 15.057 14.555 18 10 18s-8.266-2.943-9.828-7.278zM10 15c2.411 0 4.373-1.94 4.373-4.333S12.411 6.333 10 6.333 5.627 8.274 5.627 10.667 7.589 15 10 15zm0-9c-2.411 0-4.373 1.94-4.373 4.333S7.589 14.667 10 14.667 14.373 12.726 14.373 10.333 12.411 6 10 6z" />
+                )}
+              </svg>
+            </button>
           </div>
 
           <button
@@ -105,7 +104,6 @@ const LoginForm: React.FC = () => {
           </button>
         </form>
 
-        {/* Enlaces de registro y olvidé mi contraseña */}
         <div className="text-center mt-4">
           <button onClick={() => navigate('/register')} className="text-sm text-blue-500 hover:underline">
             ¿No tienes una cuenta? Regístrate
