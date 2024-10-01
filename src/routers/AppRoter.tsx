@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
 
+
 // Lazy loading for pages
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -17,7 +18,7 @@ const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
 const CertificacionesPage = React.lazy(() => import('../pages/DashboardPages/CertificacionesPage'));
-const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
+const RoomsPage =React.lazy(()=> import('../DashboardPages/RoomsPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
@@ -55,11 +56,12 @@ const AppRouter: React.FC = () => {
           <Route path="/request-password-reset" element={<RequestPasswordReset />} />
           <Route path="/reset-password" element={<ResetPasswordForm />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/verify" element={<VerificationForm />} />
           {/* Rutas del Dashboard */}
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route path="certificaciones" element={<CertificacionesPage />} />
             {/* Rutas de Gestiones */}
-            <Route path="salas" element={<SalasPage />} />
+            <Route path="salas" element={<RoomsPage />} />
             <Route path="laboratorios" element={<LaboratoriosPage />} />
             <Route path="roles" element={<RolesManagement />} />
             {/* Rutas de Creación */}

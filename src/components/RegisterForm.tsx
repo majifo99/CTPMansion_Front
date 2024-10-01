@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import { useTheme } from "./ThemeContext";
 
-
 Modal.setAppElement('#root');
 
 interface RegisterFormData {
@@ -21,11 +20,13 @@ const RegisterForm: React.FC = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormData>();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para el botón
   const { isDarkMode, toggleDarkMode } = useTheme(); // Access theme state and toggle
 
   const password = watch("password");
 
   const onSubmit = async (data: RegisterFormData) => {
+    setIsSubmitting(true); // Cambia el estado del botón a "Procesando..."
     try {
       const response = await fetch('https://localhost:7055/api/User/register', {
         method: 'POST',
@@ -33,23 +34,29 @@ const RegisterForm: React.FC = () => {
         body: JSON.stringify(data),
       });
 
+      if (!response.ok) {
+        throw new Error('Error en la solicitud');
+      }
+
       const result = await response.json();
       const userId = result.id_User;
 
       if (userId) {
         sessionStorage.setItem('userId', userId);
-        setIsModalOpen(true);
-        navigate('/verify-email');
+        setIsModalOpen(true); // Abre el modal
       } else {
         console.error('No userId found in the response.');
       }
     } catch (error) {
       console.error('Error in registration:', error);
+    } finally {
+      setIsSubmitting(false); // Termina el estado de "Procesando..."
     }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    navigate('/verify-email'); // Redirige a la página de verificación
   };
 
   const handleLoginRedirect = () => {
@@ -187,9 +194,10 @@ const RegisterForm: React.FC = () => {
 
           <button
             type="submit"
-            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+            disabled={isSubmitting}
+            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-teal-500 text-white' : 'bg-blue-500 text-white'} ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-600'}`}
           >
-            Registrarse
+            {isSubmitting ? 'Procesando...' : 'Registrarse'}
           </button>
         </form>
 
@@ -202,7 +210,7 @@ const RegisterForm: React.FC = () => {
         >
           <div className={`p-6 rounded-lg shadow-lg z-[9999] ${isDarkMode ? 'bg-[#13152A] text-gray-300' : 'bg-white text-gray-800'}`}>
             <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-teal-400' : 'text-blue-600'}`}>Registro Exitoso</h2>
-            <p className="mt-2">Tu registro ha sido exitoso. Serás redirigido a la página de validación de correo electrónico.</p>
+            <p className="mt-2">Tu registro ha sido exitoso. Por favor verifica tu correo para activar tu cuenta.</p>
             <button
               onClick={closeModal}
               className={`mt-4 px-4 py-2 rounded-lg ${isDarkMode ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}

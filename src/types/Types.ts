@@ -24,7 +24,7 @@ export interface Event {
   export interface OurService {
     id: number;
     title: string;
-    icon: string; // Representaremos el icono como un string y luego lo mapearemos a un componente React.
+    icon: string; 
   }
 
 
@@ -65,7 +65,18 @@ export interface Event {
     description: string;
     url_Image: string;
   }
-  
+
+
+  export interface Room {
+    id_Room: number;      // Este es el identificador de la sala
+    name: string;
+    description: string;
+    capacity: number;
+    url_Image?: string;   // URL opcional para la imagen de la sala
+    isConferenceRoom: boolean;
+  }
+
+
   export interface CertificationRequest {
     id: number;
     status: number;
@@ -84,3 +95,4 @@ export interface Event {
     certificationName: string;
   }
   
+
