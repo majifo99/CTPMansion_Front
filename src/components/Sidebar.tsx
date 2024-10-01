@@ -9,25 +9,39 @@ import { FaCog } from 'react-icons/fa';
 import { FiUsers } from 'react-icons/fi';
 
 const Sidebar: React.FC = () => {
-  // Estados para manejar los dropdowns
+  // States for handling dropdowns
   const [isGestionesOpen, setIsGestionesOpen] = useState(false);
   const [isCreacionElaboracionOpen, setIsCreacionElaboracionOpen] = useState(false);
+  const [isSolicitudesOpen, setIsSolicitudesOpen] = useState(false);
 
   return (
-    <div className="w-64 bg-gray-800 text-white h-screen p-4 flex flex-col overflow-y-auto">
+    <div className="w-64 bg-gray-900 text-white h-screen p-4 flex flex-col overflow-y-auto">
       <h2 className="text-xl font-bold mb-6">CTP La Mansión</h2>
 
       <nav>
-        {/* Sección de Certificaciones */}
+        {/* Section for Requests */}
         <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Certificaciones</h3>
-          <Link to="/dashboard/certificaciones" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
-            <FaCertificate className="mr-2" />
-            Certificaciones
-          </Link>
+          <h3
+            className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer"
+            onClick={() => setIsSolicitudesOpen(!isSolicitudesOpen)}
+          >
+            Solicitudes {isSolicitudesOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </h3>
+          {isSolicitudesOpen && (
+            <div className="pl-4">
+              <Link to="/dashboard/solicitar-sala" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <MdRoom className="mr-2" />
+                Solicitar Sala
+              </Link>
+              <Link to="/dashboard/solicitar-laboratorio" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <MdScience className="mr-2" />
+                Solicitar Laboratorio
+              </Link>
+            </div>
+          )}
         </div>
 
-        {/* Sección de Gestiones con dropdown */}
+        {/* Section for Management with dropdown */}
         <div className="mb-4">
           <h3
             className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer"
@@ -38,8 +52,8 @@ const Sidebar: React.FC = () => {
           {isGestionesOpen && (
             <div className="pl-4">
               <Link to="/dashboard/roles" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
-              <FiUsers className="mr-2" />
-              Gestion de Usuarios
+                <FiUsers className="mr-2" />
+                Gestión de Usuarios
               </Link>
               <Link to="/dashboard/salas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <MdRoom className="mr-2" />
@@ -49,11 +63,15 @@ const Sidebar: React.FC = () => {
                 <MdScience className="mr-2" />
                 Laboratorios
               </Link>
+              <Link to="/dashboard/certificaciones" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaCertificate className="mr-2" />
+                Certificaciones
+              </Link>
             </div>
           )}
         </div>
 
-        {/* Sección combinada de Creación y Elaboración */}
+        {/* Combined Creation and Elaboration section */}
         <div className="mb-4">
           <h3
             className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer"
