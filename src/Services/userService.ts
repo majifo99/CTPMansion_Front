@@ -1,10 +1,11 @@
+
 import axios from 'axios';
 
 // URL base para tu API
 const BASE_URL = 'https://localhost:7055/api';
 
 // Obtener la lista de usuarios
-export const getUsers = async (token: string) => {
+export const getUsers = async (token) => {
   try {
     const response = await axios.get(`${BASE_URL}/User`, {
       headers: {
@@ -19,7 +20,7 @@ export const getUsers = async (token: string) => {
 };
 
 // Obtener roles de un usuario
-export const getUserRoles = async (userId: number, token: string) => {
+export const getUserRoles = async (userId, token) => {
   try {
     const response = await axios.get(`${BASE_URL}/UserRole/${userId}/roles`, {
       headers: {
@@ -34,7 +35,7 @@ export const getUserRoles = async (userId: number, token: string) => {
 };
 
 // Agregar rol a un usuario
-export const addUserRole = async (userId: number, roleId: number, token: string) => {
+export const addUserRole = async (userId, roleId, token) => {
   try {
     await axios.post(`${BASE_URL}/UserRole/add`, null, {
       headers: {
@@ -52,7 +53,7 @@ export const addUserRole = async (userId: number, roleId: number, token: string)
 };
 
 // Quitar rol a un usuario
-export const removeUserRole = async (userId: number, roleId: number, token: string) => {
+export const removeUserRole = async (userId, roleId, token) => {
   try {
     await axios.post(`${BASE_URL}/UserRole/remove`, null, {
       headers: {
@@ -65,6 +66,37 @@ export const removeUserRole = async (userId: number, roleId: number, token: stri
     });
   } catch (error) {
     console.error(`Error al quitar rol ${roleId} del usuario ${userId}:`, error);
+    throw error;
+  }
+};
+
+// Obtener datos del usuario por ID
+export const getUserById = async (userId: number, token: string) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/User/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error al obtener los datos del usuario ${userId}:`, error);
+    throw error;
+  }
+};
+
+// Actualizar el perfil del usuario
+export const updateUser = async (userId: number, updatedData: any, token: string) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/User/${userId}`, updatedData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error al actualizar los datos del usuario ${userId}:`, error);
     throw error;
   }
 };

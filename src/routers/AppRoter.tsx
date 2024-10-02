@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
 import ProtectedRoute from './ProtectedRoute';  // Componente de rutas protegidas
 import { AuthProvider } from '../contexts/AuthContext';
+import UserProfile from '../DashboardPages/UserProfile';
 
 // Lazy loading para páginas
 const HomePage = React.lazy(() => import('../pages/HomePage'));
@@ -64,6 +65,11 @@ const AppRouter: React.FC = () => {
                 <DashboardLayout />
               </ProtectedRoute>
             }>
+              <Route path="perfil" element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              } />
               {/* Rutas específicas dentro del dashboard con roles */}
               <Route path="certificaciones" element={
                 <ProtectedRoute requiredRoles={['Admin', 'CertificationManager']}>
