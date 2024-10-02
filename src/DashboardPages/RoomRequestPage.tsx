@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRooms } from '../hooks/useRoom';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,12 +6,34 @@ import 'react-toastify/dist/ReactToastify.css'; // Importar CSS para las notific
 import { useRoomRequest } from '../hooks/useRoomRequest';
 import { RoomRequest } from '../types/RoomRequestType'; // Importar tipo RoomRequest
 import { Room } from '../types/Types'; // Importar tipo Room
+import {jwtDecode} from 'jwt-decode';  // Necesario para decodificar el token
+
+interface DecodedToken {
+  nameid: string; // Este es el campo donde se almacena el userId en el token
+}
+
+// Función para obtener el userId del token
+const getUserIdFromToken = (): string | null => {
+  const token = localStorage.getItem('token');  // Asumiendo que el token está almacenado en el localStorage
+  if (token) {
+    const decodedToken = jwtDecode<DecodedToken>(token);
+    return decodedToken.nameid;
+  }
+  return null;
+};
 
 const RoomRequestCard: React.FC = () => {
   const { rooms, loading, error } = useRooms();
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Omit<RoomRequest, 'id_RoomRequest' | 'status'>>();
   const { isSubmitting, error: submitError, submitRoomRequest } = useRoomRequest();
+  const [userId, setUserId] = useState<string | null>(null);  // Estado para almacenar el userId
+
+  // Obtener el userId cuando el componente se monta
+  useEffect(() => {
+    const userIdFromToken = getUserIdFromToken();
+    setUserId(userIdFromToken);
+  }, []);
 
   // Notificaciones de éxito o error
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
@@ -19,14 +41,17 @@ const RoomRequestCard: React.FC = () => {
 
   // Envío del formulario
   const onSubmit = (data: Omit<RoomRequest, 'id_RoomRequest' | 'status'>) => {
-    if (selectedRoom) {
-      submitRoomRequest({ ...data, roomId: selectedRoom.id_Room }).then(() => {
+    if (selectedRoom && userId) {
+      // Agregar id_RoomRequest (siempre 0 para una nueva solicitud) y userId al payload
+      submitRoomRequest({ ...data, roomId: selectedRoom.id_Room, id_RoomRequest: 0, userId }).then(() => {
         reset();  // Resetear el formulario tras envío exitoso
         notifySuccess();  // Mostrar notificación de éxito
         setSelectedRoom(null);  // Resetear la sala seleccionada
       }).catch(() => {
         notifyError('Error al enviar la solicitud.');  // Mostrar notificación de error
       });
+    } else {
+      notifyError('No se pudo obtener el usuario o la sala seleccionada.');
     }
   };
 

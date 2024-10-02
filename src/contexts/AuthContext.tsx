@@ -1,11 +1,16 @@
-
 import React, { createContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode'; // Asegúrate de tener este paquete instalado
+import { jwtDecode } from "jwt-decode"; // Asegúrate de que jwtDecode esté importado correctamente
 import { login as authLogin, logout as authLogout } from '../Services/authService';
+
+interface UserType {
+  name: string;
+  email: string;
+  roles: string[];  // Los roles del usuario decodificados
+}
 
 interface AuthContextType {
   token: string | null;
-  user: any; // Puedes tipar mejor dependiendo de la estructura del token decodificado
+  user: UserType | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -14,14 +19,19 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null); // El usuario decodificado del JWT
+  const [user, setUser] = useState<UserType | null>(null);
 
   // Cargar token desde localStorage al iniciar la aplicación
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
-      const decodedUser = jwtDecode(storedToken);
+      const decodedToken: any = jwtDecode(storedToken);
+      const decodedUser: UserType = {
+        name: decodedToken.Name,
+        email: decodedToken.Email,
+        roles: decodedToken.role,  // Extraer los roles desde el campo "role"
+      };
       setUser(decodedUser);
     }
   }, []);
@@ -33,12 +43,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (loggedInUser) {
         const tokenFromStorage = localStorage.getItem('token');
         setToken(tokenFromStorage);
-        setUser(loggedInUser);
+        setUser(loggedInUser); // Almacena el usuario con roles
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('Error durante el login:', error);
       return false;
     }
   };
