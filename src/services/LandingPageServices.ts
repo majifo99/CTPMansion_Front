@@ -1,9 +1,8 @@
 import axios from 'axios';
-import {
-  AboutUsContent,  Event,  Location,  Mission,  OurService,  Speciality,  Value,  Vision,  Workshop,} from '../types/Types';
-  import { RoomRequest } from '../types/RoomRequestType'
+import { RoomRequest } from '../types/RoomRequestType';
 
-const API_URL = 'https://localhost:7055/api'; // Cambia la URL según tu API
+// URL base de la API
+const API_URL = 'https://localhost:7055/api';
 
 // Crear una instancia de axios con la URL base y encabezados predeterminados
 const apiClient = axios.create({
@@ -13,10 +12,22 @@ const apiClient = axios.create({
   },
 });
 
+// Interceptor para agregar el token JWT a cada solicitud
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Manejo de respuestas
-const handleResponse = async <T>(url: string): Promise<T> => {
+const handleResponse = async (url) => {
   try {
-    const response = await apiClient.get<T>(url);
+    const response = await apiClient.get(url);
     return response.data;
   } catch (error) {
     console.error(`Error fetching data from ${url}:`, error);
@@ -24,14 +35,28 @@ const handleResponse = async <T>(url: string): Promise<T> => {
   }
 };
 
-// === Servicios relacionados a eventos ===
-export const getEvents = (): Promise<Event[]> => {
-  return handleResponse<Event[]>('/Events');
+// === Funciones de autenticación ===
+export const login = async (email, password) => {
+  try {
+    const response = await apiClient.post('/User/login', { email, password });
+    const { token } = response.data;
+    localStorage.setItem('token', token);
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
 };
 
-export const addEvent = async (newEvent: Omit<Event, 'id'>): Promise<Event> => {
+export const logout = () => {
+  localStorage.removeItem('token');
+};
+
+// === Servicios relacionados a eventos ===
+export const getEvents = () => handleResponse('/Events');
+
+export const addEvent = async (newEvent) => {
   try {
-    const response = await apiClient.post<Event>('/Events', newEvent);
+    const response = await apiClient.post('/Events', newEvent);
     return response.data;
   } catch (error) {
     console.error('Error adding event:', error);
@@ -39,9 +64,9 @@ export const addEvent = async (newEvent: Omit<Event, 'id'>): Promise<Event> => {
   }
 };
 
-export const editEvent = async (eventId: number, updatedEvent: Event): Promise<Event> => {
+export const editEvent = async (eventId, updatedEvent) => {
   try {
-    const response = await apiClient.put<Event>(`/Events/${eventId}`, updatedEvent);
+    const response = await apiClient.put(`/Events/${eventId}`, updatedEvent);
     return response.data;
   } catch (error) {
     console.error('Error editing event:', error);
@@ -49,7 +74,7 @@ export const editEvent = async (eventId: number, updatedEvent: Event): Promise<E
   }
 };
 
-export const deleteEvent = async (eventId: number): Promise<void> => {
+export const deleteEvent = async (eventId) => {
   try {
     await apiClient.delete(`/Events/${eventId}`);
   } catch (error) {
@@ -59,13 +84,11 @@ export const deleteEvent = async (eventId: number): Promise<void> => {
 };
 
 // === Servicios relacionados a especialidades ===
-export const fetchSpecialities = (): Promise<Speciality[]> => {
-  return handleResponse<Speciality[]>('/Especiality');
-};
+export const fetchSpecialities = () => handleResponse('/Especiality');
 
-export const addSpeciality = async (speciality: Omit<Speciality, 'id'>): Promise<Speciality> => {
+export const addSpeciality = async (speciality) => {
   try {
-    const response = await apiClient.post<Speciality>('/Especiality', speciality);
+    const response = await apiClient.post('/Especiality', speciality);
     return response.data;
   } catch (error) {
     console.error('Error adding speciality:', error);
@@ -73,9 +96,9 @@ export const addSpeciality = async (speciality: Omit<Speciality, 'id'>): Promise
   }
 };
 
-export const editSpeciality = async (id: number, speciality: Omit<Speciality, 'id'>): Promise<Speciality> => {
+export const editSpeciality = async (id, speciality) => {
   try {
-    const response = await apiClient.put<Speciality>(`/Especiality/${id}`, speciality);
+    const response = await apiClient.put(`/Especiality/${id}`, speciality);
     return response.data;
   } catch (error) {
     console.error('Error editing speciality:', error);
@@ -83,7 +106,7 @@ export const editSpeciality = async (id: number, speciality: Omit<Speciality, 'i
   }
 };
 
-export const deleteSpeciality = async (id: number): Promise<void> => {
+export const deleteSpeciality = async (id) => {
   try {
     await apiClient.delete(`/Especiality/${id}`);
   } catch (error) {
@@ -93,15 +116,15 @@ export const deleteSpeciality = async (id: number): Promise<void> => {
 };
 
 // === Servicios relacionados con el contenido "Sobre Nosotros" ===
-export const getAboutUsContent = async (): Promise<AboutUsContent | null> => {
-  const data = await handleResponse<AboutUsContent[]>('/AboutUsContentManager');
+export const getAboutUsContent = async () => {
+  const data = await handleResponse('/AboutUsContentManager');
   return data.length > 0 ? data[0] : null;
 };
 
 // === Servicios relacionados a la ubicación ===
-export const fetchLocation = async (): Promise<Location> => {
+export const fetchLocation = async () => {
   try {
-    const response = await apiClient.get<Location[]>('/Location');
+    const response = await apiClient.get('/Location');
     return response.data[0]; // Asume que la respuesta es un array y toma el primer elemento
   } catch (error) {
     console.error('Error fetching location data:', error);
@@ -110,14 +133,12 @@ export const fetchLocation = async (): Promise<Location> => {
 };
 
 // === Servicios relacionados con nuestros servicios ===
-export const fetchOurServices = (): Promise<OurService[]> => {
-  return handleResponse<OurService[]>('/OurService');
-};
+export const fetchOurServices = () => handleResponse('/OurService');
 
 // === Servicios relacionados con la misión ===
-export const fetchMission = async (): Promise<Mission> => {
+export const fetchMission = async () => {
   try {
-    const response = await apiClient.get<Mission[]>('/Missions');
+    const response = await apiClient.get('/Missions');
     return response.data[0];
   } catch (error) {
     console.error('Error fetching mission data:', error);
@@ -126,9 +147,9 @@ export const fetchMission = async (): Promise<Mission> => {
 };
 
 // === Servicios relacionados con la visión ===
-export const fetchVision = async (): Promise<Vision> => {
+export const fetchVision = async () => {
   try {
-    const response = await apiClient.get<Vision[]>('/Vision');
+    const response = await apiClient.get('/Vision');
     return response.data[0];
   } catch (error) {
     console.error('Error fetching vision data:', error);
@@ -137,14 +158,12 @@ export const fetchVision = async (): Promise<Vision> => {
 };
 
 // === Servicios relacionados con valores ===
-export const fetchValues = (): Promise<Value[]> => {
-  return handleResponse<Value[]>('/Value');
-};
+export const fetchValues = () => handleResponse('/Value');
 
 // === Servicios relacionados a talleres (Workshops) ===
-export const getAllWorkshops = async (): Promise<Workshop[]> => {
+export const getAllWorkshops = async () => {
   try {
-    const response = await apiClient.get<Workshop[]>('/Workshop'); // Asegúrate que el endpoint sea correcto
+    const response = await apiClient.get('/Workshop');
     return response.data;
   } catch (error) {
     console.error('Error al obtener los talleres:', error);
@@ -152,9 +171,9 @@ export const getAllWorkshops = async (): Promise<Workshop[]> => {
   }
 };
 
-export const getWorkshopById = async (id: number): Promise<Workshop> => {
+export const getWorkshopById = async (id) => {
   try {
-    const response = await apiClient.get<Workshop>(`/Workshop/${id}`);
+    const response = await apiClient.get(`/Workshop/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error al obtener el taller:', error);
@@ -162,9 +181,9 @@ export const getWorkshopById = async (id: number): Promise<Workshop> => {
   }
 };
 
-export const createWorkshop = async (workshopData: Omit<Workshop, 'id'>): Promise<Workshop> => {
+export const createWorkshop = async (workshopData) => {
   try {
-    const response = await apiClient.post<Workshop>('/Workshop', workshopData);
+    const response = await apiClient.post('/Workshop', workshopData);
     return response.data;
   } catch (error) {
     console.error('Error al crear el taller:', error);
@@ -172,9 +191,9 @@ export const createWorkshop = async (workshopData: Omit<Workshop, 'id'>): Promis
   }
 };
 
-export const updateWorkshop = async (id: number, workshopData: Omit<Workshop, 'id'>): Promise<Workshop> => {
+export const updateWorkshop = async (id, workshopData) => {
   try {
-    const response = await apiClient.put<Workshop>(`/Workshop/${id}`, workshopData);
+    const response = await apiClient.put(`/Workshop/${id}`, workshopData);
     return response.data;
   } catch (error) {
     console.error('Error al actualizar el taller:', error);
@@ -182,7 +201,7 @@ export const updateWorkshop = async (id: number, workshopData: Omit<Workshop, 'i
   }
 };
 
-export const deleteWorkshop = async (id: number): Promise<void> => {
+export const deleteWorkshop = async (id) => {
   try {
     await apiClient.delete(`/Workshop/${id}`);
   } catch (error) {
@@ -192,9 +211,9 @@ export const deleteWorkshop = async (id: number): Promise<void> => {
 };
 
 // === Servicios relacionados con los métodos de entrega y nombres de certificación ===
-export const getDeliveryMethods = async (): Promise<{ id: number; name: string }[]> => {
+export const getDeliveryMethods = async () => {
   try {
-    const response = await apiClient.get<{ id: number; name: string }[]>('/Enums/deliveryMethods');
+    const response = await apiClient.get('/Enums/deliveryMethods');
     return response.data;
   } catch (error) {
     console.error('Error fetching delivery methods:', error);
@@ -202,9 +221,9 @@ export const getDeliveryMethods = async (): Promise<{ id: number; name: string }
   }
 };
 
-export const getCertificationNames = async (): Promise<{ id: number; name: string }[]> => {
+export const getCertificationNames = async () => {
   try {
-    const response = await apiClient.get<{ id: number; name: string }[]>('/CertificationName');
+    const response = await apiClient.get('/CertificationName');
     return response.data;
   } catch (error) {
     console.error('Error fetching certification names:', error);
@@ -213,7 +232,7 @@ export const getCertificationNames = async (): Promise<{ id: number; name: strin
 };
 
 // === Servicios relacionados con solicitudes de certificación ===
-export const getRequests = async (): Promise<any[]> => {
+export const getRequests = async () => {
   try {
     const response = await apiClient.get('/CertificationRequests');
     return response.data;
@@ -222,7 +241,7 @@ export const getRequests = async (): Promise<any[]> => {
   }
 };
 
-export const rejectRequest = async (id: number): Promise<void> => {
+export const rejectRequest = async (id) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/reject`);
   } catch (error) {
@@ -230,7 +249,7 @@ export const rejectRequest = async (id: number): Promise<void> => {
   }
 };
 
-export const approveRequest = async (id: number): Promise<void> => {
+export const approveRequest = async (id) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/approve`);
   } catch (error) {
@@ -238,7 +257,7 @@ export const approveRequest = async (id: number): Promise<void> => {
   }
 };
 
-export const setDeliveryDeadline = async (id: number, deliveryDays: number): Promise<void> => {
+export const setDeliveryDeadline = async (id, deliveryDays) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/set-delivery-deadline`, null, {
       params: { deliveryDays },
@@ -248,37 +267,12 @@ export const setDeliveryDeadline = async (id: number, deliveryDays: number): Pro
   }
 };
 
-
-export const createRoomRequest = async (roomRequest: Omit<RoomRequest, 'id_RoomRequest' | 'status'>): Promise<void> => {
+// === Servicios relacionados con solicitudes de sala (Room Requests) ===
+export const createRoomRequest = async (roomRequest) => {
   try {
-    await axios.post(`${API_URL}/RoomRequests`, roomRequest);
+    await apiClient.post(`/RoomRequest`, roomRequest);
   } catch (error) {
     console.error('Error creating room request:', error);
-    throw error;
-  }
-};
-
-
-// Enviar solicitud de certificado
-export const submitCertificateRequest = async (requestData: {
-  studentName: string;
-  studentLastName1: string;
-  studentLastName2: string;
-  studentIdentification: string;
-  guardianName: string;
-  guardianLastName1: string;
-  guardianLastName2: string;
-  guardianIdentification: string;
-  email: string;
-  phoneNumber: string;
-  deliveryMethod: number | string;
-  certificationName: string;
-}): Promise<void> => {
-  try {
-    console.log('Submitting certificate request:', requestData);
-    await apiClient.post('/CertificationRequests', requestData);
-  } catch (error) {
-    console.error('Error submitting certificate request:', error);
     throw error;
   }
 };

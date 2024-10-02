@@ -3,35 +3,51 @@ import { Room } from '../types/Types'; // Definimos un tipo de 'Room' en Types p
 
 const API_URL = 'https://localhost:7055/api/Room';
 
+// Crear una instancia de Axios con configuración predeterminada
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor para agregar el token JWT a cada solicitud
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token'); // Obtener el token desde localStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`; // Agregar el token a la cabecera de autorización
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Obtener todas las salas
 export const fetchRooms = async (): Promise<Room[]> => {
-  const response = await axios.get(API_URL);
+  const response = await apiClient.get('/');
   return response.data;
 };
 
 // Obtener una sala por ID
 export const fetchRoomById = async (id: number): Promise<Room> => {
-  const response = await axios.get(`${API_URL}/${id}`);
+  const response = await apiClient.get(`/${id}`);
   return response.data;
 };
 
 // Crear una nueva sala
 export const addRoom = async (room: Room): Promise<Room> => {
-  const response = await axios.post(API_URL, room, {
-    headers: { 'Content-Type': 'application/json-patch+json' },
-  });
+  const response = await apiClient.post('/', room);
   return response.data;
 };
 
 // Editar una sala por ID
 export const editRoom = async (id: number, room: Room): Promise<Room> => {
-  const response = await axios.put(`${API_URL}/${id}`, room, {
-    headers: { 'Content-Type': 'application/json-patch+json' },
-  });
+  const response = await apiClient.put(`/${id}`, room);
   return response.data;
 };
 
 // Eliminar una sala por ID
 export const deleteRoom = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/${id}`);
+  await apiClient.delete(`/${id}`);
 };
