@@ -1,6 +1,6 @@
 import React from 'react';
 import LaboratoryForm from '../DashboardPages/LaboratoryForm'; // Importa el formulario
-import { Laboratory } from '../types/LaboratoryType';
+import { Laboratory } from '../types/LaboratoryRequestType';
 
 
 interface EditLaboratoryModalProps {

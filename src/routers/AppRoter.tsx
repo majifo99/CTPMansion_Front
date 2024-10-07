@@ -26,11 +26,10 @@ const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
 const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
 const TalleresPage = React.lazy(() => import('../DashboardPages/WorkshopsPageD'));
-const ElaborarSalasPage = React.lazy(() => import('../pages/DashboardPages/ElaborarSalasPage'));
 const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
 const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
 const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage'));
-const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/RoomRequest'));
+const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/LabRequestPage'));
 const Unauthorized = React.lazy(() => import('../pages/UnauthorizedPage')); // Página de no autorizado
 
 const AppRouter: React.FC = () => {
@@ -78,7 +77,7 @@ const AppRouter: React.FC = () => {
               } />
               <Route path="salas" element={
                 <ProtectedRoute requiredRoles={['Admin', 'RoomManager', 'ConferenceRoomManager']}>
-                  <RoomsPage />
+                  <SalasPage />
                 </ProtectedRoute>
               } />
               <Route path="laboratorios" element={
@@ -113,7 +112,7 @@ const AppRouter: React.FC = () => {
               } />
               <Route path="elaborar-salas" element={
                 <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                  <ElaborarSalasPage />
+                  <RoomsPage />
                 </ProtectedRoute>
               } />
               <Route path="elaborar-laboratorios" element={

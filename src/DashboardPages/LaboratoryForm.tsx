@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Laboratory } from '../types/LaboratoryType';
+import { Laboratory } from '../types/LaboratoryRequestType';
 
 
 interface LaboratoryFormProps {

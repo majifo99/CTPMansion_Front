@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Laboratory } from '../types/LaboratoryType';
+
 import { addLaboratory, deleteLaboratory, getLaboratories, updateLaboratory } from '../Services/LaboratoryService';
+import { Laboratory } from '../types/Types';
 
 
 export const useLaboratories = () => {
