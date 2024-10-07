@@ -1,23 +1,23 @@
 export enum RequestStatus {
-    Pending = "Pending",
-    Approved = "Approved",
-    Rejected = "Rejected"
-  }
-
+  Pending = 0,
+  Approved = 1,
+  Rejected = 2,
+}
 
 export interface RoomRequest {
-  id_RoomRequest: number;    // Unique identifier for the room request
-  managerName: string;       // Name of the person requesting the room
-  managerLastName: string;   // First last name of the manager
-  managerLastName2: string;  // Second last name of the manager
-  course: string;            // Course associated with the request
-  activityDescription: string; // Description of the activity
-  needs: string;             // Specific needs for the room
-  numberOfAttendees: number; // Number of attendees for the event
-  startDate: string;         // Start date of the request
-  endDate: string;           // End date of the request
-  startTime: string;         // Start time of the event
-  endTime: string;           // End time of the event
-  roomId: number;            // Reference to the room being requested
-  status?: string;           // Optional status of the request
+  id_RoomRequest: number;          // Identificador único para la solicitud de sala
+  managerName: string;             // Nombre del encargado
+  managerLastName: string;         // Primer apellido del encargado
+  managerLastName2: string;        // Segundo apellido del encargado
+  course: string;                  // Curso asociado a la solicitud
+  activityDescription: string;     // Descripción de la actividad
+  needs: string;                   // Necesidades para la sala
+  numberOfAttendees: number;       // Número de asistentes
+  startDate: string;               // Fecha de inicio (ISO string)
+  endDate: string;                 // Fecha de fin (ISO string)
+  startTime: string;               // Hora de inicio
+  endTime: string;                 // Hora de fin
+  roomId: number;                  // ID de la sala solicitada
+  userId: string;                  // ID del usuario que realiza la solicitud
+  status?: RequestStatus;          // Estado de la solicitud (Pendiente, Aprobada, Rechazada)
 }

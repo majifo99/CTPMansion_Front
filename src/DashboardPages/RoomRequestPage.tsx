@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'; // Importar CSS para las notific
 import { useRoomRequest } from '../hooks/useRoomRequest';
 import { RoomRequest } from '../types/RoomRequestType'; // Importar tipo RoomRequest
 import { Room } from '../types/Types'; // Importar tipo Room
-import {jwtDecode} from 'jwt-decode';  // Necesario para decodificar el token
+import { jwtDecode } from 'jwt-decode';  // Necesario para decodificar el token
 
 interface DecodedToken {
   nameid: string; // Este es el campo donde se almacena el userId en el token
@@ -57,7 +57,7 @@ const RoomRequestCard: React.FC = () => {
 
   // Función para renderizar campos de entrada con estilo consistente
   const renderInputField = (id: string, label: string, placeholder: string, validation: any, type = 'text') => (
-    <div className="flex flex-col mb-4 w-1/2 px-2"> {/* Reducir el tamaño de cada campo y darle espacio lateral */}
+    <div className="flex flex-col mb-4 px-2"> {/* Reducir el tamaño de cada campo y darle espacio lateral */}
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <input
         type={type}
@@ -70,12 +70,12 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  // Componente Modal mejorado
+  // Componente Modal mejorado con diseño simétrico
   const Modal = ({ onClose }: { onClose: () => void }) => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl"> {/* Reducimos el ancho máximo */}
-        <h3 className="text-lg  font-semibold mb-4">Solicitud para {selectedRoom?.name}</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap space-y-4 mt-4">
+      <div className="bg-white rounded-lg p-6 w-full max-w-3xl"> {/* Ampliar el ancho máximo */}
+        <h3 className="text-lg font-semibold mb-4">Solicitud para {selectedRoom?.name}</h3>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {renderInputField('managerName', 'Nombre del Encargado', 'Juan', { required: 'El nombre es obligatorio' })}
           {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', { required: 'El primer apellido es obligatorio' })}
           {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez', { required: 'El segundo apellido es obligatorio' })}
@@ -88,7 +88,7 @@ const RoomRequestCard: React.FC = () => {
           {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time')}
           {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time')}
           
-          <div className="w-full px-2 flex justify-end">
+          <div className="w-full flex justify-end sm:col-span-2">
             <button
               type="submit"
               className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2"
