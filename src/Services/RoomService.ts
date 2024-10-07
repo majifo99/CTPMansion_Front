@@ -32,3 +32,4 @@ export const fetchRooms = async (): Promise<Room[]> => {
     throw new Error('Failed to fetch rooms'); // Manejar errores de manera adecuada
   }
 };
+

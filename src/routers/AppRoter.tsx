@@ -19,7 +19,7 @@ const VerificationForm = React.lazy(() => import('../components/VerificationForm
 const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
-const SalasPage = React.lazy(() => import('../pages/DashboardPages/SalasPage'));
+const SalasPage = React.lazy(() => import('../DashboardPages/ManageRoomRequests'));
 const RoomsPage = React.lazy(() => import('../DashboardPages/RoomsPage'));
 const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));

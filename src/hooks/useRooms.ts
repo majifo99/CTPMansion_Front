@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { fetchRooms, addRoom, editRoom, deleteRoom } from '../Services/RoomServices'; // Importamos el servicio de API
+import { fetchRooms, addRoom, editRoom, deleteRoom, fetchRoomRequests, approveRoomRequest, rejectRoomRequest } from '../Services/RoomServices'; // Importamos los servicios de API
 import { Room } from '../types/Types'; // Importamos el tipo 'Room'
+import { RoomRequest } from '../types/RoomRequestType'; // Importamos RoomRequest para gestionar las solicitudes de sala
 
-export const useRooms = () => {
+export const useRoomsAndRequests = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);  // `loading` solo se usa al inicio
+  const [roomRequests, setRoomRequests] = useState<RoomRequest[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para obtener todas las salas
+  // Obtener todas las salas
   const fetchRoomsData = async () => {
     try {
-      const data = await fetchRooms(); // Llamada al servicio API
+      const data = await fetchRooms(); // Llamada al servicio API para obtener las salas
       setRooms(data);
     } catch (error) {
       console.error('Error al obtener las salas:', error);
@@ -18,23 +20,35 @@ export const useRooms = () => {
     }
   };
 
+  // Obtener todas las solicitudes de sala
+  const fetchRoomRequestsData = async () => {
+    try {
+      const data = await fetchRoomRequests(); // Llamada al servicio API para obtener las solicitudes
+      setRoomRequests(data);
+    } catch (error) {
+      console.error('Error al obtener las solicitudes:', error);
+      setError('Error al obtener las solicitudes');
+    }
+  };
+
   useEffect(() => {
-    setLoading(true); // Solo mostramos loading durante la carga inicial
-    fetchRoomsData().finally(() => setLoading(false)); // Finalmente ocultamos el estado de carga
+    setLoading(true);
+    Promise.all([fetchRoomsData(), fetchRoomRequestsData()]) // Obtener ambas listas al cargar
+      .finally(() => setLoading(false));
   }, []);
 
-  // Recargar las salas con un retraso, sin cambiar el estado de `loading`
-  const delayedFetchRooms = async (delay: number = 2000) => {
+  // Recargar datos después de agregar, editar o eliminar
+  const delayedFetchData = async (delay: number = 2000) => {
     setTimeout(async () => {
-      await fetchRoomsData();
-    }, delay); // Introducimos un retraso de 2 segundos por defecto
+      await Promise.all([fetchRoomsData(), fetchRoomRequestsData()]);
+    }, delay); // Introducimos un retraso por defecto de 2 segundos
   };
 
   // Función para agregar una sala
   const handleAddRoom = async (newRoom: Room) => {
     try {
-      await addRoom(newRoom); // Llamada al servicio para agregar la sala
-      delayedFetchRooms(); // Recargar las salas con un retraso
+      await addRoom(newRoom);
+      delayedFetchData(); // Recargar los datos tras agregar
     } catch (error) {
       console.error('Error al agregar la sala:', error);
       setError('Error al agregar la sala');
@@ -44,8 +58,8 @@ export const useRooms = () => {
   // Función para editar una sala
   const handleEditRoom = async (id: number, updatedRoom: Room) => {
     try {
-      await editRoom(id, updatedRoom); // Llamada al servicio para editar la sala
-      delayedFetchRooms(); // Recargar las salas con un retraso
+      await editRoom(id, updatedRoom);
+      delayedFetchData(); // Recargar los datos tras editar
     } catch (error) {
       console.error('Error al editar la sala:', error);
       setError('Error al editar la sala');
@@ -55,20 +69,46 @@ export const useRooms = () => {
   // Función para eliminar una sala
   const handleDeleteRoom = async (id: number) => {
     try {
-      await deleteRoom(id); // Llamada al servicio para eliminar la sala
-      delayedFetchRooms(); // Recargar las salas con un retraso
+      await deleteRoom(id);
+      delayedFetchData(); // Recargar los datos tras eliminar
     } catch (error) {
       console.error('Error al eliminar la sala:', error);
       setError('Error al eliminar la sala');
     }
   };
 
+  // Aprobar una solicitud de sala
+  const handleApproveRequest = async (id: number) => {
+    try {
+      await approveRoomRequest(id);
+      delayedFetchData(); // Recargar los datos tras aprobar
+    } catch (error) {
+      console.error('Error al aprobar la solicitud:', error);
+      setError('Error al aprobar la solicitud');
+    }
+  };
+
+  // Rechazar una solicitud de sala
+  const handleRejectRequest = async (id: number) => {
+    try {
+      await rejectRoomRequest(id);
+      delayedFetchData(); // Recargar los datos tras rechazar
+    } catch (error) {
+      console.error('Error al rechazar la solicitud:', error);
+      setError('Error al rechazar la solicitud');
+    }
+  };
+
   return {
     rooms,
-    loading, // El loading se usa solo para la carga inicial
+    roomRequests,
+    loading,
     error,
     handleAddRoom,
     handleEditRoom,
     handleDeleteRoom,
+    handleApproveRequest,
+    handleRejectRequest,
+    fetchRoomRequestsData, // Exponemos la función para recargar solicitudes de sala
   };
 };
