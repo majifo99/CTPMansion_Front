@@ -75,6 +75,13 @@ export interface Room {
   url_Image?: string;   // URL opcional para la imagen de la sala
   isConferenceRoom: boolean;
 }
+export interface Laboratory {
+  id_Laboratory: number;
+  name: string;
+  description: string;
+  capacity: number;
+  url_Image?: string;
+}
 
 
 export interface CertificationRequest {

@@ -1,9 +1,9 @@
 import axios from "axios";
-import { Laboratory } from '../types/LaboratoryType';
+import { Laboratory } from "../types/Types";
+import { LabRequest } from "../types/LaboratoryRequestType";
 
-const API_URL = 'https://localhost:7055/api'; // Asegúrate de cambiar a la URL correcta de la API
+const API_URL = 'https://localhost:7055/api';
 
-// Crear una instancia de axios con la URL base y encabezados predeterminados
 const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
@@ -11,7 +11,6 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor para agregar el token JWT a cada solicitud
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -20,12 +19,9 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Manejo de respuestas
 const handleResponse = async <T>(url: string): Promise<T> => {
   try {
     const response = await apiClient.get<T>(url);
@@ -36,26 +32,17 @@ const handleResponse = async <T>(url: string): Promise<T> => {
   }
 };
 
-// Función para realizar el login y obtener el token JWT
-export const login = async (email: string, password: string): Promise<void> => {
+export const getLaboratories = (): Promise<Laboratory[]> => handleResponse<Laboratory[]>(`/Laboratory`);
+
+export const getLaboratoryById = (id: number): Promise<Laboratory> => handleResponse<Laboratory>(`/Laboratory/${id}`);
+
+export const createLabRequest = async (labRequest: LabRequest): Promise<void> => {
   try {
-    const response = await apiClient.post<{ token: string }>('/User/login', { email, password });
-    const { token } = response.data;
-    localStorage.setItem('token', token);
+    await apiClient.post(`/LaboratoryRequest`, labRequest);
   } catch (error) {
-    console.error('Error logging in:', error);
+    console.error('Error creating lab request:', error.response?.data || error.message);
     throw error;
   }
-};
-
-// === Servicios relacionados a laboratorios ===
-
-export const getLaboratories = (): Promise<Laboratory[]> => {
-  return handleResponse<Laboratory[]>(`/Laboratory`);
-};
-
-export const getLaboratoryById = (id: number): Promise<Laboratory> => {
-  return handleResponse<Laboratory>(`/Laboratory/${id}`);
 };
 
 export const addLaboratory = async (newLaboratory: Laboratory): Promise<Laboratory> => {
@@ -78,16 +65,6 @@ export const updateLaboratory = async (id: number, updatedLaboratory: Laboratory
   }
 };
 
-export const patchLaboratory = async (id: number, partialLaboratory: Partial<Laboratory>): Promise<Laboratory> => {
-  try {
-    const response = await apiClient.patch<Laboratory>(`/Laboratory/${id}`, partialLaboratory);
-    return response.data;
-  } catch (error) {
-    console.error('Error patching laboratory:', error);
-    throw error;
-  }
-};
-
 export const deleteLaboratory = async (id: number): Promise<void> => {
   try {
     await apiClient.delete(`/Laboratory/${id}`);
@@ -96,4 +73,3 @@ export const deleteLaboratory = async (id: number): Promise<void> => {
     throw error;
   }
 };
-
