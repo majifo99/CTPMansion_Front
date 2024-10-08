@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useRooms } from '../hooks/useRoom';
+import { useRoomsAndRequests } from '../hooks/useRooms';
+import { useRoomRequest } from '../hooks/useRoomRequest';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Importar CSS para las notificaciones
-import { useRoomRequest } from '../hooks/useRoomRequest';
-import { RoomRequest } from '../types/RoomRequestType'; // Importar tipo RoomRequest
-import { Room } from '../types/Types'; // Importar tipo Room
-import { jwtDecode } from 'jwt-decode';  // Necesario para decodificar el token
+import 'react-toastify/dist/ReactToastify.css';
+import { RoomRequest, RequestStatus } from '../types/RoomRequestType';
+import { Room } from '../types/Types';
+import {jwtDecode} from 'jwt-decode';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 interface DecodedToken {
-  nameid: string; // Este es el campo donde se almacena el userId en el token
+  nameid: string;
 }
 
-// Función para obtener el userId del token
+// Función para extraer userId desde el token JWT
 const getUserIdFromToken = (): string | null => {
-  const token = localStorage.getItem('token');  // Asumiendo que el token está almacenado en el localStorage
+  const token = localStorage.getItem('token');
   if (token) {
     const decodedToken = jwtDecode<DecodedToken>(token);
     return decodedToken.nameid;
@@ -23,41 +25,46 @@ const getUserIdFromToken = (): string | null => {
 };
 
 const RoomRequestCard: React.FC = () => {
-  const { rooms, loading, error } = useRooms();
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<Omit<RoomRequest, 'id_RoomRequest' | 'status'>>();
-  const { isSubmitting, error: submitError, submitRoomRequest } = useRoomRequest();
-  const [userId, setUserId] = useState<string | null>(null);  // Estado para almacenar el userId
+  const { rooms, roomRequests, loading, error, fetchRoomRequestsData } = useRoomsAndRequests();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>>();
+  const { isSubmitting, submitRoomRequest, error: submitError } = useRoomRequest();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [selectedRoomForRequest, setSelectedRoomForRequest] = useState<Room | null>(null);
+  const [selectedRoomForCalendar, setSelectedRoomForCalendar] = useState<Room | null>(null);
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
+  const [selectedDateDetails, setSelectedDateDetails] = useState<RoomRequest[] | null>(null);
 
-  // Obtener el userId cuando el componente se monta
+  // Obtener el userId al cargar el componente
   useEffect(() => {
     const userIdFromToken = getUserIdFromToken();
     setUserId(userIdFromToken);
   }, []);
 
-  // Notificaciones de éxito o error
+  // Notificaciones de éxito y error
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
-  // Envío del formulario
-  const onSubmit = (data: Omit<RoomRequest, 'id_RoomRequest' | 'status'>) => {
-    if (selectedRoom && userId) {
-      // Agregar id_RoomRequest (siempre 0 para una nueva solicitud) y userId al payload
-      submitRoomRequest({ ...data, roomId: selectedRoom.id_Room, id_RoomRequest: 0, userId }).then(() => {
-        reset();  // Resetear el formulario tras envío exitoso
-        notifySuccess();  // Mostrar notificación de éxito
-        setSelectedRoom(null);  // Resetear la sala seleccionada
-      }).catch(() => {
-        notifyError('Error al enviar la solicitud.');  // Mostrar notificación de error
-      });
+  const onSubmit = (data: Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>) => {
+    if (selectedRoomForRequest && userId) {
+      const requestPayload = { ...data, roomId: selectedRoomForRequest.id_Room, userId };
+      submitRoomRequest(requestPayload)
+        .then(() => {
+          reset();
+          notifySuccess();
+          setSelectedRoomForRequest(null);
+          fetchRoomRequestsData(); // Recargar las solicitudes de sala
+        })
+        .catch(() => {
+          notifyError('Error al enviar la solicitud.');
+        });
     } else {
       notifyError('No se pudo obtener el usuario o la sala seleccionada.');
     }
   };
 
-  // Función para renderizar campos de entrada con estilo consistente
+  // Función para renderizar los campos de entrada
   const renderInputField = (id: string, label: string, placeholder: string, validation: any, type = 'text') => (
-    <div className="flex flex-col mb-4 px-2"> {/* Reducir el tamaño de cada campo y darle espacio lateral */}
+    <div className="flex flex-col mb-4 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <input
         type={type}
@@ -70,11 +77,11 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  // Componente Modal mejorado con diseño simétrico
+  // Modal de solicitud de sala
   const Modal = ({ onClose }: { onClose: () => void }) => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-3xl"> {/* Ampliar el ancho máximo */}
-        <h3 className="text-lg font-semibold mb-4">Solicitud para {selectedRoom?.name}</h3>
+      <div className="bg-white rounded-lg p-6 w-full max-w-3xl">
+        <h3 className="text-lg font-semibold mb-4">Solicitud para {selectedRoomForRequest?.name}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {renderInputField('managerName', 'Nombre del Encargado', 'Juan', { required: 'El nombre es obligatorio' })}
           {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', { required: 'El primer apellido es obligatorio' })}
@@ -104,29 +111,125 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
+  // Crear un conjunto de fechas de solicitudes aprobadas para el calendario
+  const approvedRequests = roomRequests.filter(
+    (request) => request.roomId === selectedRoomForCalendar?.id_Room && request.status === RequestStatus.Approved
+  );
+
+  const approvedDates = approvedRequests.map((request) => new Date(request.startDate)); // Solo marcamos el día de inicio
+
+  // Función para destacar y manejar clic en los días con reservas
+  const tileClassName = ({ date, view }: { date: Date; view: string }) => {
+    if (view === 'month') {
+      return approvedDates.some((approvedDate) => approvedDate.toDateString() === date.toDateString())
+        ? 'highlight-day'
+        : null;
+    }
+  };
+
+  const handleDateClick = (date: Date) => {
+    const details = approvedRequests.filter(
+      (request) => new Date(request.startDate).toDateString() === date.toDateString()
+    );
+    setSelectedDateDetails(details.length > 0 ? details : null);
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
-      <h2 className=" text-center text-2xl font-semibold mb-4">Solicitar Sala</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Cambia a un diseño de grid adaptable */}
+      <h2 className="text-center text-2xl font-semibold mb-4">Solicitar Sala</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading && <p>Cargando salas...</p>}
         {error && <p className="text-red-600">{error}</p>}
         {Array.isArray(rooms) && rooms.map(room => (
           <div
             key={room.id_Room}
             className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
-            onClick={() => setSelectedRoom(room)}
           >
             <h3 className="font-semibold text-lg mb-2">{room.name}</h3>
             <p className="flex-grow">{room.description}</p>
             <p className="mt-2 text-sm">Capacidad: {room.capacity}</p>
             <p className="mt-2 text-sm">{room.isConferenceRoom ? 'Sala de Conferencias' : 'Sala Normal'}</p>
+            <button
+              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={() => {
+                setSelectedRoomForCalendar(room);
+                setIsCalendarOpen(true);
+              }}
+            >
+              Ver Disponibilidad
+            </button>
+            <button
+              className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              onClick={() => setSelectedRoomForRequest(room)}
+            >
+              Solicitar Sala
+            </button>
           </div>
         ))}
       </div>
 
-      {selectedRoom && <Modal onClose={() => setSelectedRoom(null)} />}
+      {/* Modal de calendario */}
+      {isCalendarOpen && selectedRoomForCalendar && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Disponibilidad de la Sala</h2>
+            <Calendar
+              tileClassName={tileClassName}
+              onClickDay={handleDateClick}
+            />
+            <button
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              onClick={() => setIsCalendarOpen(false)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
 
-      <ToastContainer /> {/* Contenedor para notificaciones */}
+      {/* Modal de detalles del día */}
+      {selectedDateDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Detalles de Reservas</h2>
+            {selectedDateDetails.map((detail, index) => (
+              <div key={index} className="mb-2">
+                <p><strong>Reservado por:</strong> {detail.managerName} {detail.managerLastName}</p>
+                <p><strong>Hora:</strong> {detail.startTime} - {detail.endTime}</p>
+                <p><strong>Curso:</strong> {detail.course}</p>
+                <p><strong>Descripción:</strong> {detail.activityDescription}</p>
+              </div>
+            ))}
+            <button
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              onClick={() => setSelectedDateDetails(null)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de solicitud de sala */}
+      {selectedRoomForRequest && <Modal onClose={() => setSelectedRoomForRequest(null)} />}
+      
+      <ToastContainer />
+
+      {/* Estilos adicionales */}
+      <style>
+        {`
+          .highlight-day {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+          }
+          .highlight-day:hover {
+            transform: scale(1.1);
+            cursor: pointer;
+          }
+        `}
+      </style>
     </div>
   );
 };
