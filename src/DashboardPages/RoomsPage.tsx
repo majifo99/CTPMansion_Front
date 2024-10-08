@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRooms } from '../hooks/useRooms'; // Hook para manejar salas
+import { useRoomsAndRequests } from '../hooks/useRooms'; // Hook para manejar salas
 import EditRoomModal from '../modals/EditRoomModal'; // Modal para agregar/editar salas
 import DeleteEventModal from '../modals/DeleteEventModal'; // Modal para confirmar eliminación
 import { Room } from '../types/Types';
@@ -8,7 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const RoomsPage: React.FC = () => {
-  const { rooms, loading, error, handleAddRoom, handleEditRoom, handleDeleteRoom } = useRooms();
+  const { rooms, loading, error, handleAddRoom, handleEditRoom, handleDeleteRoom } = useRoomsAndRequests();
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);

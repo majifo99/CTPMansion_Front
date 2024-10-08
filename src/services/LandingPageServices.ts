@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RoomRequest } from '../types/RoomRequestType';
+
 
 // URL base de la API
 const API_URL = 'https://localhost:7055/api';
@@ -211,6 +211,31 @@ export const deleteWorkshop = async (id) => {
 };
 
 // === Servicios relacionados con los métodos de entrega y nombres de certificación ===
+
+
+
+export const submitCertificateRequest = async (formData: {
+  studentName: string;
+  studentIdentification: string;
+  guardianName: string;
+  guardianIdentification: string;
+  email: string;
+  phoneNumber: string;
+  deliveryMethod: number;
+  certificationName: string;
+}) => {
+  try {
+    const response = await axios.post(`${API_URL}/CertificationRequests`, formData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data; // Retorna la respuesta si necesitas utilizarla en tu aplicación
+  } catch (error) {
+    console.error('Error al enviar la solicitud de certificado:', error);
+    throw new Error('Error al enviar la solicitud de certificado');
+  }
+};
 export const getDeliveryMethods = async () => {
   try {
     const response = await apiClient.get('/Enums/deliveryMethods');
