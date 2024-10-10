@@ -7,14 +7,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { RoomRequest, RequestStatus } from '../types/RoomRequestType';
 import { Room } from '../types/Types';
 import {jwtDecode} from 'jwt-decode';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+
+const localizer = momentLocalizer(moment);
 
 interface DecodedToken {
   nameid: string;
 }
 
-// Función para extraer userId desde el token JWT
 const getUserIdFromToken = (): string | null => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -32,15 +34,12 @@ const RoomRequestCard: React.FC = () => {
   const [selectedRoomForRequest, setSelectedRoomForRequest] = useState<Room | null>(null);
   const [selectedRoomForCalendar, setSelectedRoomForCalendar] = useState<Room | null>(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
-  const [selectedDateDetails, setSelectedDateDetails] = useState<RoomRequest[] | null>(null);
 
-  // Obtener el userId al cargar el componente
   useEffect(() => {
     const userIdFromToken = getUserIdFromToken();
     setUserId(userIdFromToken);
   }, []);
 
-  // Notificaciones de éxito y error
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
@@ -52,7 +51,7 @@ const RoomRequestCard: React.FC = () => {
           reset();
           notifySuccess();
           setSelectedRoomForRequest(null);
-          fetchRoomRequestsData(); // Recargar las solicitudes de sala
+          fetchRoomRequestsData();
         })
         .catch(() => {
           notifyError('Error al enviar la solicitud.');
@@ -62,7 +61,6 @@ const RoomRequestCard: React.FC = () => {
     }
   };
 
-  // Función para renderizar los campos de entrada
   const renderInputField = (id: string, label: string, placeholder: string, validation: any, type = 'text') => (
     <div className="flex flex-col mb-4 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
@@ -77,9 +75,8 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  // Modal de solicitud de sala
   const Modal = ({ onClose }: { onClose: () => void }) => (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-3xl">
         <h3 className="text-lg font-semibold mb-4">Solicitud para {selectedRoomForRequest?.name}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -111,28 +108,20 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  // Crear un conjunto de fechas de solicitudes aprobadas para el calendario
   const approvedRequests = roomRequests.filter(
     (request) => request.roomId === selectedRoomForCalendar?.id_Room && request.status === RequestStatus.Approved
   );
 
-  const approvedDates = approvedRequests.map((request) => new Date(request.startDate)); // Solo marcamos el día de inicio
+  const events = approvedRequests.map((request) => {
+    const start = moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate();
+    const end = moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate();
 
-  // Función para destacar y manejar clic en los días con reservas
-  const tileClassName = ({ date, view }: { date: Date; view: string }) => {
-    if (view === 'month') {
-      return approvedDates.some((approvedDate) => approvedDate.toDateString() === date.toDateString())
-        ? 'highlight-day'
-        : null;
-    }
-  };
-
-  const handleDateClick = (date: Date) => {
-    const details = approvedRequests.filter(
-      (request) => new Date(request.startDate).toDateString() === date.toDateString()
-    );
-    setSelectedDateDetails(details.length > 0 ? details : null);
-  };
+    return {
+      title: `Reservado: ${request.managerName}`, 
+      start,
+      end,
+    };
+  });
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
@@ -140,7 +129,7 @@ const RoomRequestCard: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading && <p>Cargando salas...</p>}
         {error && <p className="text-red-600">{error}</p>}
-        {Array.isArray(rooms) && rooms.map(room => (
+        {rooms.map((room) => (
           <div
             key={room.id_Room}
             className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
@@ -148,7 +137,6 @@ const RoomRequestCard: React.FC = () => {
             <h3 className="font-semibold text-lg mb-2">{room.name}</h3>
             <p className="flex-grow">{room.description}</p>
             <p className="mt-2 text-sm">Capacidad: {room.capacity}</p>
-            <p className="mt-2 text-sm">{room.isConferenceRoom ? 'Sala de Conferencias' : 'Sala Normal'}</p>
             <button
               className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               onClick={() => {
@@ -168,17 +156,20 @@ const RoomRequestCard: React.FC = () => {
         ))}
       </div>
 
-      {/* Modal de calendario */}
-      {isCalendarOpen && selectedRoomForCalendar && (
+      {isCalendarOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">Disponibilidad de la Sala</h2>
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full">
+            <h2 className="text-2xl font-bold mb-4 text-center">Disponibilidad de la Sala</h2>
             <Calendar
-              tileClassName={tileClassName}
-              onClickDay={handleDateClick}
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: 500 }}
+              className="border-2 border-gray-300 rounded-lg shadow-lg"
             />
             <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 w-full"
               onClick={() => setIsCalendarOpen(false)}
             >
               Cerrar
@@ -187,49 +178,8 @@ const RoomRequestCard: React.FC = () => {
         </div>
       )}
 
-      {/* Modal de detalles del día */}
-      {selectedDateDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4">Detalles de Reservas</h2>
-            {selectedDateDetails.map((detail, index) => (
-              <div key={index} className="mb-2">
-                <p><strong>Reservado por:</strong> {detail.managerName} {detail.managerLastName}</p>
-                <p><strong>Hora:</strong> {detail.startTime} - {detail.endTime}</p>
-                <p><strong>Curso:</strong> {detail.course}</p>
-                <p><strong>Descripción:</strong> {detail.activityDescription}</p>
-              </div>
-            ))}
-            <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-              onClick={() => setSelectedDateDetails(null)}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de solicitud de sala */}
       {selectedRoomForRequest && <Modal onClose={() => setSelectedRoomForRequest(null)} />}
-      
       <ToastContainer />
-
-      {/* Estilos adicionales */}
-      <style>
-        {`
-          .highlight-day {
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 50%;
-            transition: transform 0.2s;
-          }
-          .highlight-day:hover {
-            transform: scale(1.1);
-            cursor: pointer;
-          }
-        `}
-      </style>
     </div>
   );
 };
