@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { addLaboratory, deleteLaboratory, getLaboratories, updateLaboratory } from '../Services/LaboratoryService';
+import { addLaboratory, deleteLaboratory, fetchLaboratories, updateLaboratory } from '../Services/LaboratoryService';
 import { Laboratory } from '../types/Types';
 
 
@@ -12,7 +12,7 @@ export const useLaboratories = () => {
   // Función para obtener todos los laboratorios
   const fetchLaboratories = async () => {
     try {
-      const data = await getLaboratories();
+      const data = await fetchLaboratories();
       setLaboratories(data);
     } catch (err) {
       console.error('Error fetching laboratories:', err);

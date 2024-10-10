@@ -32,18 +32,11 @@ const handleResponse = async <T>(url: string): Promise<T> => {
   }
 };
 
-export const getLaboratories = (): Promise<Laboratory[]> => handleResponse<Laboratory[]>(`/Laboratory`);
+// === Funciones relacionadas con laboratorios ===
+
+export const fetchLaboratories = (): Promise<Laboratory[]> => handleResponse<Laboratory[]>(`/Laboratory`);
 
 export const getLaboratoryById = (id: number): Promise<Laboratory> => handleResponse<Laboratory>(`/Laboratory/${id}`);
-
-export const createLabRequest = async (labRequest: LabRequest): Promise<void> => {
-  try {
-    await apiClient.post(`/LaboratoryRequest`, labRequest);
-  } catch (error) {
-    console.error('Error creating lab request:', error.response?.data || error.message);
-    throw error;
-  }
-};
 
 export const addLaboratory = async (newLaboratory: Laboratory): Promise<Laboratory> => {
   try {
@@ -72,4 +65,29 @@ export const deleteLaboratory = async (id: number): Promise<void> => {
     console.error('Error deleting laboratory:', error);
     throw error;
   }
+};
+
+// === Funciones relacionadas con solicitudes de laboratorio ===
+
+export const createLabRequest = async (labRequest: LabRequest): Promise<void> => {
+  try {
+    await apiClient.post(`/LaboratoryRequest`, labRequest);
+  } catch (error) {
+    console.error('Error creating lab request:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const fetchLabRequests = async (): Promise<LabRequest[]> => handleResponse<LabRequest[]>(`/LaboratoryRequest`);
+
+// Aprobar una solicitud de laboratorio
+export const approveLabRequest = async (id: number): Promise<void> => {
+  if (!id) throw new Error("El ID de la solicitud es requerido.");
+  await apiClient.post(`/LaboratoryRequest/${id}/approve`);
+};
+
+// Rechazar una solicitud de laboratorio
+export const rejectLabRequest = async (id: number): Promise<void> => {
+  if (!id) throw new Error("El ID de la solicitud es requerido.");
+  await apiClient.post(`/LaboratoryRequest/${id}/reject`);
 };

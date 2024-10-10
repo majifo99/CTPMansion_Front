@@ -60,8 +60,8 @@ const Sidebar: React.FC = () => {
                 Salas
               </Link>
               <Link to="/dashboard/laboratorios" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
-                <MdScience className="mr-2" />
-                Laboratorios
+                 <MdScience className="mr-2" />
+                   Laboratorios
               </Link>
               <Link to="/dashboard/certificaciones" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <FaCertificate className="mr-2" />

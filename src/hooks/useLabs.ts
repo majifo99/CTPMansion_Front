@@ -1,32 +1,73 @@
 import { useState, useEffect } from 'react';
+import { fetchLaboratories, fetchLabRequests, approveLabRequest, rejectLabRequest } from '../Services/LaboratoryService';
+import { Laboratory } from '../types/Types';
+import { LabRequest } from '../types/LaboratoryRequestType';
 
-import { Laboratory } from '../types/Types';  // Importar el tipo Laboratory
-import { getLaboratories } from '../Services/LaboratoryService';
-
-export const useLabs = () => {
-  const [labs, setLabs] = useState<Laboratory[]>([]);  // Estado para almacenar los laboratorios
-  const [loading, setLoading] = useState(true);
+export const useLabsAndRequests = () => {
+  const [labs, setLabs] = useState<Laboratory[]>([]);
+  const [labRequests, setLabRequests] = useState<LabRequest[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const getLabs = async () => {
-      setLoading(true);  // Iniciar la carga
-      try {
-        const data = await getLaboratories();  // Llamada al servicio para obtener laboratorios
-        if (Array.isArray(data)) {
-          setLabs(data);  // Asignar los laboratorios obtenidos
-        } else {
-          throw new Error('Se esperaba un arreglo de laboratorios');
-        }
-      } catch (err) {
-        setError(err.message);  // Asignar mensaje de error
-      } finally {
-        setLoading(false);  // Finalizar la carga
-      }
-    };
+  const fetchLabsData = async () => {
+    try {
+      const data = await fetchLaboratories();
+      setLabs(data);
+    } catch (error) {
+      console.error('Error al obtener los laboratorios:', error);
+      setError('Error al obtener los laboratorios');
+    }
+  };
 
-    getLabs();
+  const fetchLabRequestsData = async () => {
+    try {
+      const data = await fetchLabRequests();
+      setLabRequests(data);
+    } catch (error) {
+      console.error('Error al obtener las solicitudes de laboratorio:', error);
+      setError('Error al obtener las solicitudes de laboratorio');
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([fetchLabsData(), fetchLabRequestsData()])
+      .finally(() => setLoading(false));
   }, []);
 
-  return { labs, loading, error };
+  const delayedFetchData = async (delay: number = 2000) => {
+    setTimeout(async () => {
+      await Promise.all([fetchLabsData(), fetchLabRequestsData()]);
+    }, delay);
+  };
+
+  const handleApproveLabRequest = async (id: number) => {
+    try {
+      await approveLabRequest(id);
+      delayedFetchData();
+    } catch (error) {
+      console.error('Error al aprobar la solicitud:', error);
+      setError('Error al aprobar la solicitud');
+    }
+  };
+
+  const handleRejectLabRequest = async (id: number) => {
+    try {
+      await rejectLabRequest(id);
+      delayedFetchData();
+    } catch (error) {
+      console.error('Error al rechazar la solicitud:', error);
+      setError('Error al rechazar la solicitud');
+    }
+  };
+
+  return {
+    labs,
+    labRequests,
+    loading,
+    error,
+    handleApproveLabRequest,
+    handleRejectLabRequest,
+    fetchLabRequestsData,
+  };
 };
