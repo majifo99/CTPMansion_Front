@@ -14,6 +14,26 @@ const images = [
   { src: heroImage5, alt: "Galería del Colegio 5" },
 ];
 
+const GallerySkeleton = () => {
+  return (
+    <div className="my-10 mx-auto max-w-4xl">
+      <h2 className="text-4xl font-extrabold text-center text-teal-600 mb-2 relative">
+        ¡Explora Nuestra Galería del Colegio!
+        <div className="w-3/4 h-1 bg-gradient-to-r from-teal-500 to-green-500 mx-auto mt-1 rounded-full"></div>
+      </h2>
+
+      <div className="flex overflow-x-hidden space-x-4 p-4 animate-pulse">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex-none w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 h-64 sm:h-80 md:h-96 bg-gray-300 rounded-lg"
+          ></div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export function Gallery() {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -21,6 +41,13 @@ export function Gallery() {
   const [containerWidth, setContainerWidth] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Simular carga de imágenes con setTimeout
+  useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 1000); // Simular 1s de carga
+    return () => clearTimeout(timeout);
+  }, []);
 
   // Update the width of the container dynamically
   useEffect(() => {
@@ -83,11 +110,18 @@ export function Gallery() {
     };
   }, [isModalOpen, closeModal]);
 
+  if (loading) {
+    return <GallerySkeleton />;
+  }
+
   return (
     <div className="my-10 mx-auto max-w-4xl">
-      <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-6">
+      {/* Título con color verde azulado y subrayado */}
+      <h2 className="text-4xl font-extrabold text-center text-teal-600 mb-2 relative">
         ¡Explora Nuestra Galería del Colegio!
+        <div className="w-3/4 h-1 bg-gradient-to-r from-teal-500 to-green-500 mx-auto mt-1 rounded-full"></div>
       </h2>
+
       <div className="relative w-full overflow-hidden" ref={containerRef}>
         <div ref={scrollRef} className="flex overflow-x-hidden space-x-4 p-4">
           {images.map((image, index) => (
@@ -100,7 +134,7 @@ export function Gallery() {
                 src={image.src}
                 alt={image.alt}
                 className="object-cover w-full h-64 sm:h-80 md:h-96 lg:h-96 xl:h-96 rounded-lg"
-                loading="lazy" // Add lazy loading for performance
+                loading="lazy"
               />
             </div>
           ))}

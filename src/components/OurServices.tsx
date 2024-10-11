@@ -3,46 +3,77 @@ import { BiBookReader, BiBusSchool } from "react-icons/bi";
 import { TbBallFootball, TbBowlSpoon, TbUserHeart, TbUserQuestion, TbPigMoney, TbHome } from "react-icons/tb";
 import { useOurServices } from '../hooks/useOurServices';
 
-// Mapeo de iconos según el nombre proporcionado en la API
-const iconMapper: { [key: string]: JSX.Element } = {
-  BiBookReader: <BiBookReader className="w-12 h-12 text-[#0075A2]" />,
-  BiBusSchool: <BiBusSchool className="w-12 h-12 text-[#0075A2]" />,
-  TbBallFootball: <TbBallFootball className="w-12 h-12 text-[#0075A2]" />,
-  TbBowlSpoon: <TbBowlSpoon className="w-12 h-12 text-[#0075A2]" />,
-  TbUserHeart: <TbUserHeart className="w-12 h-12 text-[#4EA5D9]" />,
-  TbUserQuestion: <TbUserQuestion className="w-12 h-12 text-[#B22222]" />,
-  TbPigMoney: <TbPigMoney className="w-12 h-12 text-[#B22222]" />,
-  TbHome: <TbHome className="w-12 h-12 text-[#B22222]" />,
+// Mapear iconos
+const iconMapper = {
+  BiBookReader: <BiBookReader className="w-12 h-12 text-[#006494]" />,
+  BiBusSchool: <BiBusSchool className="w-12 h-12 text-[#006494]" />,
+  TbBallFootball: <TbBallFootball className="w-12 h-12 text-[#006494]" />,
+  TbBowlSpoon: <TbBowlSpoon className="w-12 h-12 text-[#006494]" />,
+  TbUserHeart: <TbUserHeart className="w-12 h-12 text-[#87a330]" />,
+  TbUserQuestion: <TbUserQuestion className="w-12 h-12 text-[#d9534f]" />,
+  TbPigMoney: <TbPigMoney className="w-12 h-12 text-[#d9534f]" />,
+  TbHome: <TbHome className="w-12 h-12 text-[#d9534f]" />,
 };
+
+// Componente del loader (skeleton) para mostrar mientras se cargan los datos
+const ServiceSkeleton: React.FC = () => (
+  <div className="p-4 md:w-1/4 sm:w-1/2 w-full animate-fadeInUp">
+    <div className="h-full min-h-[200px] max-h-[300px] bg-gray-200 border-2 border-gray-200 rounded-lg flex flex-col items-center justify-center p-6 animate-pulse">
+      <div className="w-12 h-12 bg-gray-300 rounded-full mb-4"></div>
+      <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-gray-300 rounded w-2/4"></div>
+    </div>
+  </div>
+);
 
 const OurServices: React.FC = () => {
   const { services, loading, error } = useOurServices();
 
-  if (loading) return <p className="text-center text-lg">Cargando...</p>;
-  if (error) return <p className="text-center text-red-500">Error: {error.message}</p>;
-
   return (
-    <section className="text-gray-700 body-font">
-      <div className="container px-5 py-24 mx-auto">
-        <h2 className="text-4xl font-extrabold text-gray-900 text-center mb-8">Nuestros Servicios</h2>
+    <section className="bg-white py-16">
+      <div className="container px-5 mx-auto">
+        {/* Título animado y centrado */}
+        <div className="flex justify-center">
+          <h2 className="relative text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 text-center mb-10 animate-fadeInUp">
+            Nuestros Servicios
+            <span className="absolute left-1/2 transform -translate-x-1/2 -bottom-2 h-1 w-3/4 bg-gradient-to-r from-blue-600 to-blue-400 rounded-md animate-expandWidth"></span>
+          </h2>
+        </div>
+
         <div className="flex flex-wrap -m-4 text-center">
-          {services.map((service) => (
-            <div key={service.id} className="p-4 md:w-1/4 sm:w-1/2 w-full">
+          {loading ? (
+            // Mostrar 8 skeletons mientras se cargan los datos
+            Array.from({ length: 8 }).map((_, index) => (
+              <ServiceSkeleton key={index} />
+            ))
+          ) : error ? (
+            <p className="text-center text-red-500 w-full">Error: {error.message}</p>
+          ) : (
+            // Mostrar servicios si ya están cargados
+            services.map((service) => (
               <div
-                className="h-full min-h-[200px] max-h-[300px] border-2 border-gray-200 px-6 py-6 rounded-lg hover:shadow-lg transform transition duration-300 hover:scale-105 flex flex-col justify-center items-center"
-                aria-label={`Servicio: ${service.title}`}
+                key={service.id}
+                className="p-4 md:w-1/4 sm:w-1/2 w-full animate-fadeInUp"
               >
-                {/* Icono del servicio */}
-                {iconMapper[service.icon] || (
-                  <BiBookReader className="w-12 h-12 text-[#0075A2]" aria-hidden="true" />
-                )}
-                {/* Título del servicio */}
-                <h2 className="title-font font-semibold text-xl text-gray-900 mt-4">
-                  {service.title}
-                </h2>
+                <div
+                  className="h-full min-h-[200px] max-h-[300px] bg-white border-2 border-gray-200 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center p-6"
+                  aria-label={`Servicio: ${service.title}`}
+                >
+                  {/* Icono del servicio */}
+                  {iconMapper[service.icon] || (
+                    <BiBookReader className="w-12 h-12 text-[#006494]" aria-hidden="true" />
+                  )}
+                  {/* Título del servicio */}
+                  <h2 className="text-xl font-semibold text-gray-900 mt-4 mb-2">
+                    {service.title}
+                  </h2>
+                  <p className="text-sm text-gray-600 opacity-80">
+                    Un servicio para toda la comunidad estudiantil
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </section>
