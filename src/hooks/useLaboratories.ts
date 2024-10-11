@@ -1,45 +1,50 @@
 import { useState, useEffect } from 'react';
-
 import { addLaboratory, deleteLaboratory, fetchLaboratories, updateLaboratory } from '../Services/LaboratoryService';
 import { Laboratory } from '../types/Types';
-
 
 export const useLaboratories = () => {
   const [laboratories, setLaboratories] = useState<Laboratory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para obtener todos los laboratorios
-  const fetchLaboratories = async () => {
+  // Función para manejar errores
+  const handleError = (message: string, err: any) => {
+    console.error(message, err);
+    setError(message);
+  };
+
+  // Función para cargar laboratorios
+  const loadLaboratories = async () => {
+    setLoading(true);
     try {
       const data = await fetchLaboratories();
       setLaboratories(data);
+      setError(null); // Restablecer el error en caso de éxito
     } catch (err) {
-      console.error('Error fetching laboratories:', err);
-      setError('Error fetching laboratories');
+      handleError('Error fetching laboratories', err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Cargar laboratorios al montar el componente
   useEffect(() => {
-    setLoading(true);
-    fetchLaboratories().finally(() => setLoading(false));
+    loadLaboratories();
   }, []);
 
-  // Agregar retraso antes de la recarga sin cambiar el estado loading
-  const delayedFetchLaboratories = async (delay: number = 2000) => {
-    setTimeout(async () => {
-      await fetchLaboratories();
-    }, delay);
+  // Función para agregar retraso en la recarga de laboratorios
+  const delayedReload = (delay: number = 2000) => {
+    setLoading(true);
+    setTimeout(loadLaboratories, delay);
   };
 
   // Función para agregar un laboratorio
   const handleAddLaboratory = async (newLaboratory: Laboratory) => {
     try {
       await addLaboratory(newLaboratory);
-      delayedFetchLaboratories();
+      delayedReload();
     } catch (err) {
-      console.error('Error adding laboratory:', err);
-      setError('Error adding laboratory');
+      handleError('Error adding laboratory', err);
     }
   };
 
@@ -47,10 +52,9 @@ export const useLaboratories = () => {
   const handleEditLaboratory = async (id: number, updatedLaboratory: Laboratory) => {
     try {
       await updateLaboratory(id, updatedLaboratory);
-      delayedFetchLaboratories();
+      delayedReload();
     } catch (err) {
-      console.error('Error editing laboratory:', err);
-      setError('Error editing laboratory');
+      handleError('Error editing laboratory', err);
     }
   };
 
@@ -58,10 +62,9 @@ export const useLaboratories = () => {
   const handleDeleteLaboratory = async (id: number) => {
     try {
       await deleteLaboratory(id);
-      delayedFetchLaboratories();
+      delayedReload();
     } catch (err) {
-      console.error('Error deleting laboratory:', err);
-      setError('Error deleting laboratory');
+      handleError('Error deleting laboratory', err);
     }
   };
 
