@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute';  // Componente de rutas protegida
 import { AuthProvider } from '../contexts/AuthContext';
 import UserProfile from '../DashboardPages/UserProfile';
 
+
 // Lazy loading para páginas
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -21,7 +22,7 @@ const RequestPasswordReset = React.lazy(() => import('../components/RequestPassw
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
 const SalasPage = React.lazy(() => import('../DashboardPages/ManageRoomRequests'));
 const RoomsPage = React.lazy(() => import('../DashboardPages/RoomsPage'));
-const LaboratoriosPage = React.lazy(() => import('../pages/DashboardPages/LaboratoriosPage'));
+const LabRequestPage = React.lazy(() => import('../DashboardPages/ManageLabRequests'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
 const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
 const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
@@ -82,7 +83,7 @@ const AppRouter: React.FC = () => {
               } />
               <Route path="laboratorios" element={
                 <ProtectedRoute requiredRoles={['Admin', 'LabManager']}>
-                  <LaboratoriosPage />
+                  <LabRequestPage />
                 </ProtectedRoute>
               } />
               <Route path="roles" element={
@@ -130,6 +131,9 @@ const AppRouter: React.FC = () => {
                   <SolicitarLaboratorio />
                 </ProtectedRoute>
               } />
+
+           
+              
             </Route>
           </Routes>
         </Suspense>

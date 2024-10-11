@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLabs } from '../hooks/useLabs';
+import { useLabsAndRequests } from '../hooks/useLabs';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -28,7 +28,7 @@ const formatDateTime = (date: Date): string => date.toISOString().split('.')[0];
 const formatTime = (time: string): string => (time.includes(":") ? time : `${time}:00`);
 
 const LabRequestPage: React.FC = () => {
-  const { labs, loading, error } = useLabs();
+  const { labs, loading, error } = useLabsAndRequests();
   const [selectedLab, setSelectedLab] = useState<Laboratory | null>(null);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Omit<LabRequest, 'id_LabRequest' | 'status'>>();
   const { isSubmitting, error: submitError, submitLabRequest } = useLabRequest();

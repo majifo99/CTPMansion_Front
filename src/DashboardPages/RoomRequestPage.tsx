@@ -117,7 +117,9 @@ const RoomRequestCard: React.FC = () => {
     const end = moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate();
 
     return {
+
       title: `Reservado: ${request.managerName}`,
+
       start,
       end,
     };
