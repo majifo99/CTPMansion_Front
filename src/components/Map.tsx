@@ -1,75 +1,102 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { PiMapPinSimpleDuotone } from 'react-icons/pi';
-import useLocation from '../hooks/useLocation'; // Asegúrate de ajustar la ruta correctamente
+import useLocation from '../hooks/useLocation'; // Ajusta la ruta según sea necesario
+
+// Skeleton de carga
+const LocationSkeleton = () => (
+  <section className="bg-white mt-[60px] z-10">
+    <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-20 lg:px-8">
+      <div className="max-w-2xl lg:max-w-4xl mx-auto text-center">
+        <h2 className="text-4xl font-extrabold text-teal-600 relative inline-block animate-pulse">
+          Visítanos
+          <span className="block h-1 w-3/4 mx-auto bg-gradient-to-r from-teal-500 to-blue-500 mt-1 rounded-full"></span>
+        </h2>
+        <p className="mt-4 text-lg text-gray-400 animate-pulse">
+          Cargando información de ubicación...
+        </p>
+      </div>
+      <div className="mt-16 lg:mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div className="h-[480px] bg-gray-200 rounded-lg animate-pulse"></div>
+        <div className="p-6 bg-gray-50 rounded-lg shadow-lg animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+          <div className="h-5 bg-gray-200 rounded w-full"></div>
+          <div className="h-5 bg-gray-200 rounded w-5/6 mx-auto"></div>
+          <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mt-4"></div>
+          <div className="h-5 bg-gray-200 rounded w-full"></div>
+          <div className="h-5 bg-gray-200 rounded w-5/6 mx-auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
 
 const LocationSection = () => {
   const { location, loading, error } = useLocation();
-  const position = [10.098611822058782, -85.3739927038014]; // Coordenadas de ejemplo
+  const position = [10.098611822058782, -85.3739927038014];
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
+  if (loading) return <LocationSkeleton />;
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-center text-red-500">{error}</div>;
   }
 
   if (!location) {
-    return <div>No se encontró la información de la ubicación.</div>;
+    return <div className="text-center text-gray-500">No se encontró la información de la ubicación.</div>;
   }
 
   return (
-    <section className="bg-gray-100 mt-[60px] z-10">
+    <section className="bg-white mt-[60px] z-10">
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-20 lg:px-8">
         <div className="max-w-2xl lg:max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">Visítanos</h2>
+          <h2 className="text-4xl font-extrabold text-teal-600 relative inline-block">
+            Visítanos
+            <span className="block h-1 w-3/4 mx-auto bg-gradient-to-r from-teal-500 to-blue-500 mt-1 rounded-full"></span>
+          </h2>
           <p className="mt-4 text-lg text-gray-500">
             Estamos ubicados en un lugar accesible y estratégico.
           </p>
         </div>
-        <div className="mt-16 lg:mt-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Mapa con el marcador */}
-            <div className="rounded-lg overflow-hidden" style={{ zIndex: 20 }}>
-              <div className="h-[480px] w-full">
-                <MapContainer 
-                  center={position} 
-                  zoom={19} 
-                  className="h-full w-full"
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  <Marker position={position}>
-                    <Popup>
-                      {location.addres}
-                    </Popup>
-                  </Marker>
-                </MapContainer>
-              </div>
-            </div>
-
-            {/* Información de contacto */}
-            <div>
-              <div className="max-w-full mx-auto rounded-lg overflow-hidden">
-                <div className="px-6 py-4">
-                  <h3 className="text-lg font-medium text-gray-900">Nuestra Dirección</h3>
-                  <p className="mt-1 text-gray-600">
-                    <PiMapPinSimpleDuotone className="inline mr-1" />
+        <div className="mt-16 lg:mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          {/* Mapa con el marcador */}
+          <div className="rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105">
+            <div className="h-[480px] w-full">
+              <MapContainer 
+                center={position} 
+                zoom={19} 
+                className="h-full w-full rounded-lg"
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker position={position}>
+                  <Popup>
                     {location.addres}
-                  </p>
-                </div>
-                <div className="border-t border-gray-200 px-6 py-4">
-                  <h3 className="text-lg font-medium text-gray-900">Horario</h3>
-                  <p className="mt-1 text-gray-600">{location.schedule}</p>
-                </div>
-                <div className="border-t border-gray-200 px-6 py-4">
-                  <h3 className="text-lg font-medium text-gray-900">Contacto</h3>
-                  <p className="mt-1 text-gray-600">Email: {location.email}</p>
-                  <p className="mt-1 text-gray-600">Teléfono: {location.phoneNumber}</p>
-                </div>
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+          </div>
+
+          {/* Información de contacto */}
+          <div className="p-6 bg-gray-50 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
+            <div className="max-w-full mx-auto">
+              <div className="px-4 py-9">
+                <h3 className="text-xl font-semibold text-teal-700">Nuestra Dirección</h3>
+                <p className="mt-2 text-gray-600 flex items-center">
+                  <PiMapPinSimpleDuotone className="text-teal-500 w-5 h-5 mr-2" />
+                  {location.addres}
+                </p>
+              </div>
+              <div className="border-t border-gray-200 px-4 py-6">
+                <h3 className="text-xl font-semibold text-teal-700">Horario</h3>
+                <p className="mt-2 text-gray-600">{location.schedule}</p>
+              </div>
+              <div className="border-t border-gray-200 px-4 py-6">
+                <h3 className="text-xl font-semibold text-teal-700">Contacto</h3>
+                <p className="mt-2 text-gray-600">Email: {location.email}</p>
+                <p className="mt-1 text-gray-600">Teléfono: {location.phoneNumber}</p>
               </div>
             </div>
           </div>
