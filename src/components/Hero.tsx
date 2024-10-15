@@ -18,13 +18,13 @@ const Hero: React.FC = () => {
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white font-playfair tracking-wide shadow-lg">
           Colegio Técnico Profesional
         </h1>
-        <h2 className="mt-2 text-4xl md:text-5xl lg:text-6xl font-semibold text-teal-400 shadow-md">
+        <h2 className="mt-2 text-4xl md:text-5xl lg:text-6xl font-semibold text-[#00A8BA] shadow-md">
           La Mansión
         </h2>
         <p className="mt-6 text-lg md:text-xl text-gray-200 font-light max-w-xl px-4">
           Formación técnica de excelencia para el desarrollo integral de nuestros estudiantes.
         </p>
-        <div className="mt-10 h-1 w-1/2 bg-gradient-to-r from-teal-400 via-blue-500 to-purple-500 rounded-full"></div>
+        <div className="mt-10 h-1 w-1/2 bg-gradient-to-r bg-[#00A8BA] rounded-full"></div>
       </div>
     </div>
   );

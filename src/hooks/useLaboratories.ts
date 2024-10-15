@@ -1,64 +1,53 @@
 import { useState, useEffect } from 'react';
-
-import { addLaboratory, deleteLaboratory, fetchLaboratories, updateLaboratory } from '../Services/LaboratoryService';
+import { addLaboratory, deleteLaboratory, fetchLaboratories as fetchLabService, updateLaboratory } from '../Services/LaboratoryService';
 import { Laboratory } from '../types/Types';
-
 
 export const useLaboratories = () => {
   const [laboratories, setLaboratories] = useState<Laboratory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para obtener todos los laboratorios
-  const fetchLaboratories = async () => {
+  const fetchLaboratoriesData = async () => {
+    setLoading(true);
     try {
-      const data = await fetchLaboratories();
+      const data = await fetchLabService();
       setLaboratories(data);
     } catch (err) {
       console.error('Error fetching laboratories:', err);
       setError('Error fetching laboratories');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchLaboratories().finally(() => setLoading(false));
+    fetchLaboratoriesData();
   }, []);
 
-  // Agregar retraso antes de la recarga sin cambiar el estado loading
-  const delayedFetchLaboratories = async (delay: number = 2000) => {
-    setTimeout(async () => {
-      await fetchLaboratories();
-    }, delay);
-  };
-
-  // Función para agregar un laboratorio
   const handleAddLaboratory = async (newLaboratory: Laboratory) => {
     try {
       await addLaboratory(newLaboratory);
-      delayedFetchLaboratories();
+      fetchLaboratoriesData();
     } catch (err) {
       console.error('Error adding laboratory:', err);
       setError('Error adding laboratory');
     }
   };
 
-  // Función para editar un laboratorio
   const handleEditLaboratory = async (id: number, updatedLaboratory: Laboratory) => {
     try {
       await updateLaboratory(id, updatedLaboratory);
-      delayedFetchLaboratories();
+      fetchLaboratoriesData();
     } catch (err) {
       console.error('Error editing laboratory:', err);
       setError('Error editing laboratory');
     }
   };
 
-  // Función para eliminar un laboratorio
   const handleDeleteLaboratory = async (id: number) => {
     try {
       await deleteLaboratory(id);
-      delayedFetchLaboratories();
+      fetchLaboratoriesData();
     } catch (err) {
       console.error('Error deleting laboratory:', err);
       setError('Error deleting laboratory');

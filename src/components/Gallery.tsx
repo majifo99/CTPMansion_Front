@@ -117,9 +117,9 @@ export function Gallery() {
   return (
     <div className="my-10 mx-auto max-w-4xl">
       {/* Título con color verde azulado y subrayado */}
-      <h2 className="text-4xl font-extrabold text-center text-teal-600 mb-2 relative">
+      <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]  text-center mb-2 relative">
         ¡Explora Nuestra Galería del Colegio!
-        <div className="w-3/4 h-1 bg-gradient-to-r from-teal-500 to-green-500 mx-auto mt-1 rounded-full"></div>
+        <span className="absolute left-1/2 transform -translate-x-1/2 -bottom-3 h-1 w-4/5 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] rounded-md"></span>
       </h2>
 
       <div className="relative w-full overflow-hidden" ref={containerRef}>
