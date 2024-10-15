@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+
 import { addLaboratory, deleteLaboratory, fetchLaboratories as fetchLabService, updateLaboratory } from '../Services/LaboratoryService';
+
 import { Laboratory } from '../types/Types';
 
 export const useLaboratories = () => {
@@ -7,20 +9,27 @@ export const useLaboratories = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+
   const fetchLaboratoriesData = async () => {
+
     setLoading(true);
     try {
       const data = await fetchLabService();
       setLaboratories(data);
+      setError(null); // Restablecer el error en caso de éxito
     } catch (err) {
+
       console.error('Error fetching laboratories:', err);
       setError('Error fetching laboratories');
+
     } finally {
       setLoading(false);
     }
   };
 
+  // Cargar laboratorios al montar el componente
   useEffect(() => {
+
     fetchLaboratoriesData();
   }, []);
 
@@ -28,29 +37,31 @@ export const useLaboratories = () => {
     try {
       await addLaboratory(newLaboratory);
       fetchLaboratoriesData();
+
     } catch (err) {
-      console.error('Error adding laboratory:', err);
-      setError('Error adding laboratory');
+      handleError('Error adding laboratory', err);
     }
   };
 
   const handleEditLaboratory = async (id: number, updatedLaboratory: Laboratory) => {
     try {
       await updateLaboratory(id, updatedLaboratory);
+
       fetchLaboratoriesData();
+
     } catch (err) {
-      console.error('Error editing laboratory:', err);
-      setError('Error editing laboratory');
+      handleError('Error editing laboratory', err);
     }
   };
 
   const handleDeleteLaboratory = async (id: number) => {
     try {
       await deleteLaboratory(id);
+
       fetchLaboratoriesData();
+
     } catch (err) {
-      console.error('Error deleting laboratory:', err);
-      setError('Error deleting laboratory');
+      handleError('Error deleting laboratory', err);
     }
   };
 
