@@ -18,31 +18,21 @@ const ManageLabRequests: React.FC = () => {
   const notifySuccess = (message: string) => toast.success(message);
   const notifyError = (message: string) => toast.error(message);
 
-  const approveRequest = async (id: number | undefined) => {
-    if (!id) {
-      notifyError('ID de solicitud inválido');
-      return;
-    }
-
+  const approveRequest = async (id: number) => {
     try {
       await handleApproveLabRequest(id);
       notifySuccess('Solicitud de laboratorio aprobada exitosamente');
-      fetchLabRequestsData();
+      await fetchLabRequestsData(); // Asegura que los datos se recarguen después de la aprobación
     } catch {
       notifyError('Error al aprobar la solicitud');
     }
   };
 
-  const rejectRequest = async (id: number | undefined) => {
-    if (!id) {
-      notifyError('ID de solicitud inválido');
-      return;
-    }
-
+  const rejectRequest = async (id: number) => {
     try {
       await handleRejectLabRequest(id);
       notifySuccess('Solicitud de laboratorio rechazada exitosamente');
-      fetchLabRequestsData();
+      await fetchLabRequestsData(); // Asegura que los datos se recarguen después de la denegación
     } catch {
       notifyError('Error al rechazar la solicitud');
     }
@@ -99,13 +89,13 @@ const ManageLabRequests: React.FC = () => {
                   <div className="flex space-x-4 mt-4">
                     <button
                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                      onClick={() => approveRequest(request.id_LaboratoryRequest)}
+                      onClick={() => approveRequest(request.id_LaboratoryRequest!)}
                     >
                       Aprobar
                     </button>
                     <button
                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                      onClick={() => rejectRequest(request.id_LaboratoryRequest)}
+                      onClick={() => rejectRequest(request.id_LaboratoryRequest!)}
                     >
                       Rechazar
                     </button>

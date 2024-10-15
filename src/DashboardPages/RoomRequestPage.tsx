@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RoomRequest, RequestStatus } from '../types/RoomRequestType';
 import { Room } from '../types/Types';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -28,8 +28,8 @@ const getUserIdFromToken = (): string | null => {
 
 const RoomRequestCard: React.FC = () => {
   const { rooms, roomRequests, loading, error, fetchRoomRequestsData } = useRoomsAndRequests();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>>();
-  const { isSubmitting, submitRoomRequest, error: submitError } = useRoomRequest();
+  const { register, handleSubmit, reset } = useForm<Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>>();
+  const { isSubmitting, submitRoomRequest } = useRoomRequest();
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedRoomForRequest, setSelectedRoomForRequest] = useState<Room | null>(null);
   const [selectedRoomForCalendar, setSelectedRoomForCalendar] = useState<Room | null>(null);
@@ -43,26 +43,63 @@ const RoomRequestCard: React.FC = () => {
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
-  const onSubmit = (data: Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>) => {
+  const onSubmit = async (data) => {
     if (selectedRoomForRequest && userId) {
+      const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
+      const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
+
+      // Validación para días de la semana (no permitir fines de semana)
+      if (startDateTime.day() === 6 || startDateTime.day() === 0) {
+        notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
+        return;
+      }
+
+      // Validaciones de Fecha y Hora con notificaciones de error
+      if (startDateTime.isBefore(moment())) {
+        notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
+        return;
+      }
+      if (startDateTime.hour() < 6 || startDateTime.hour() >= 16 || (startDateTime.hour() === 16 && startDateTime.minute() > 20)) {
+        notifyError("La hora de inicio debe estar dentro del horario de colegio (6:00 am - 4:20 pm).");
+        return;
+      }
+      if (endDateTime.hour() < 6 || endDateTime.hour() >= 16 || (endDateTime.hour() === 16 && endDateTime.minute() > 20)) {
+        notifyError("La hora de fin debe estar dentro del horario de colegio (6:00 am - 4:20 pm).");
+        return;
+      }
+      if (startDateTime.isSameOrAfter(endDateTime)) {
+        notifyError("La hora de inicio debe ser anterior a la hora de fin.");
+        return;
+      }
+
+      const duration = moment.duration(endDateTime.diff(startDateTime));
+      if (duration.asMinutes() < 30) {
+        notifyError("La duración mínima de la solicitud es de 30 minutos.");
+        return;
+      }
+      if (duration.asHours() > 8) {
+        notifyError("La duración máxima de la solicitud es de 8 horas.");
+        return;
+      }
+
       const requestPayload = { ...data, roomId: selectedRoomForRequest.id_Room, userId };
-      submitRoomRequest(requestPayload)
-        .then(() => {
-          reset();
-          notifySuccess();
-          setSelectedRoomForRequest(null);
-          fetchRoomRequestsData();
-        })
-        .catch(() => {
-          notifyError('Error al enviar la solicitud.');
-        });
+      
+      try {
+        await submitRoomRequest(requestPayload);
+        reset();
+        notifySuccess();
+        setSelectedRoomForRequest(null);
+        fetchRoomRequestsData();
+      } catch (error) {
+        notifyError('Error al enviar la solicitud.');
+      }
     } else {
       notifyError('No se pudo obtener el usuario o la sala seleccionada.');
     }
   };
 
-  const renderInputField = (id: string, label: string, placeholder: string, validation: any, type = 'text') => (
-    <div className="flex flex-col mb-4 px-2">
+  const renderInputField = (id, label, placeholder, validation, type = 'text') => (
+    <div className="flex flex-col mb-2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <input
         type={type}
@@ -71,27 +108,50 @@ const RoomRequestCard: React.FC = () => {
         {...register(id, validation)}
         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
       />
-      {errors[id] && <p className="text-red-600 text-sm">{errors[id].message}</p>}
     </div>
   );
 
-  const Modal = ({ onClose }: { onClose: () => void }) => (
+  const renderDropdownField = (id, label, options) => (
+    <div className="flex flex-col mb-2 px-2">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
+      <select
+        id={id}
+        {...register(id, { required: 'Este campo es obligatorio' })}
+        className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const Modal = ({ onClose }) => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-3xl">
-        <h3 className="text-lg font-semibold mb-4">Solicitud para {selectedRoomForRequest?.name}</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="bg-white rounded-lg p-6 w-full max-w-3xl relative">
+        <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 text-3xl font-bold">&times;</button>
+        <h3 className="text-lg font-semibold mb-4 text-center">Solicitud para {selectedRoomForRequest?.name}</h3>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {renderInputField('managerName', 'Nombre del Encargado', 'Juan', { required: 'El nombre es obligatorio' })}
           {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', { required: 'El primer apellido es obligatorio' })}
           {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez', { required: 'El segundo apellido es obligatorio' })}
-          {renderInputField('course', 'Curso', 'Matemáticas', { required: 'El curso es obligatorio' })}
-          {renderInputField('activityDescription', 'Descripción de la Actividad', 'Descripción', { required: 'La descripción es obligatoria' })}
-          {renderInputField('needs', 'Necesidades', 'Equipos', { required: 'Las necesidades son obligatorias' })}
-          {renderInputField('numberOfAttendees', 'Número de Asistentes', '5', { required: 'El número de asistentes es obligatorio', min: 1, valueAsNumber: true }, 'number')}
+          {renderInputField('course', 'Curso', 'Literatura', { required: 'El curso es obligatorio' })}
+          {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de música', { required: 'La descripción es obligatoria' })}
+          {renderInputField('needs', 'Necesidades', 'Equipo de sonido', { required: 'Las necesidades son obligatorias' })}
+
+          {selectedRoomForRequest && renderDropdownField(
+            'numberOfAttendees',
+            'Número de Asistentes',
+            Array.from({ length: selectedRoomForRequest.capacity }, (_, i) => i + 1)
+          )}
+          
           {renderInputField('startDate', 'Fecha de Inicio', '', { required: 'La fecha de inicio es obligatoria' }, 'date')}
           {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date')}
           {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time')}
           {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time')}
-          
+
           <div className="w-full flex justify-end sm:col-span-2">
             <button
               type="submit"
@@ -102,8 +162,6 @@ const RoomRequestCard: React.FC = () => {
             </button>
           </div>
         </form>
-        {submitError && <p className="text-red-600 mt-4">{submitError}</p>}
-        <button onClick={onClose} className="mt-4 text-gray-600">Cerrar</button>
       </div>
     </div>
   );
@@ -117,9 +175,7 @@ const RoomRequestCard: React.FC = () => {
     const end = moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate();
 
     return {
-
       title: `Reservado: ${request.managerName}`,
-
       start,
       end,
     };
