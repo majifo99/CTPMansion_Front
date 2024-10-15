@@ -5,12 +5,12 @@ import { useOurServices } from '../hooks/useOurServices';
 
 // Mapear iconos
 const iconMapper = {
-  BiBookReader: <BiBookReader className="w-12 h-12 text-[#006494]" />,
-  BiBusSchool: <BiBusSchool className="w-12 h-12 text-[#006494]" />,
-  TbBallFootball: <TbBallFootball className="w-12 h-12 text-[#006494]" />,
+  BiBookReader: <BiBookReader className="w-12 h-12 text-[#ff7a59]" />,
+  BiBusSchool: <BiBusSchool className="w-12 h-12 text-[#e1cf97]" />,
+  TbBallFootball: <TbBallFootball className="w-12 h-12 text-[#2E4A5A]" />,
   TbBowlSpoon: <TbBowlSpoon className="w-12 h-12 text-[#006494]" />,
   TbUserHeart: <TbUserHeart className="w-12 h-12 text-[#87a330]" />,
-  TbUserQuestion: <TbUserQuestion className="w-12 h-12 text-[#d9534f]" />,
+  TbUserQuestion: <TbUserQuestion className="w-12 h-12 text-[#6EC2D7]" />,
   TbPigMoney: <TbPigMoney className="w-12 h-12 text-[#d9534f]" />,
   TbHome: <TbHome className="w-12 h-12 text-[#d9534f]" />,
 };
@@ -34,9 +34,9 @@ const OurServices: React.FC = () => {
       <div className="container px-5 mx-auto">
         {/* Título animado y centrado */}
         <div className="flex justify-center">
-          <h2 className="relative text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 text-center mb-10 animate-fadeInUp">
+          <h2 className="relative text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B] text-center mb-10 animate-fadeInUp ">
             Nuestros Servicios
-            <span className="absolute left-1/2 transform -translate-x-1/2 -bottom-2 h-1 w-3/4 bg-gradient-to-r from-blue-600 to-blue-400 rounded-md animate-expandWidth"></span>
+            <span className="absolute left-1/2 transform -translate-x-1/2 -bottom-3 h-1 w-4/5 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] rounded-md "></span>
           </h2>
         </div>
 
@@ -64,9 +64,9 @@ const OurServices: React.FC = () => {
                     <BiBookReader className="w-12 h-12 text-[#006494]" aria-hidden="true" />
                   )}
                   {/* Título del servicio */}
-                  <h2 className="text-xl font-semibold text-gray-900 mt-4 mb-2">
+                  <h3 className="text-xl font-semibold text-gray-900 mt-4 mb-2">
                     {service.title}
-                  </h2>
+                  </h3>
                   <p className="text-sm text-gray-600 opacity-80">
                     Un servicio para toda la comunidad estudiantil
                   </p>

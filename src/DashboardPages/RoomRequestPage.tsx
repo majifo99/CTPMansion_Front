@@ -95,7 +95,7 @@ const RoomRequestCard: React.FC = () => {
           <div className="w-full flex justify-end sm:col-span-2">
             <button
               type="submit"
-              className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2"
+              className="w-full text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
@@ -140,7 +140,7 @@ const RoomRequestCard: React.FC = () => {
             <p className="flex-grow">{room.description}</p>
             <p className="mt-2 text-sm">Capacidad: {room.capacity}</p>
             <button
-              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
               onClick={() => {
                 setSelectedRoomForCalendar(room);
                 setIsCalendarOpen(true);
@@ -149,7 +149,7 @@ const RoomRequestCard: React.FC = () => {
               Ver Disponibilidad
             </button>
             <button
-              className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800"
               onClick={() => setSelectedRoomForRequest(room)}
             >
               Solicitar Sala

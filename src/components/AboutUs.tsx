@@ -45,12 +45,12 @@ const AboutUs = () => {
             <p className="text-sm uppercase tracking-wider text-burntOrange">
               {content.title}
             </p>
-            <h2 className="mb-6 text-5xl font-light leading-snug tracking-tight text-softGreen sm:text-7xl sm:leading-snug">
+            <h1 className="mb-6 text-5xl font-light leading-snug tracking-tight text-[#34436B] sm:text-7xl sm:leading-snug">
               ¿Quiénes{' '}
-              <span className="inline-block font-bold text-darkBlue bg-gradient-to-r from-softGreen to-burntOrange bg-clip-text text-transparent">
+              <span className="inline-block font-bold text-darkBlue bg-gradient-to-r from-[#34436B] to-[#34436B] bg-clip-text text-transparent">
                 Somos?
               </span>
-            </h2>
+            </h1>
             <p className="text-base text-darkBlue leading-relaxed animate-fadeInUp">
               {content.description}
             </p>
