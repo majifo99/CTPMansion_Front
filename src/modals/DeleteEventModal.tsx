@@ -18,10 +18,10 @@ const DeleteEventModal: React.FC<DeleteEventModalProps> = ({ show, onClose, onCo
             className="bg-red-500 text-white px-4 py-2 rounded mr-2"
             onClick={onConfirm}
           >
-            Confirmar
+            Eliminar
           </button>
           <button
-            className="bg-gray-500 text-white px-4 py-2 rounded"
+            className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
             onClick={onClose}
           >
             Cancelar

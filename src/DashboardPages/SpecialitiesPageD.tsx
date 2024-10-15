@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useSpecialities } from '../hooks/useSpecialities';
-import EditSpecialityModal from '../modals/EditSpecialityModal'; // Modal para agregar/editar especialidad
-import DeleteEventModal from '../modals/DeleteEventModal'; // Modal para confirmar eliminación
+import EditSpecialityModal from '../modals/EditSpecialityModal';
+import DeleteEventModal from '../modals/DeleteEventModal';
+
 import { Speciality } from '../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SpecialityForm from './SpecialityForm';
 
 const SpecialitiesPage: React.FC = () => {
   const { specialities, loading, error, handleAddSpeciality, handleEditSpeciality, handleDeleteSpeciality } = useSpecialities();
@@ -14,19 +16,19 @@ const SpecialitiesPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [deletingSpecialityId, setDeletingSpecialityId] = useState<number | null>(null);
 
-  // Abre el modal de edición o creación
+  // Abrir el modal de edición o creación
   const handleOpenEditModal = (speciality?: Speciality) => {
     setEditingSpeciality(speciality || null);
     setShowEditModal(true);
   };
 
-  // Cierra el modal de edición
+  // Cerrar el modal de edición
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setEditingSpeciality(null);
   };
 
-  // Guarda la especialidad (agrega o edita)
+  // Guardar la especialidad (agregar o editar)
   const handleSaveSpeciality = (speciality: Speciality) => {
     if (editingSpeciality) {
       handleEditSpeciality(editingSpeciality.id, speciality);
@@ -44,13 +46,13 @@ const SpecialitiesPage: React.FC = () => {
     setShowDeleteModal(true);
   };
 
-  // Cierra el modal de confirmación de eliminación
+  // Cerrar el modal de confirmación de eliminación
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setDeletingSpecialityId(null);
   };
 
-  // Elimina la especialidad después de la confirmación
+  // Confirmación de eliminación
   const handleConfirmDelete = () => {
     if (deletingSpecialityId !== null) {
       handleDeleteSpeciality(deletingSpecialityId);
@@ -63,15 +65,20 @@ const SpecialitiesPage: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="p-8 bg-gray-600">
-      <h1 className="text-3xl font-bold mb-6 text-center text-stone-50">Gestión de Especialidades</h1>
-      <div className="flex justify-end mb-6 mr-10">
-      <button className=" bg-softGreen hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg " onClick={() => handleOpenEditModal()}>
-        <AiTwotonePlusSquare size={30} />
-      </button>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">Gestión de Especialidades</h1>
+
+      <div className="flex justify-end mb-6">
+        <button
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+          onClick={() => handleOpenEditModal()}
+        >
+          <AiTwotonePlusSquare size={30} />
+        </button>
       </div>
+
       <div className="overflow-x-auto">
-        <table className="table-auto w-full bg-white text-gray-800 rounded-lg shadow-lg">
+        <table className="table-auto w-full bg-white text-gray-800 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-200">
               <th className="px-4 py-2">Título</th>
@@ -88,12 +95,18 @@ const SpecialitiesPage: React.FC = () => {
                 <td className="border px-4 py-2">
                   <img src={speciality.url_Image} alt={speciality.title} className="h-16 w-16 object-cover rounded-lg mx-auto" />
                 </td>
-                <td className="border px-4 py-2">
-                  <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2" onClick={() => handleOpenEditModal(speciality)}>
-                  <AiTwotoneEdit size={20} />
+                <td className="border px-4 py-2 flex justify-center">
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
+                    onClick={() => handleOpenEditModal(speciality)}
+                  >
+                    <AiTwotoneEdit size={24} />
                   </button>
-                  <button className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded" onClick={() => handleOpenDeleteModal(speciality.id)}>
-                    <AiFillDelete size={20} />
+                  <button
+                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                    onClick={() => handleOpenDeleteModal(speciality.id)}
+                  >
+                    <AiFillDelete size={24} />
                   </button>
                 </td>
               </tr>
@@ -105,10 +118,14 @@ const SpecialitiesPage: React.FC = () => {
       {/* Modal para agregar/editar especialidad */}
       <EditSpecialityModal
         show={showEditModal}
-        speciality={editingSpeciality}
         onClose={handleCloseEditModal}
-        onSave={handleSaveSpeciality}
-      />
+      >
+        <SpecialityForm
+          speciality={editingSpeciality}
+          onSave={handleSaveSpeciality}
+          onCancel={handleCloseEditModal} // Pasamos onCancel para cerrar el modal
+        />
+      </EditSpecialityModal>
 
       {/* Modal para confirmar eliminación */}
       <DeleteEventModal
@@ -118,7 +135,7 @@ const SpecialitiesPage: React.FC = () => {
       />
 
       {/* Contenedor de Toast */}
-      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover />
     </div>
   );
 };

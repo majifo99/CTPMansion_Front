@@ -31,11 +31,11 @@ const Sidebar: React.FC = () => {
             <div className="pl-4">
               <Link to="/dashboard/solicitar-sala" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <MdRoom className="mr-2" />
-                Solicitar Sala
+                Solicitar sala
               </Link>
               <Link to="/dashboard/solicitar-laboratorio" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <MdScience className="mr-2" />
-                Solicitar Laboratorio
+                Solicitar laboratorio
               </Link>
             </div>
           )}
@@ -53,7 +53,7 @@ const Sidebar: React.FC = () => {
             <div className="pl-4">
               <Link to="/dashboard/roles" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <FiUsers className="mr-2" />
-                Gestión de Usuarios
+                Gestión de roles
               </Link>
               <Link to="/dashboard/salas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <MdRoom className="mr-2" />
@@ -77,7 +77,7 @@ const Sidebar: React.FC = () => {
             className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer"
             onClick={() => setIsCreacionElaboracionOpen(!isCreacionElaboracionOpen)}
           >
-            Creación y Elaboración {isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />}
+            Creación y elaboración {isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />}
           </h3>
           {isCreacionElaboracionOpen && (
             <div className="pl-4">
@@ -99,11 +99,11 @@ const Sidebar: React.FC = () => {
               </Link>
               <Link to="/dashboard/elaborar-salas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <FaPlus className="mr-2" />
-                Elaborar Salas
+                Elaborar salas
               </Link>
               <Link to="/dashboard/elaborar-laboratorios" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <FaPlus className="mr-2" />
-                Elaborar Laboratorios
+                Elaborar laboratorios
               </Link>
             </div>
           )}
