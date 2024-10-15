@@ -6,55 +6,70 @@ import { LabRequest } from '../types/LaboratoryRequestType';
 export const useLabsAndRequests = () => {
   const [labs, setLabs] = useState<Laboratory[]>([]);
   const [labRequests, setLabRequests] = useState<LabRequest[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingLabs, setLoadingLabs] = useState<boolean>(true);
+  const [loadingRequests, setLoadingRequests] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Función para cargar laboratorios
   const fetchLabsData = async () => {
+    setLoadingLabs(true);
     try {
       const data = await fetchLaboratories();
       setLabs(data);
+      setError(null); // Resetea el error si los datos se cargan correctamente
     } catch (error) {
       console.error('Error al obtener los laboratorios:', error);
       setError('Error al obtener los laboratorios');
+    } finally {
+      setLoadingLabs(false);
     }
   };
 
+  // Función para cargar solicitudes de laboratorio
   const fetchLabRequestsData = async () => {
+    setLoadingRequests(true);
     try {
       const data = await fetchLabRequests();
       setLabRequests(data);
+      setError(null); // Resetea el error si los datos se cargan correctamente
     } catch (error) {
       console.error('Error al obtener las solicitudes de laboratorio:', error);
       setError('Error al obtener las solicitudes de laboratorio');
+    } finally {
+      setLoadingRequests(false);
     }
   };
 
+  // Carga inicial de datos
   useEffect(() => {
-    setLoading(true);
-    Promise.all([fetchLabsData(), fetchLabRequestsData()])
-      .finally(() => setLoading(false));
+    fetchLabsData();
+    fetchLabRequestsData();
   }, []);
 
+  // Función de recarga con retraso opcional
   const delayedFetchData = async (delay: number = 2000) => {
     setTimeout(async () => {
-      await Promise.all([fetchLabsData(), fetchLabRequestsData()]);
+      await fetchLabsData();
+      await fetchLabRequestsData();
     }, delay);
   };
 
+  // Aprobar solicitud de laboratorio
   const handleApproveLabRequest = async (id: number) => {
     try {
       await approveLabRequest(id);
-      delayedFetchData();
+      fetchLabRequestsData(); // Recarga inmediatamente después de aprobar
     } catch (error) {
       console.error('Error al aprobar la solicitud:', error);
       setError('Error al aprobar la solicitud');
     }
   };
 
+  // Rechazar solicitud de laboratorio
   const handleRejectLabRequest = async (id: number) => {
     try {
       await rejectLabRequest(id);
-      delayedFetchData();
+      fetchLabRequestsData(); // Recarga inmediatamente después de rechazar
     } catch (error) {
       console.error('Error al rechazar la solicitud:', error);
       setError('Error al rechazar la solicitud');
@@ -64,7 +79,7 @@ export const useLabsAndRequests = () => {
   return {
     labs,
     labRequests,
-    loading,
+    loading: loadingLabs || loadingRequests, // Combinación de estados de carga
     error,
     handleApproveLabRequest,
     handleRejectLabRequest,

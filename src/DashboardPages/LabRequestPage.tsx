@@ -7,13 +7,16 @@ import { useLabRequest } from '../hooks/useLabRequest';
 import { Laboratory } from '../types/Types';
 import { jwtDecode } from 'jwt-decode';
 import { LabRequest } from '../types/LaboratoryRequestType';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-// Interfaz para el token decodificado
+const localizer = momentLocalizer(moment);
+
 interface DecodedToken {
   nameid: string;
 }
 
-// Función para obtener el userId del token
 const getUserIdFromToken = (): string | null => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -23,15 +26,15 @@ const getUserIdFromToken = (): string | null => {
   return null;
 };
 
-// Función auxiliar para formatear fecha y hora
 const formatDateTime = (date: Date): string => date.toISOString().split('.')[0];
 const formatTime = (time: string): string => (time.includes(":") ? time : `${time}:00`);
 
 const LabRequestPage: React.FC = () => {
-  const { labs, loading, error } = useLabsAndRequests();
+  const { labs, labRequests, loading, error, fetchLabRequestsData } = useLabsAndRequests();
   const [selectedLab, setSelectedLab] = useState<Laboratory | null>(null);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<Omit<LabRequest, 'id_LabRequest' | 'status'>>();
-  const { isSubmitting, error: submitError, submitLabRequest } = useLabRequest();
+  const [activeModal, setActiveModal] = useState<"form" | "calendar" | null>(null); // Define qué componente está activo
+  const { register, handleSubmit, reset } = useForm<Omit<LabRequest, 'id_LabRequest' | 'status'>>();
+  const { isSubmitting, submitLabRequest } = useLabRequest();
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,8 +45,44 @@ const LabRequestPage: React.FC = () => {
   const notifySuccess = () => toast.success('Solicitud de laboratorio enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
-  const onSubmit = (data: Omit<LabRequest, 'id_LabRequest' | 'status'>) => {
+  const onSubmit = async (data: Omit<LabRequest, 'id_LabRequest' | 'status'>) => {
     if (selectedLab && userId) {
+      const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
+      const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
+
+      // Validaciones para fechas y horarios
+      if (startDateTime.day() === 6 || startDateTime.day() === 0) {
+        notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
+        return;
+      }
+
+      if (startDateTime.isBefore(moment())) {
+        notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
+        return;
+      }
+      if (startDateTime.hour() < 6 || startDateTime.hour() >= 16 || (startDateTime.hour() === 16 && startDateTime.minute() > 20)) {
+        notifyError("La hora de inicio debe estar dentro del horario de laboratorio (6:00 am - 4:20 pm).");
+        return;
+      }
+      if (endDateTime.hour() < 6 || endDateTime.hour() >= 16 || (endDateTime.hour() === 16 && endDateTime.minute() > 20)) {
+        notifyError("La hora de fin debe estar dentro del horario de laboratorio (6:00 am - 4:20 pm).");
+        return;
+      }
+      if (startDateTime.isSameOrAfter(endDateTime)) {
+        notifyError("La hora de inicio debe ser anterior a la hora de fin.");
+        return;
+      }
+
+      const duration = moment.duration(endDateTime.diff(startDateTime));
+      if (duration.asMinutes() < 30) {
+        notifyError("La duración mínima de la solicitud es de 30 minutos.");
+        return;
+      }
+      if (duration.asHours() > 8) {
+        notifyError("La duración máxima de la solicitud es de 8 horas.");
+        return;
+      }
+
       const labRequest = {
         ...data,
         id_LabRequest: 0,
@@ -56,15 +95,16 @@ const LabRequestPage: React.FC = () => {
         endTime: formatTime(data.endTime)
       };
 
-      submitLabRequest(labRequest)
-        .then(() => {
-          reset();
-          notifySuccess();
-          setSelectedLab(null);
-        })
-        .catch(() => {
-          notifyError('Error al enviar la solicitud.');
-        });
+      try {
+        await submitLabRequest(labRequest);
+        reset();
+        notifySuccess();
+        setSelectedLab(null);
+        setActiveModal(null); // Cierra el formulario después de enviar
+        fetchLabRequestsData();
+      } catch {
+        notifyError('Error al enviar la solicitud.');
+      }
     } else {
       notifyError('No se pudo obtener el usuario o el laboratorio seleccionado.');
     }
@@ -80,13 +120,28 @@ const LabRequestPage: React.FC = () => {
         {...register(id, validation)}
         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
       />
-      {errors[id] && <p className="text-red-600 text-sm">{errors[id].message}</p>}
+    </div>
+  );
+
+  const renderDropdownField = (id: string, label: string, options: number[]) => (
+    <div className="flex flex-col mb-4 w-1/2 px-2">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
+      <select
+        id={id}
+        {...register(id, { required: 'Este campo es obligatorio' })}
+        className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
+      >
+        {options.map(option => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+      </select>
     </div>
   );
 
   const Modal = ({ onClose }: { onClose: () => void }) => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl relative">
+        <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 text-3xl font-bold">&times;</button>
         <h3 className="text-lg font-semibold mb-4">Solicitud para {selectedLab?.name}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap space-y-4 mt-4">
           {renderInputField('managerName', 'Nombre del Encargado', 'Juan', { required: 'El nombre es obligatorio' })}
@@ -95,7 +150,13 @@ const LabRequestPage: React.FC = () => {
           {renderInputField('course', 'Curso', 'Matemáticas', { required: 'El curso es obligatorio' })}
           {renderInputField('activityDescription', 'Descripción de la Actividad', 'Descripción', { required: 'La descripción es obligatoria' })}
           {renderInputField('needs', 'Necesidades', 'Equipos', { required: 'Las necesidades son obligatorias' })}
-          {renderInputField('numberOfAttendees', 'Número de Asistentes', '5', { required: 'El número de asistentes es obligatorio', min: 1, valueAsNumber: true }, 'number')}
+
+          {selectedLab && renderDropdownField(
+            'numberOfAttendees',
+            'Número de Asistentes',
+            Array.from({ length: selectedLab.capacity }, (_, i) => i + 1)
+          )}
+          
           {renderInputField('startDate', 'Fecha de Inicio', '', { required: 'La fecha de inicio es obligatoria' }, 'date')}
           {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date')}
           {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time')}
@@ -111,11 +172,24 @@ const LabRequestPage: React.FC = () => {
             </button>
           </div>
         </form>
-        {submitError && <p className="text-red-600 mt-4">{submitError}</p>}
-        <button onClick={onClose} className="mt-4 text-gray-600">Cerrar</button>
       </div>
     </div>
   );
+
+  const approvedRequests = labRequests.filter(
+    (request) => request.laboratoryId === selectedLab?.id_Laboratory && request.status === 1
+  );
+
+  const events = approvedRequests.map((request) => {
+    const start = moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate();
+    const end = moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate();
+
+    return {
+      title: `Reservado: ${request.managerName}`,
+      start,
+      end,
+    };
+  });
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
@@ -127,16 +201,55 @@ const LabRequestPage: React.FC = () => {
           <div
             key={lab.id_Laboratory}
             className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
-            onClick={() => setSelectedLab(lab)}
           >
             <h3 className="font-semibold text-lg mb-2">{lab.name}</h3>
             <p className="flex-grow">{lab.description}</p>
             <p className="mt-2 text-sm">Capacidad: {lab.capacity}</p>
+            <button
+              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
+              onClick={() => {
+                setSelectedLab(lab);
+                setActiveModal("calendar");
+              }}
+            >
+              Ver Disponibilidad
+            </button>
+            <button
+              className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800"
+              onClick={() => {
+                setSelectedLab(lab);
+                setActiveModal("form");
+              }}
+            >
+              Reservar Laboratorio
+            </button>
           </div>
         ))}
       </div>
 
-      {selectedLab && <Modal onClose={() => setSelectedLab(null)} />}
+      {activeModal === "calendar" && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full">
+            <h2 className="text-2xl font-bold mb-4 text-center">Disponibilidad del Laboratorio</h2>
+            <Calendar
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: 500 }}
+              className="border-2 border-gray-300 rounded-lg shadow-lg"
+            />
+            <button
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 w-full"
+              onClick={() => setActiveModal(null)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "form" && <Modal onClose={() => setActiveModal(null)} />}
 
       <ToastContainer />
     </div>
