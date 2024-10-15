@@ -6,9 +6,10 @@ interface WorkshopFormProps {
   workshop: Workshop | null;
   specialities: Speciality[];
   onSave: (workshop: Omit<Workshop, 'id'>) => void;
+  onCancel: () => void; // Prop para manejar el cierre del modal
 }
 
-const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onSave }) => {
+const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onSave, onCancel }) => {
   const { control, handleSubmit, reset } = useForm<Omit<Workshop, 'id'>>({
     defaultValues: workshop || { title: '', description: '', especiality: '', url_Image: '' },
   });
@@ -19,9 +20,9 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-white p-4 rounded-lg shadow">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Título</label>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-gray-800">
+      <div className="flex flex-col">
+        <label className="mb-2 font-semibold">Título</label>
         <Controller
           name="title"
           control={control}
@@ -29,7 +30,7 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
             <input
               {...field}
               type="text"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese el título"
               required
             />
@@ -37,15 +38,15 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Descripción</label>
+      <div className="flex flex-col">
+        <label className="mb-2 font-semibold">Descripción</label>
         <Controller
           name="description"
           control={control}
           render={({ field }) => (
             <textarea
               {...field}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese la descripción"
               required
             />
@@ -53,15 +54,15 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Especialidad</label>
+      <div className="flex flex-col">
+        <label className="mb-2 font-semibold">Especialidad</label>
         <Controller
           name="especiality"
           control={control}
           render={({ field }) => (
             <select
               {...field}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm"
+              className="border border-gray-300 p-2 rounded-md"
               required
             >
               <option value="">Seleccione una especialidad</option>
@@ -75,8 +76,8 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">URL de Imagen</label>
+      <div className="flex flex-col">
+        <label className="mb-2 font-semibold">URL de Imagen</label>
         <Controller
           name="url_Image"
           control={control}
@@ -84,7 +85,7 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
             <input
               {...field}
               type="text"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese la URL de la imagen"
               required
             />
@@ -92,12 +93,25 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
         />
       </div>
 
-      <button
-        type="submit"
-        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      >
-        Guardar
-      </button>
+      {/* Botones de Guardar y Cancelar alineados horizontalmente */}
+      <div className="flex justify-end space-x-4 mt-4">
+        <button
+          type="button"
+          onClick={() => {
+            reset();
+            onCancel();
+          }}
+          className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+        >
+          Guardar
+        </button>
+      </div>
     </form>
   );
 };

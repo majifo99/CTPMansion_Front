@@ -5,13 +5,15 @@ import { Speciality } from '../types/Types';
 interface SpecialityFormProps {
   speciality: Speciality | null;
   onSave: (speciality: Speciality) => void;
+  onCancel: () => void; // Añade onCancel como prop para cerrar el modal
 }
 
-const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave }) => {
+const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onCancel }) => {
   const { control, handleSubmit, reset } = useForm<Speciality>({
     defaultValues: speciality || { id: 0, title: '', description: '', url_Image: '' },
   });
 
+  // Enviar el formulario y guardar la especialidad
   const onSubmit = (data: Speciality) => {
     onSave(data);
     reset();
@@ -35,6 +37,7 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave }) =
           )}
         />
       </div>
+
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">Descripción</label>
         <Controller
@@ -50,6 +53,7 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave }) =
           )}
         />
       </div>
+
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">URL de Imagen</label>
         <Controller
@@ -66,9 +70,23 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave }) =
           )}
         />
       </div>
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
-        Guardar
-      </button>
+
+      {/* Botones de Guardar y Cancelar alineados horizontalmente */}
+      <div className="flex justify-end space-x-4 mt-4">
+        <button
+          type="button"
+          onClick={() => {
+            reset();
+            onCancel(); // Llama a onCancel para cerrar el modal
+          }}
+          className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
+        >
+          Cancelar
+        </button>
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+          Guardar
+        </button>
+      </div>
     </form>
   );
 };

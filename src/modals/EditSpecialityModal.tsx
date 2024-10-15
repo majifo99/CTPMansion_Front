@@ -1,31 +1,24 @@
-import React from 'react';
-import SpecialityForm from '../DashboardPages/SpecialityForm'; // Importa el formulario
-import { Speciality } from '../types/Types';
+import React, { ReactNode } from 'react';
 
 interface EditSpecialityModalProps {
   show: boolean;
-  speciality: Speciality | null;
   onClose: () => void;
-  onSave: (speciality: Speciality) => void;
+  children: ReactNode;
 }
 
-const EditSpecialityModal: React.FC<EditSpecialityModalProps> = ({ show, speciality, onClose, onSave }) => {
+const EditSpecialityModal: React.FC<EditSpecialityModalProps> = ({ show, onClose, children }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-md w-full max-w-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">
-          {speciality ? 'Editar Especialidad' : 'Agregar Especialidad'}
-        </h2>
-        {/* Formulario de Especialidad */}
-        <SpecialityForm speciality={speciality} onSave={onSave} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg w-3/4 max-w-lg p-6 relative shadow-lg">
         <button
-          className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
           onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
         >
-          Cancelar
+          ×
         </button>
+        {children}
       </div>
     </div>
   );

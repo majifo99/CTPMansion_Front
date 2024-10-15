@@ -5,30 +5,30 @@ import { Room } from '../types/Types';
 interface RoomFormProps {
   room: Room | null;
   onSave: (room: Room) => Promise<void>; // Asume que onSave es una promesa
+  onCancel: () => void; // Añadimos onCancel para el botón de cancelar
 }
 
-const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
+const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
   const { control, handleSubmit, reset } = useForm<Room>({
     defaultValues: room || { id_Room: 0, name: '', capacity: 0, description: '', url_Image: '', isConferenceRoom: false },
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para manejar el envío
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: Room) => {
-    setIsSubmitting(true); // Cambia el estado a "Procesando..."
+    setIsSubmitting(true);
     try {
-      await onSave(data); // Asume que onSave es una promesa
-      reset(); // Limpia el formulario
+      await onSave(data);
+      reset();
     } catch (error) {
       console.error("Error al guardar la sala:", error);
     } finally {
-      setIsSubmitting(false); // Vuelve el estado a "Guardar"
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Nombre de la Sala */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-gray-800">
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">Nombre de la sala</label>
         <Controller
@@ -38,7 +38,7 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
             <input
               {...field}
               type="text"
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese el nombre de la sala"
               required
             />
@@ -46,7 +46,6 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
         />
       </div>
 
-      {/* Capacidad */}
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">Capacidad</label>
         <Controller
@@ -56,7 +55,7 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
             <input
               {...field}
               type="number"
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese la capacidad"
               required
             />
@@ -64,7 +63,6 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
         />
       </div>
 
-      {/* Descripción */}
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">Descripción</label>
         <Controller
@@ -74,7 +72,7 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
             <input
               {...field}
               type="text"
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese una descripción"
               required
             />
@@ -82,7 +80,6 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
         />
       </div>
 
-      {/* URL de la Imagen */}
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">URL de la Imagen</label>
         <Controller
@@ -92,7 +89,7 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
             <input
               {...field}
               type="url"
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese la URL de la imagen"
               required
             />
@@ -100,7 +97,6 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
         />
       </div>
 
-      {/* ¿Es Sala de Conferencias? */}
       <div className="flex items-center space-x-4">
         <label htmlFor="isConferenceRoom" className="font-semibold">¿Es Sala de Conferencias?</label>
         <Controller
@@ -117,14 +113,26 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave }) => {
         />
       </div>
 
-      {/* Botón de Guardar */}
-      <button
-        type="submit"
-        className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? 'Procesando...' : 'Guardar'}
-      </button>
+      {/* Botones de Guardar y Cancelar alineados horizontalmente */}
+      <div className="flex justify-end space-x-4 mt-4">
+        <button
+          type="button"
+          onClick={() => {
+            reset();
+            onCancel();
+          }}
+          className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Procesando...' : 'Guardar'}
+        </button>
+      </div>
     </form>
   );
 };

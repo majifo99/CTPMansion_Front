@@ -17,21 +17,18 @@ const formatDateForInput = (dateString: string) => {
 const EditEventModal: React.FC<EditEventModalProps> = ({ show, event, onClose, onSave }) => {
   if (!show) return null;
 
-  // Si estamos editando un evento, formateamos la fecha correctamente.
+  // Formateamos la fecha si estamos editando un evento.
   const eventWithFormattedDate = event ? { ...event, date: formatDateForInput(event.date) } : null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-md max-w-lg w-full shadow-lg"> {/* Cambié w-96 por max-w-lg y w-full */}
-        <h2 className="text-xl text-black font-semibold mb-4">{event ? 'Editar Evento' : 'Agregar Evento'}</h2>
-        {/* Pasamos el evento con la fecha formateada al formulario */}
-        <EventForm event={eventWithFormattedDate} onSave={onSave} />
-        <button
-          className="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
-          onClick={onClose}
-        >
-          Cancelar
-        </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg w-3/4 max-w-lg p-6 relative shadow-lg">
+        <h2 className="text-2xl text-gray-800 font-semibold mb-6">
+          {event ? 'Editar Evento' : 'Agregar Evento'}
+        </h2>
+        
+        {/* Formulario de evento con los datos correspondientes */}
+        <EventForm event={eventWithFormattedDate} onSave={onSave} onCancel={onClose} />
       </div>
     </div>
   );

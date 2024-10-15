@@ -1,6 +1,6 @@
 import React from 'react';
-import { Workshop, Speciality } from '../types/Types';
 import WorkshopForm from '../DashboardPages/WorkshopForm';
+import { Workshop, Speciality } from '../types/Types';
 
 interface EditWorkshopModalProps {
   show: boolean;
@@ -14,16 +14,13 @@ const EditWorkshopModal: React.FC<EditWorkshopModalProps> = ({ show, workshop, s
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-4 rounded-lg shadow-xl max-w-lg w-full">
-        <h2 className="text-xl font-semibold mb-4">{workshop ? 'Editar Taller' : 'Crear Nuevo Taller'}</h2>
-        <WorkshopForm workshop={workshop} specialities={specialities} onSave={onSave} />
-        <button
-          onClick={onClose}
-          className="mt-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-        >
-          Cerrar
-        </button>
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white p-8 rounded-md max-w-lg w-full shadow-lg">
+        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-900">
+          {workshop ? 'Editar Taller' : 'Crear Nuevo Taller'}
+        </h2>
+        {/* Pasamos la función de cierre y guardado al formulario */}
+        <WorkshopForm workshop={workshop} specialities={specialities} onSave={onSave} onCancel={onClose} />
       </div>
     </div>
   );

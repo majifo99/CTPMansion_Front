@@ -26,10 +26,10 @@ const EventosPage: React.FC = () => {
 
   const handleSaveEvent = (event: Event) => {
     if (editingEvent) {
-      handleEditEvent(editingEvent.id, event); // Editar evento
+      handleEditEvent(editingEvent.id, event);
       toast.success('Evento editado con éxito!');
     } else {
-      handleAddEvent(event); // Agregar nuevo evento
+      handleAddEvent(event);
       toast.success('Evento creado con éxito!');
     }
     handleCloseEditModal();
@@ -47,7 +47,7 @@ const EventosPage: React.FC = () => {
 
   const handleConfirmDelete = () => {
     if (deletingEventId !== null) {
-      handleDeleteEvent(deletingEventId); // Eliminar evento
+      handleDeleteEvent(deletingEventId);
       toast.error('Evento eliminado');
       handleCloseDeleteModal();
     }
@@ -56,7 +56,7 @@ const EventosPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="loader">Loading...</div>
+        <div className="loader">Cargando...</div>
       </div>
     );
   }
@@ -73,20 +73,20 @@ const EventosPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br bg-gray-600 text-white p-8">
+    <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Gestión de Eventos</h1>
 
-      <div className="flex justify-end mb-6 mr-10">
+      <div className="flex justify-end mb-6">
         <button
-          className="bg-softGreen hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg"
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
           onClick={() => handleOpenEditModal()}
         >
-         <AiTwotonePlusSquare size={30} />
+          <AiTwotonePlusSquare size={30} />
         </button>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="table-auto w-full text-center bg-white text-gray-800 rounded-lg shadow-lg">
+        <table className="table-auto w-full bg-white text-gray-800 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-200">
               <th className="px-4 py-2">Título</th>
@@ -96,31 +96,27 @@ const EventosPage: React.FC = () => {
               <th className="px-4 py-2">Acciones</th>
             </tr>
           </thead>
-          <tbody>
-            {events.map((event) => (
-              <tr key={event.id} className="border-t">
+          <tbody className="divide-y">
+            {events.map((event, index) => (
+              <tr key={event.id} className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                 <td className="border px-4 py-2">{event.title}</td>
                 <td className="border px-4 py-2">{event.description}</td>
                 <td className="border px-4 py-2">{new Date(event.date).toLocaleDateString()}</td>
                 <td className="border px-4 py-2">
-                  <img
-                    src={event.url_Image}
-                    alt={event.title}
-                    className="h-16 w-16 object-cover mx-auto rounded-lg"
-                  />
+                  <img src={event.url_Image} alt={event.title} className="h-16 w-16 object-cover mx-auto rounded-lg" />
                 </td>
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 flex justify-center">
                   <button
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
                     onClick={() => handleOpenEditModal(event)}
                   >
-                    <AiTwotoneEdit size ={30} />
+                    <AiTwotoneEdit size={24} />
                   </button>
                   <button
                     className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
                     onClick={() => handleOpenDeleteModal(event.id)}
                   >
-                    <AiFillDelete size={30} />
+                    <AiFillDelete size={24} />
                   </button>
                 </td>
               </tr>
@@ -145,7 +141,7 @@ const EventosPage: React.FC = () => {
       />
 
       {/* Contenedor para Toasts */}
-      <ToastContainer />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover />
     </div>
   );
 };
