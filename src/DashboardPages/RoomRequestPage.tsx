@@ -6,10 +6,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RoomRequest, RequestStatus } from '../types/RoomRequestType';
 import { Room } from '../types/Types';
-import { jwtDecode } from 'jwt-decode';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { jwtDecode } from 'jwt-decode';
 
 const localizer = momentLocalizer(moment);
 
@@ -33,38 +33,26 @@ const RoomRequestCard: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedRoomForRequest, setSelectedRoomForRequest] = useState<Room | null>(null);
   const [selectedRoomForCalendar, setSelectedRoomForCalendar] = useState<Room | null>(null);
-  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   useEffect(() => {
-    const userIdFromToken = getUserIdFromToken();
-    setUserId(userIdFromToken);
+    setUserId(getUserIdFromToken());
   }, []);
 
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>) => {
     if (selectedRoomForRequest && userId) {
       const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
       const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
 
-      // Validación para días de la semana (no permitir fines de semana)
       if (startDateTime.day() === 6 || startDateTime.day() === 0) {
         notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
         return;
       }
-
-      // Validaciones de Fecha y Hora con notificaciones de error
       if (startDateTime.isBefore(moment())) {
         notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
-        return;
-      }
-      if (startDateTime.hour() < 6 || startDateTime.hour() >= 16 || (startDateTime.hour() === 16 && startDateTime.minute() > 20)) {
-        notifyError("La hora de inicio debe estar dentro del horario de colegio (6:00 am - 4:20 pm).");
-        return;
-      }
-      if (endDateTime.hour() < 6 || endDateTime.hour() >= 16 || (endDateTime.hour() === 16 && endDateTime.minute() > 20)) {
-        notifyError("La hora de fin debe estar dentro del horario de colegio (6:00 am - 4:20 pm).");
         return;
       }
       if (startDateTime.isSameOrAfter(endDateTime)) {
@@ -82,7 +70,12 @@ const RoomRequestCard: React.FC = () => {
         return;
       }
 
-      const requestPayload = { ...data, roomId: selectedRoomForRequest.id_Room, userId };
+      const requestPayload: RoomRequest = {
+        ...data,
+        roomId: selectedRoomForRequest.id_Room,
+        userId,
+        status: RequestStatus.Pending
+      };
       
       try {
         await submitRoomRequest(requestPayload);
@@ -98,7 +91,7 @@ const RoomRequestCard: React.FC = () => {
     }
   };
 
-  const renderInputField = (id, label, placeholder, validation, type = 'text') => (
+  const renderInputField = (id: keyof RoomRequest, label: string, placeholder: string, validation?: object, type: string = 'text') => (
     <div className="flex flex-col mb-2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <input
@@ -111,7 +104,7 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  const renderDropdownField = (id, label, options) => (
+  const renderDropdownField = (id: keyof RoomRequest, label: string, options: number[]) => (
     <div className="flex flex-col mb-2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <select
@@ -119,7 +112,7 @@ const RoomRequestCard: React.FC = () => {
         {...register(id, { required: 'Este campo es obligatorio' })}
         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
       >
-        {options.map((option) => (
+        {options.map(option => (
           <option key={option} value={option}>
             {option}
           </option>
@@ -128,7 +121,7 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  const Modal = ({ onClose }) => (
+  const Modal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-3xl relative">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 text-3xl font-bold">&times;</button>
@@ -138,19 +131,35 @@ const RoomRequestCard: React.FC = () => {
           {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', { required: 'El primer apellido es obligatorio' })}
           {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez', { required: 'El segundo apellido es obligatorio' })}
           {renderInputField('course', 'Curso', 'Literatura', { required: 'El curso es obligatorio' })}
-          {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de música', { required: 'La descripción es obligatoria' })}
-          {renderInputField('needs', 'Necesidades', 'Equipo de sonido', { required: 'Las necesidades son obligatorias' })}
 
-          {selectedRoomForRequest && renderDropdownField(
-            'numberOfAttendees',
-            'Número de Asistentes',
-            Array.from({ length: selectedRoomForRequest.capacity }, (_, i) => i + 1)
-          )}
-          
-          {renderInputField('startDate', 'Fecha de Inicio', '', { required: 'La fecha de inicio es obligatoria' }, 'date')}
-          {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date')}
-          {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time')}
-          {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time')}
+          <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de música', { required: 'La descripción es obligatoria' })}
+            {selectedRoomForRequest && renderDropdownField(
+              'numberOfAttendees',
+              'Número de Asistentes',
+              Array.from({ length: selectedRoomForRequest.capacity }, (_, i) => i + 1)
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:col-span-2">
+            {renderInputField('startDate', 'Fecha de Inicio', '', { required: 'La fecha de inicio es obligatoria' }, 'date')}
+            {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time')}
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:col-span-2">
+            {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date')}
+            {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time')}
+          </div>
+
+          <div className="sm:col-span-2">
+            <label htmlFor="needs" className="block text-sm text-center font-medium text-gray-900">Necesidades</label>
+            <textarea
+              id="needs"
+              {...register('needs', { required: 'Las necesidades son obligatorias' })}
+              className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
+              placeholder="Equipo de sonido, proyector, etc."
+              rows={4}
+            />
+          </div>
 
           <div className="w-full flex justify-end sm:col-span-2">
             <button
@@ -170,16 +179,11 @@ const RoomRequestCard: React.FC = () => {
     (request) => request.roomId === selectedRoomForCalendar?.id_Room && request.status === RequestStatus.Approved
   );
 
-  const events = approvedRequests.map((request) => {
-    const start = moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate();
-    const end = moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate();
-
-    return {
-      title: `Reservado: ${request.managerName}`,
-      start,
-      end,
-    };
-  });
+  const events = approvedRequests.map((request) => ({
+    title: `Reservado: ${request.managerName}`,
+    start: moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate(),
+    end: moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate(),
+  }));
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
