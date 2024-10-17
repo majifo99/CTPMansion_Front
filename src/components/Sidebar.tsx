@@ -85,7 +85,7 @@ const Sidebar: React.FC = () => {
                 <IoIosConstruct className="mr-2" />
                 Eventos
               </Link>
-              <Link to="/dashboard/udps" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+              <Link to="/dashboard/udps" className="flex items-center mb-2 hover:bg-blue-200 text-blue-600 p-2 rounded-md transition duration-200">
                 <GiTeacher className="mr-2" />
                 UDPs
               </Link>

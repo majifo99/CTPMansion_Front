@@ -5,8 +5,6 @@ import ProtectedRoute from './ProtectedRoute';  // Componente de rutas protegida
 import { AuthProvider } from '../contexts/AuthContext';
 import UserProfile from '../DashboardPages/UserProfile';
 
-
-// Lazy loading para páginas
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
 const UsPage = React.lazy(() => import('../components/UsPage'));
@@ -24,7 +22,7 @@ const SalasPage = React.lazy(() => import('../DashboardPages/ManageRoomRequests'
 const RoomsPage = React.lazy(() => import('../DashboardPages/RoomsPage'));
 const LabRequestPage = React.lazy(() => import('../DashboardPages/ManageLabRequests'));
 const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
-const UDPsPage = React.lazy(() => import('../pages/DashboardPages/UDPsPage'));
+const UDPsPage = React.lazy(() => import('../DashboardPages/UDPsPage'));  // <-- Asegúrate de que el path es correcto
 const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
 const TalleresPage = React.lazy(() => import('../DashboardPages/WorkshopsPageD'));
 const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
@@ -70,7 +68,15 @@ const AppRouter: React.FC = () => {
                   <UserProfile />
                 </ProtectedRoute>
               } />
-              {/* Rutas específicas dentro del dashboard con roles */}
+              
+              {/* Nueva Ruta para UDPs */}
+              <Route path="udps" element={
+                <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
+                  <UDPsPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Otras rutas ya existentes */}
               <Route path="certificaciones" element={
                 <ProtectedRoute requiredRoles={['Admin', 'CertificationManager']}>
                   <CertificacionesPage />
@@ -94,11 +100,6 @@ const AppRouter: React.FC = () => {
               <Route path="eventos" element={
                 <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
                   <EventosPage />
-                </ProtectedRoute>
-              } />
-              <Route path="udps" element={
-                <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
-                  <UDPsPage />
                 </ProtectedRoute>
               } />
               <Route path="especialidades" element={
@@ -131,9 +132,6 @@ const AppRouter: React.FC = () => {
                   <SolicitarLaboratorio />
                 </ProtectedRoute>
               } />
-
-           
-              
             </Route>
           </Routes>
         </Suspense>
