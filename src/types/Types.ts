@@ -122,3 +122,12 @@ lastName2: string;
 email: string;
 phoneNumber: string;
 }
+
+export interface UDP {
+  id_UDP: number;
+  title: string;
+  description: string;
+  area: string;
+  balance: number;
+  userId: number;
+}
