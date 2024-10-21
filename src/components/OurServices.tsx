@@ -80,5 +80,6 @@ const OurServices: React.FC = () => {
       </div>
     </section>
   )
+
 }
 export default OurServices;
