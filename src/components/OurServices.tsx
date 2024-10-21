@@ -1,130 +1,84 @@
-import { useEffect } from 'react';
-import { FaPeopleCarry, FaHandshake, FaHandsHelping } from 'react-icons/fa';
-import { RiEmpathizeFill } from 'react-icons/ri';
-import Navbar from './Navbar';
-import Footer from './Footer';
-import useUsPage from '../hooks/useUsePage';
+import React from 'react';
+import { BiBookReader, BiBusSchool } from "react-icons/bi";
+import { TbBallFootball, TbBowlSpoon, TbUserHeart, TbUserQuestion, TbPigMoney, TbHome } from "react-icons/tb";
+import { useOurServices } from '../hooks/useOurServices';
 
 const iconMapper = {
-  Respeto: <FaHandshake className="text-burntOrange w-12 h-12" />,
-  Compromiso: <FaPeopleCarry className="text-burntOrange w-12 h-12" />,
-  Empatía: <RiEmpathizeFill className="text-burntOrange w-12 h-12" />,
-  Colaboración: <FaHandsHelping className="text-burntOrange w-12 h-12" />,
+  BiBookReader: <BiBookReader className="w-12 h-12 text-[#ff7a59]" />,
+  BiBusSchool: <BiBusSchool className="w-12 h-12 text-[#e1cf97]" />,
+  TbBallFootball: <TbBallFootball className="w-12 h-12 text-[#2E4A5A]" />,
+  TbBowlSpoon: <TbBowlSpoon className="w-12 h-12 text-[#006494]" />,
+  TbUserHeart: <TbUserHeart className="w-12 h-12 text-[#87a330]" />,
+  TbUserQuestion: <TbUserQuestion className="w-12 h-12 text-[#6EC2D7]" />,
+  TbPigMoney: <TbPigMoney className="w-12 h-12 text-[#d9534f]" />,
+  TbHome: <TbHome className="w-12 h-12 text-[#d9534f]" />
 };
 
-const UsPage = () => {
-  const { mission, vision, values, loading, error } = useUsPage();
+// Componente del loader (skeleton) para mostrar mientras se cargan los datos
+const ServiceSkeleton: React.FC = () => (
+  <div className="p-4 md:w-1/4 sm:w-1/2 w-full animate-fadeInUp">
+    <div className="h-full min-h-[200px] max-h-[300px] bg-gray-200 border-2 border-gray-200 rounded-lg flex flex-col items-center justify-center p-6 animate-pulse">
+      <div className="w-12 h-12 bg-gray-300 rounded-full mb-4"></div>
+      <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-gray-300 rounded w-2/4"></div>
+    </div>
+  </div>
+);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+const OurServices: React.FC = () => {
+  const { services, loading, error } = useOurServices();
 
-  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div>
-      <Navbar />
-
-      {/* Misión y Visión */}
-      <div className="text-center p-8 mt-8">
-        {loading ? (
-          <div className="flex flex-wrap items-center mt-20 text-center animate-pulse">
-            <div className="w-full md:w-3/5 lg:w-1/2 px-4 h-64 bg-gray-200 rounded"></div>
-            <div className="w-full md:w-2/5 lg:w-1/2 px-4 text-center md:text-left lg:pl-12 mt-4 md:mt-0">
-              <div className="h-8 w-3/4 bg-gray-200 rounded mb-4"></div>
-              <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 w-4/5 bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 w-3/4 bg-gray-200 rounded mb-2"></div>
-            </div>
-          </div>
-        ) : (
-          <>
-            {vision && (
-              <div className="flex flex-wrap items-center mt-20 text-center">
-                <div className="w-full md:w-3/5 lg:w-1/2 px-4">
-                  <img
-                    src={vision.url_Image}
-                    alt="Visión"
-                    className="inline-block rounded"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="w-full md:w-2/5 lg:w-1/2 px-4 text-center md:text-left lg:pl-12">
-                  <h2 className="font-bold mt-8 text-xl md:mt-0 sm:text-4xl text-center">
-                    {vision.title}
-                  </h2>
-                  <p className="sm:text-lg mt-6 text-gray-600 text-justify">
-                    {vision.description}
-                  </p>
-                </div>
-              </div>
-            )}
-            {mission && (
-              <div className="flex flex-wrap items-center mt-20 text-center">
-                <div className="w-full md:w-3/5 lg:w-1/2 px-4">
-                  <img
-                    src={mission.url_Image}
-                    alt="Misión"
-                    className="inline-block rounded"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="w-full md:w-2/5 lg:w-1/2 px-4 md:order-first text-center md:text-left lg:pr-12">
-                  <h2 className="font-bold mt-8 text-xl md:mt-0 sm:text-4xl text-center">
-                    {mission.title}
-                  </h2>
-                  <p className="sm:text-lg mt-6 text-gray-600 text-justify">
-                    {mission.description}
-                  </p>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Valores */}
-      <section className="bg-gray-100 py-8">
-        <div className="container mx-auto text-center px-4">
-          <h2 className="text-4xl font-bold text-gray-800 mb-8">Nuestros Valores</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {loading
-              ? Array(4).fill(0).map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-white p-8 shadow-md rounded-md hover:shadow-lg transition-shadow duration-300 animate-pulse"
-                >
-                  <div className="flex justify-center mb-4">
-                    <div className="bg-gray-200 w-12 h-12 rounded-full"></div>
-                  </div>
-                  <div className="h-6 w-3/4 bg-gray-200 rounded mb-4 mx-auto"></div>
-                  <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 w-5/6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 w-4/5 bg-gray-200 rounded mb-2"></div>
-                </div>
-              ))
-              : values.map((value) => (
-                <div
-                  key={value.id}
-                  className="bg-white p-8 shadow-md rounded-md hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div className="flex justify-center mb-4">
-                    {iconMapper[value.title] || (
-                      <RiEmpathizeFill className="text-burntOrange w-12 h-12" aria-hidden="true" />
-                    )}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{value.title}</h3>
-                  <p className="text-gray-600">{value.description}</p>
-                </div>
-              ))}
-          </div>
+    <section className="bg-white py-16">
+      <div className="container px-5 mx-auto">
+        {/* Título animado y centrado */}
+        <div className="flex justify-center">
+          <h2 className="relative text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B] text-center mb-10 animate-fadeInUp ">
+            Nuestros Servicios
+            <span className="absolute left-1/2 transform -translate-x-1/2 -bottom-3 h-1 w-4/5 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] rounded-md "></span>
+          </h2>
         </div>
-      </section>
 
-      <Footer />
-    </div>
-  );
-};
+        <div className="flex flex-wrap -m-4 text-center">
+          {loading ? (
+            // Mostrar 8 skeletons mientras se cargan los datos
+            Array.from({ length: 8 }).map((_, index) => (
+              <ServiceSkeleton key={index} />
+            ))
+          ) : error ? (
+            <p className="text-center text-red-500 w-full">Error: {error.message}</p>
+          ) : (
+            // Mostrar servicios si ya están cargados
+            services.map((service) => (
+              <div
+                key={service.id}
+                className="p-4 md:w-1/4 sm:w-1/2 w-full animate-fadeInUp"
+              >
+                <div
+                  className="h-full min-h-[200px] max-h-[300px] bg-white border-2 border-gray-200 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center p-6"
+                  aria-label={`Servicio: ${service.title}`}
+                >
+                  {/* Icono del servicio */}
+                  {iconMapper[service.icon] || (
+                    <BiBookReader className="w-12 h-12 text-[#006494]" aria-hidden="true" />
+                  )}
+                  {/* Título del servicio */}
+                  <h3 className="text-xl font-semibold text-gray-900 mt-4 mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 opacity-80">
+                    Un servicio para toda la comunidad estudiantil
 
-export default UsPage;
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+      </div>
+    </section>
+  )
+}
+export default OurServices;
