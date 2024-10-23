@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCertificate, FaChevronDown, FaChevronUp, FaPlus } from 'react-icons/fa';
+import { FaCartArrowDown, FaCertificate, FaChevronDown, FaChevronUp, FaPlus } from 'react-icons/fa';
 import { MdRoom, MdScience } from 'react-icons/md';
 import { GiTeacher } from 'react-icons/gi';
 import { IoIosConstruct } from 'react-icons/io';
@@ -67,6 +67,10 @@ const Sidebar: React.FC = () => {
                 <FaCertificate className="mr-2" />
                 Certificaciones
               </Link>
+              <Link to="/dashboard/ordenesdepedido" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaCartArrowDown className="mr-2" />
+                Ordenes de pedido
+              </Link>
             </div>
           )}
         </div>
@@ -85,7 +89,7 @@ const Sidebar: React.FC = () => {
                 <IoIosConstruct className="mr-2" />
                 Eventos
               </Link>
-              <Link to="/dashboard/udps" className="flex items-center mb-2 hover:bg-blue-200 text-blue-600 p-2 rounded-md transition duration-200">
+              <Link to="/dashboard/udps" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <GiTeacher className="mr-2" />
                 UDPs
               </Link>

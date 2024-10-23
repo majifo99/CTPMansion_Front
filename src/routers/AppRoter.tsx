@@ -30,7 +30,7 @@ const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanageme
 const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage'));
 const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/LabRequestPage'));
 const Unauthorized = React.lazy(() => import('../pages/UnauthorizedPage')); // Página de no autorizado
-
+const OrdenesDePedido = React.lazy(() => import('../DashboardPages/OrdenesDePedido'));
 const AppRouter: React.FC = () => {
   return (
     <AuthProvider>
@@ -69,6 +69,13 @@ const AppRouter: React.FC = () => {
                 </ProtectedRoute>
               } />
               
+
+              {/* Nueva Ruta para Ordenes de pedido */}
+              <Route path="ordenesdepedido" element={
+                <ProtectedRoute requiredRoles={['Admin']}>
+                  <OrdenesDePedido/>
+                </ProtectedRoute>
+              } />
               {/* Nueva Ruta para UDPs */}
               <Route path="udps" element={
                 <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
