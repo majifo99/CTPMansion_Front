@@ -1,71 +1,72 @@
-// src/Services/orderService.ts
+// src/services/orderService.ts
+
 import axios from 'axios';
-import { Order } from '../types/Order';
+import { Order, ApprovedOrder, OrderStatus } from '../types/Order';
 
-const API_URL = 'https://localhost:7055/api/Order';
+// Configuración de Axios
+const api = axios.create({
+  baseURL: 'https://localhost:7055/api',
+});
 
-const getOrders = async (): Promise<Order[]> => {
-  const response = await axios.get(API_URL);
+// Interceptor para incluir el token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => Promise.reject(error));
+
+// Función para crear una orden
+export const createOrder = async (order: Order): Promise<Order> => {
+  const response = await api.post('/Order', order, {
+    headers: { 'Content-Type': 'application/json-patch+json' },
+  });
   return response.data;
 };
 
-const getOrderById = async (id: number): Promise<Order> => {
-  const response = await axios.get(`${API_URL}/${id}`);
+// Función para obtener una orden por ID
+export const getOrderById = async (id: number): Promise<Order> => {
+  const response = await api.get(`/Order/${id}`);
   return response.data;
 };
 
-const getOrdersByUserId = async (userId: number): Promise<Order[]> => {
-  const response = await axios.get(`${API_URL}/user/${userId}`);
+// Función para obtener órdenes aprobadas
+export const getApprovedOrders = async (): Promise<ApprovedOrder[]> => {
+  const response = await api.get('/Order/approved-orders');
   return response.data;
 };
 
-const getOrdersByUdpId = async (udpId: number): Promise<Order[]> => {
-  const response = await axios.get(`${API_URL}/udp/${udpId}`);
+// Función para obtener órdenes por estado
+export const getOrdersByStatus = async (status: number): Promise<OrderStatus[]> => {
+  const response = await api.get(`/Order/orders-by-status?status=${status}`);
   return response.data;
 };
 
-const getOrdersForDirector = async (): Promise<Order[]> => {
-  const response = await axios.get(`${API_URL}/director`);
+// Función para aprobar una orden
+export const approveOrder = async (id: number): Promise<void> => {
+  await api.patch(`/Order/${id}/approve`);
+};
+
+// Función para rechazar una orden
+export const rejectOrder = async (id: number): Promise<void> => {
+  await api.patch(`/Order/${id}/reject`);
+};
+
+// Función para obtener órdenes por UDP
+export const getOrdersByUDP = async (udpId: number): Promise<Order[]> => {
+  const response = await api.get(`/Order/udp/${udpId}`);
   return response.data;
 };
 
-const createOrder = async (order: Omit<Order, 'id'>): Promise<Order> => {
-  const response = await axios.post(API_URL, order);
+// Función para obtener órdenes por usuario
+export const getOrdersByUser = async (userId: number): Promise<Order[]> => {
+  const response = await api.get(`/Order/user/${userId}`);
   return response.data;
 };
 
-const approveOrder = async (id: number): Promise<void> => {
-  await axios.patch(`${API_URL}/${id}/approve`);
+// Función para obtener órdenes por producto
+export const getOrdersByProductName = async (name: string): Promise<Order[]> => {
+  const response = await api.get(`/Order/product/${name}`);
+  return response.data;
 };
-
-const rejectOrder = async (id: number): Promise<void> => {
-  await axios.patch(`${API_URL}/${id}/reject`);
-};
-
-const sendOrderToDirector = async (id: number): Promise<void> => {
-  await axios.patch(`${API_URL}/${id}/send-to-director`);
-};
-
-const returnOrderToRequester = async (id: number): Promise<void> => {
-  await axios.patch(`${API_URL}/${id}/return-to-requester`);
-};
-
-const deleteOrder = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/${id}`);
-};
-
-const orderService = {
-  getOrders,
-  getOrderById,
-  getOrdersByUserId,
-  getOrdersByUdpId,
-  getOrdersForDirector,
-  createOrder,
-  approveOrder,
-  rejectOrder,
-  sendOrderToDirector,
-  returnOrderToRequester,
-  deleteOrder,
-};
-
-export default orderService;

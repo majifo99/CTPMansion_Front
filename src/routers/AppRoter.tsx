@@ -30,6 +30,9 @@ const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanageme
 const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage'));
 const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/LabRequestPage'));
 const Unauthorized = React.lazy(() => import('../pages/UnauthorizedPage')); // Página de no autorizado
+const OrderComponent = React.lazy(() => import('../DashboardPages/OrderComponent'));
+const UpdateUDPBalanceComponent = React.lazy(() => import('../DashboardPages/UpdateUDPBalanceComponent'));
+
 
 const AppRouter: React.FC = () => {
   return (
@@ -68,14 +71,14 @@ const AppRouter: React.FC = () => {
                   <UserProfile />
                 </ProtectedRoute>
               } />
-              
+
               {/* Nueva Ruta para UDPs */}
               <Route path="udps" element={
                 <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
                   <UDPsPage />
                 </ProtectedRoute>
               } />
-              
+
               {/* Otras rutas ya existentes */}
               <Route path="certificaciones" element={
                 <ProtectedRoute requiredRoles={['Admin', 'CertificationManager']}>
@@ -92,6 +95,21 @@ const AppRouter: React.FC = () => {
                   <LabRequestPage />
                 </ProtectedRoute>
               } />
+
+               {/* Nueva ruta para el balance de UDP */}
+               <Route path="admin-udp-balance" element={
+                <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
+                  <UpdateUDPBalanceComponent />
+                </ProtectedRoute>
+              } />
+
+
+              <Route path="orden-de-pedido" element={
+                <ProtectedRoute requiredRoles={['RoomandLabRequester']}>
+                  <OrderComponent />  {/* Componente de Orden de Pedido */}
+                </ProtectedRoute>
+              } />
+
               <Route path="roles" element={
                 <ProtectedRoute requiredRoles={['Admin']}>
                   <RolesManagement />
