@@ -29,12 +29,12 @@ const SpecialitiesPage: React.FC = () => {
   };
 
   // Guardar la especialidad (agregar o editar)
-  const handleSaveSpeciality = (speciality: Speciality) => {
+  const handleSaveSpeciality = async (speciality: Speciality) => {
     if (editingSpeciality) {
-      handleEditSpeciality(editingSpeciality.id, speciality);
+      await handleEditSpeciality(editingSpeciality.id, speciality);
       toast.success('Especialidad editada correctamente');
     } else {
-      handleAddSpeciality(speciality);
+      await handleAddSpeciality(speciality);
       toast.success('Especialidad agregada correctamente');
     }
     handleCloseEditModal();
@@ -53,9 +53,9 @@ const SpecialitiesPage: React.FC = () => {
   };
 
   // Confirmación de eliminación
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deletingSpecialityId !== null) {
-      handleDeleteSpeciality(deletingSpecialityId);
+      await handleDeleteSpeciality(deletingSpecialityId);
       toast.success('Especialidad eliminada correctamente');
       handleCloseDeleteModal();
     }
@@ -88,8 +88,8 @@ const SpecialitiesPage: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {specialities.map((speciality, index) => (
-              <tr key={speciality.id} className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+            {specialities.map((speciality) => (
+              <tr key={speciality.id} className="border-t">
                 <td className="border px-4 py-2">{speciality.title}</td>
                 <td className="border px-4 py-2">{speciality.description}</td>
                 <td className="border px-4 py-2">
@@ -123,7 +123,7 @@ const SpecialitiesPage: React.FC = () => {
         <SpecialityForm
           speciality={editingSpeciality}
           onSave={handleSaveSpeciality}
-          onCancel={handleCloseEditModal} // Pasamos onCancel para cerrar el modal
+          onCancel={handleCloseEditModal}
         />
       </EditSpecialityModal>
 

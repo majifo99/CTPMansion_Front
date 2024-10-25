@@ -1,4 +1,4 @@
-// hooks/useProducts.ts
+// src/hooks/useProducts.ts
 import { useState, useEffect, useCallback } from 'react';
 import productService from '../Services/productService';
 import { Product } from '../types/Product';

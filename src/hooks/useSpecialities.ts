@@ -1,33 +1,36 @@
 import { useState, useEffect } from 'react';
-import { fetchSpecialities, addSpeciality, editSpeciality, deleteSpeciality } from '../services/LandingPageServices'; // Importa los servicios correctamente
-import { Speciality } from '../types/Types'; // Importa tu tipo Speciality
+import { fetchSpecialities, addSpeciality, editSpeciality, deleteSpeciality } from '../services/LandingPageServices'; 
+import { Speciality } from '../types/Types';
 
 export const useSpecialities = () => {
   const [specialities, setSpecialities] = useState<Speciality[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Función para obtener especialidades desde la API
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchSpecialities(); // Llamada a la API para obtener especialidades
+      setSpecialities(data);
+      setError(null);
+    } catch (error) {
+      setError('Error al obtener las especialidades');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch de especialidades cuando el componente carga
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchSpecialities(); // Llamada a la API para obtener especialidades
-        setSpecialities(data);
-      } catch (error) {
-        setError('Error al obtener las especialidades');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
   // Función para agregar especialidades
   const handleAddSpeciality = async (speciality: Speciality) => {
     try {
-      const newSpeciality = await addSpeciality(speciality); // Llamada a la API para agregar especialidad
-      setSpecialities([...specialities, newSpeciality]); // Actualizar el estado con la nueva especialidad
+      await addSpeciality(speciality); // Llamada a la API para agregar especialidad
+      fetchData(); // Volver a obtener los datos para reflejar el cambio
     } catch (error) {
       setError('Error al agregar la especialidad');
     }
@@ -36,8 +39,8 @@ export const useSpecialities = () => {
   // Función para editar especialidades
   const handleEditSpeciality = async (id: number, updatedSpeciality: Speciality) => {
     try {
-      const editedSpeciality = await editSpeciality(id, updatedSpeciality); // Llamada a la API para editar la especialidad
-      setSpecialities(specialities.map(s => (s.id === id ? editedSpeciality : s))); // Actualizar el estado con la especialidad editada
+      await editSpeciality(id, updatedSpeciality); // Llamada a la API para editar la especialidad
+      fetchData(); // Volver a obtener los datos para reflejar el cambio
     } catch (error) {
       setError('Error al editar la especialidad');
     }
@@ -47,7 +50,7 @@ export const useSpecialities = () => {
   const handleDeleteSpeciality = async (id: number) => {
     try {
       await deleteSpeciality(id); // Llamada a la API para eliminar la especialidad
-      setSpecialities(specialities.filter(s => s.id !== id)); // Actualizar el estado eliminando la especialidad
+      fetchData(); // Volver a obtener los datos para reflejar el cambio
     } catch (error) {
       setError('Error al eliminar la especialidad');
     }

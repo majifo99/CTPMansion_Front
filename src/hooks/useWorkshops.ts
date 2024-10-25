@@ -5,22 +5,22 @@ import {
   createWorkshop,
   updateWorkshop,
   deleteWorkshop,
-  fetchSpecialities,  // Importamos la función para obtener las especialidades
+  fetchSpecialities,
 } from '../services/LandingPageServices';
 
 export const useWorkshops = () => {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
-  const [specialities, setSpecialities] = useState<Speciality[]>([]); // Añadir estado para especialidades
+  const [specialities, setSpecialities] = useState<Speciality[]>([]); // Estado para especialidades
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar todos los workshops
+  // Función para cargar todos los workshops
   const fetchWorkshops = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getAllWorkshops();
-      setWorkshops(data);
+      const data = await getAllWorkshops(); // Obtener todos los workshops
+      setWorkshops(data); // Actualizar la lista de workshops
     } catch (err) {
       setError('Error al cargar los talleres');
     } finally {
@@ -28,11 +28,11 @@ export const useWorkshops = () => {
     }
   };
 
-  // Cargar las especialidades
+  // Función para cargar todas las especialidades
   const fetchSpecialitiesList = async () => {
     try {
       const data = await fetchSpecialities();
-      setSpecialities(data); // Guardar especialidades en el estado
+      setSpecialities(data); // Guardar las especialidades en el estado
     } catch (err) {
       setError('Error al cargar las especialidades');
     }
@@ -41,20 +41,18 @@ export const useWorkshops = () => {
   // Función para agregar un nuevo workshop
   const handleAddWorkshop = async (workshopData: Omit<Workshop, 'id'>) => {
     try {
-      const newWorkshop = await createWorkshop(workshopData);
-      setWorkshops((prevWorkshops) => [...prevWorkshops, newWorkshop]);
+      await createWorkshop(workshopData); // Crear el workshop
+      fetchWorkshops(); // Volver a obtener los workshops para reflejar los cambios
     } catch (err) {
       setError('Error al agregar el taller');
     }
   };
 
-  // Función para editar un workshop
+  // Función para editar un workshop existente
   const handleEditWorkshop = async (id: number, updatedWorkshop: Omit<Workshop, 'id'>) => {
     try {
-      const editedWorkshop = await updateWorkshop(id, updatedWorkshop);
-      setWorkshops((prevWorkshops) =>
-        prevWorkshops.map((workshop) => (workshop.id === id ? editedWorkshop : workshop))
-      );
+      await updateWorkshop(id, updatedWorkshop); // Actualizar el workshop
+      fetchWorkshops(); // Volver a obtener los workshops para reflejar los cambios
     } catch (err) {
       setError('Error al actualizar el taller');
     }
@@ -63,22 +61,22 @@ export const useWorkshops = () => {
   // Función para eliminar un workshop
   const handleDeleteWorkshop = async (id: number) => {
     try {
-      await deleteWorkshop(id);
-      setWorkshops((prevWorkshops) => prevWorkshops.filter((workshop) => workshop.id !== id));
+      await deleteWorkshop(id); // Eliminar el workshop
+      fetchWorkshops(); // Volver a obtener los workshops para reflejar los cambios
     } catch (err) {
       setError('Error al eliminar el taller');
     }
   };
 
-  // Cargar workshops y especialidades al montar
+  // Cargar workshops y especialidades al montar el componente
   useEffect(() => {
-    fetchWorkshops();
-    fetchSpecialitiesList(); // Cargar especialidades
+    fetchWorkshops(); // Cargar los workshops al inicio
+    fetchSpecialitiesList(); // Cargar las especialidades al inicio
   }, []);
 
   return {
     workshops,
-    specialities,  // Devolvemos las especialidades también
+    specialities, // También devolvemos las especialidades
     loading,
     error,
     handleAddWorkshop,

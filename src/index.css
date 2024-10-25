@@ -1,43 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-
-
-
 
 .sidebar {
   height: 100vh;
   overflow-y: auto;
 }
 
-@layer base{
-    
-html {
-  @apply scroll-smooth;
-}
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
 
-body {
-  font-family: "Playfair Display", sans-serif;
-}
+  body {
+    font-family: Arial, sans-serif; /* Cambia a Arial */
+  }
 
-li {
-  @apply p-4 text-sm;
+  li {
+    @apply p-4 text-sm;
+  }
+
+  h2 {
+    @apply text-xl font-bold font-thin;
+  }
+
+  h1 {
+    font-family: Arial, sans-serif; /* Cambia a Arial */
+  }
 }
 
 h2 {
-  @apply text-xl font-bold font-thin;
-}
-h1{
-    font-family: "Playfair Display", sans-serif;
-}
-}
-
-
-h2 {
-  font-family: 'Georgia', serif;
+  font-family: Arial, sans-serif; /* Cambia a Arial */
   font-style: italic;
   color: #34436B;
   font-weight: 700;

@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaCartArrowDown, FaCertificate, FaChevronDown, FaChevronUp, FaPlus } from 'react-icons/fa';
 import { MdRoom, MdScience } from 'react-icons/md';
-import { GiTeacher } from 'react-icons/gi';
+import { GiTeacher,GiTakeMyMoney } from 'react-icons/gi';
 import { IoIosConstruct } from 'react-icons/io';
 import { BsJournal } from 'react-icons/bs';
 import { FaCog } from 'react-icons/fa';
 import { FiUsers } from 'react-icons/fi';
+
 
 const Sidebar: React.FC = () => {
   // States for handling dropdowns
@@ -37,6 +38,11 @@ const Sidebar: React.FC = () => {
                 <MdScience className="mr-2" />
                 Solicitar laboratorio
               </Link>
+
+              <Link to="/dashboard/orden-de-pedido" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">  {/* Añadimos Orden de Pedido */}
+                <FaPlus className="mr-2" />
+                Orden de Pedido
+              </Link>
             </div>
           )}
         </div>
@@ -60,17 +66,27 @@ const Sidebar: React.FC = () => {
                 Salas
               </Link>
               <Link to="/dashboard/laboratorios" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
-                 <MdScience className="mr-2" />
-                   Laboratorios
+                <MdScience className="mr-2" />
+                Laboratorios
               </Link>
               <Link to="/dashboard/certificaciones" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <FaCertificate className="mr-2" />
                 Certificaciones
               </Link>
+
+
+              <Link to="/dashboard/admin-udp-balance" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+              <GiTakeMyMoney className="mr-2" />
+                Balance UDP
+              </Link>
+
+
+
               <Link to="/dashboard/ordenesdepedido" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                 <FaCartArrowDown className="mr-2" />
                 Ordenes de pedido
               </Link>
+
             </div>
           )}
         </div>

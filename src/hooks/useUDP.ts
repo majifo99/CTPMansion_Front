@@ -1,64 +1,59 @@
 // src/hooks/useUDPs.ts
 import { useState, useEffect } from 'react';
+import { getUDPs, getUDPById, patchUDPBalance } from '../Services/udpService';
 import { UDP } from '../types/Types';
-import { addUDP, deleteUDP, editUDP, getUDPs } from '../Services/udpService';
 
 export const useUDPs = () => {
-  const [udps, setUDPs] = useState<UDP[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [udps, setUdps] = useState<UDP[]>([]);
+  const [selectedUdp, setSelectedUdp] = useState<UDP | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUDPsData = async () => {
-    setLoading(true);
-    try {
-      const data = await getUDPs();
-      setUDPs(data);
-      setError(null);
-    } catch (err) {
-      setError('Error al cargar UDPs');
-      setUDPs([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Obtener todas las UDPs al montar el componente
   useEffect(() => {
-    fetchUDPsData();
+    const fetchUDPs = async () => {
+      setLoading(true);
+      const data = await getUDPs();
+      if (data) {
+        setUdps(data);
+      } else {
+        setError("Error al obtener UDPs");
+      }
+      setLoading(false);
+    };
+
+    fetchUDPs();
   }, []);
 
-  const handleAddUDP = async (newUDP: Omit<UDP, 'id_UDP'>) => {
-    try {
-      await addUDP(newUDP);
-      fetchUDPsData();
-    } catch (error) {
-      console.error('Error al agregar UDP:', error);
-    }
+  // Función para seleccionar una UDP y obtener su información actual
+  const fetchUdpById = async (id: number) => {
+    setLoading(true);
+    const udp = await getUDPById(id);
+    setSelectedUdp(udp);
+    setLoading(false);
   };
 
-  const handleEditUDP = async (id: number, updatedUDP: Omit<UDP, 'id_UDP'>) => {
-    try {
-      await editUDP(id, updatedUDP);
-      fetchUDPsData();
-    } catch (error) {
-      console.error('Error al editar UDP:', error);
-    }
-  };
 
-  const handleDeleteUDP = async (id: number) => {
+  const updateUDPBalance = async (id: number, newBalance: number) => {
     try {
-      await deleteUDP(id);
-      fetchUDPsData();
+      setLoading(true);
+      await patchUDPBalance(id, newBalance);  // Realiza el PATCH para actualizar
+      // Luego de hacer el PATCH, obtén nuevamente la UDP actualizada desde el backend
+      const udp = await getUDPById(id);
+      setSelectedUdp(udp);  // Actualiza la UDP seleccionada en el estado
+      setLoading(false);
     } catch (error) {
-      console.error('Error al eliminar UDP:', error);
+      setError('Error al actualizar el balance');
+      setLoading(false);
     }
   };
 
   return {
     udps,
+    selectedUdp,
     loading,
     error,
-    handleAddUDP,
-    handleEditUDP,
-    handleDeleteUDP,
+    fetchUdpById,
+    updateUDPBalance,
   };
 };

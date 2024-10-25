@@ -29,11 +29,12 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
     } catch (err) {
       console.error('Error al obtener las órdenes:', err);
       setError('Error al obtener las órdenes');
+
     } finally {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchOrdersData(initialStatus);  // Fetch orders based on initial status (default: Pending)
   }, [initialStatus]);
@@ -55,15 +56,20 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
     } catch (err) {
       console.error('Error al rechazar la orden:', err);
       setError('Error al rechazar la orden');
+
     }
   };
 
   return {
-    orders,
+    orders, // Para las órdenes completas
+    orderStatuses, // Para los estados de las órdenes
+    approvedOrders,
     loading,
     error,
+
     handleApproveOrder,
     handleRejectOrder,
     fetchOrdersData,  // Allow fetching orders for a specific status
+
   };
 };
