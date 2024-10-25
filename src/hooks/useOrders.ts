@@ -1,124 +1,62 @@
 // src/hooks/useOrders.ts
-import { useState} from 'react';
-import {
-  createOrder as createOrderService,
-  getApprovedOrders,
-  getOrdersByStatus,
-  approveOrder,
-  rejectOrder,
-  getOrdersByUDP, // Usar esta función o eliminar si no es necesaria
-  getOrdersByUser, // Usar esta función o eliminar si no es necesaria
-  getOrdersByProductName, // Usar esta función o eliminar si no es necesaria
-} from '../Services/orderService';
-import { Order, ApprovedOrder, OrderStatus } from '../types/Order';
+import { useState, useEffect } from 'react';
+import { getOrdersByStatus, approveOrder, rejectOrder } from '../Services/orderService';
+import { Order, RequestStatus } from '../types/OrderTypes';
 
-export const useOrders = () => {
-  const [orders, setOrders] = useState<Order[]>([]); // Para almacenar órdenes completas
-  const [orderStatuses, setOrderStatuses] = useState<OrderStatus[]>([]); // Para almacenar estados de las órdenes
-  const [approvedOrders, setApprovedOrders] = useState<ApprovedOrder[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.Pending) => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Crear una nueva orden
-  const createOrder = async (order: Order) => {
+  // Fetch orders based on the given status
+  const fetchOrdersData = async (status: RequestStatus | 'All') => {
     setLoading(true);
     try {
-      const newOrder = await createOrderService(order);
-      setOrders([...orders, newOrder]);
+      let data: Order[] = [];
+
+      if (status === 'All') {
+        // Fetch both Approved and Rejected orders
+        const approvedOrders = await getOrdersByStatus(RequestStatus.Approved);
+        const rejectedOrders = await getOrdersByStatus(RequestStatus.Rejected);
+        data = [...approvedOrders, ...rejectedOrders]; // Combine both arrays
+      } else {
+        // Fetch orders for a specific status
+        data = await getOrdersByStatus(status);
+      }
+
+      setOrders(data);
       setError(null);
     } catch (err) {
-      setError('Error al crear la orden');
+      console.error('Error al obtener las órdenes:', err);
+      setError('Error al obtener las órdenes');
+
     } finally {
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+    fetchOrdersData(initialStatus);  // Fetch orders based on initial status (default: Pending)
+  }, [initialStatus]);
 
-  // Obtener órdenes aprobadas
-  const fetchApprovedOrders = async () => {
-    setLoading(true);
-    try {
-      const data = await getApprovedOrders();
-      setApprovedOrders(data);
-      setError(null);
-    } catch (err) {
-      setError('Error al obtener órdenes aprobadas');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Obtener órdenes por estado
-  const fetchOrdersByStatus = async (status: number) => {
-    setLoading(true);
-    try {
-      const data = await getOrdersByStatus(status); // data es de tipo OrderStatus[]
-      setOrderStatuses(data); // Guardamos en orderStatuses
-      setError(null);
-    } catch (err) {
-      setError('Error al obtener órdenes por estado');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Aprobar una orden
   const handleApproveOrder = async (id: number) => {
     try {
       await approveOrder(id);
-      fetchOrdersByStatus(0); // Refrescar órdenes tras aprobar
+      fetchOrdersData(initialStatus);  // Refresh orders after approval
     } catch (err) {
+      console.error('Error al aprobar la orden:', err);
       setError('Error al aprobar la orden');
     }
   };
 
-  // Rechazar una orden
   const handleRejectOrder = async (id: number) => {
     try {
       await rejectOrder(id);
-      fetchOrdersByStatus(0); // Refrescar órdenes tras rechazar
+      fetchOrdersData(initialStatus);  // Refresh orders after rejection
     } catch (err) {
+      console.error('Error al rechazar la orden:', err);
       setError('Error al rechazar la orden');
-    }
-  };
 
-  // Puedes usar estas funciones si son necesarias:
-  
-  const fetchOrdersByUDP = async (udpId: number) => {
-    setLoading(true);
-    try {
-      const data = await getOrdersByUDP(udpId);
-      setOrders(data); // Guardamos las órdenes
-      setError(null);
-    } catch (err) {
-      setError('Error al obtener órdenes por UDP');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchOrdersByUser = async (userId: number) => {
-    setLoading(true);
-    try {
-      const data = await getOrdersByUser(userId);
-      setOrders(data);
-      setError(null);
-    } catch (err) {
-      setError('Error al obtener órdenes por usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchOrdersByProductName = async (name: string) => {
-    setLoading(true);
-    try {
-      const data = await getOrdersByProductName(name);
-      setOrders(data);
-      setError(null);
-    } catch (err) {
-      setError('Error al obtener órdenes por producto');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -128,13 +66,10 @@ export const useOrders = () => {
     approvedOrders,
     loading,
     error,
-    createOrder,
-    fetchApprovedOrders,
-    fetchOrdersByStatus,
+
     handleApproveOrder,
     handleRejectOrder,
-    fetchOrdersByUDP, // Usar si es necesario
-    fetchOrdersByUser, // Usar si es necesario
-    fetchOrdersByProductName, // Usar si es necesario
+    fetchOrdersData,  // Allow fetching orders for a specific status
+
   };
 };
