@@ -11,10 +11,10 @@ const getToken = () => localStorage.getItem('token');
 export const getOrdersByStatus = async (status: RequestStatus | null): Promise<Order[]> => {
   const token = getToken();
   
-  // If status is null, don't filter by status and fetch all orders
+  // If status is null, fetch all orders
   const url = status !== null 
     ? `${apiUrl}/orders-by-status?status=${status}` 
-    : `${apiUrl}/orders`;  // Endpoint for all orders (or modify as needed)
+    : `${apiUrl}/orders`; // Adjust to correct endpoint for all orders
 
   const response = await axios.get(url, {
     headers: {
@@ -42,4 +42,27 @@ export const rejectOrder = async (id: number): Promise<void> => {
       Authorization: `Bearer ${token}`,  // Add the token to the request
     },
   });
+};
+
+// Create a new order
+export const createOrder = async (order: Order): Promise<Order> => {
+  const token = getToken();
+  const response = await axios.post(apiUrl, order, {
+    headers: { 
+      Authorization: `Bearer ${token}`, // Add token here
+      'Content-Type': 'application/json-patch+json',
+    },
+  });
+  return response.data;
+};
+
+// Fetch orders by product name
+export const getOrdersByProductName = async (name: string): Promise<Order[]> => {
+  const token = getToken();
+  const response = await axios.get(`${apiUrl}/product/${name}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,  // Add the token to the request
+    },
+  });
+  return response.data;
 };

@@ -11,37 +11,46 @@ const OrderComponent: React.FC = () => {
   const [requesterArea, setRequesterArea] = useState<string>(''); // Área de donde proviene la solicitud
   const [receiver, setReceiver] = useState<string>(''); // Receptor de la orden
   const [comments, setComments] = useState<string>(''); // Comentarios adicionales
+  const [userId, setUserId] = useState<number | null>(null); // ID del usuario logueado
+  const [loading, setLoading] = useState<boolean>(false); // Estado de carga
+  const [message, setMessage] = useState<string>(''); // Mensaje de éxito o error
+
+  useEffect(() => {
+    // Simulación de obtener el userId del usuario logueado, reemplazar con lógica real
+    setUserId(1);
+  }, []);
 
   // Función para agregar un producto a la lista de productos seleccionados
   const addProduct = async () => {
     if (!searchTerm || !quantity || !unitOfMeasure) {
-      alert('Por favor, completa todos los campos para agregar un producto.');
+      setMessage('Por favor, completa todos los campos para agregar un producto.');
       return;
     }
-  
+
     try {
-      // Suponemos que `fetchOrdersByProductName` también devuelve un ID para el producto
+      setLoading(true);
       await fetchOrdersByProductName(searchTerm);
-  
+
       const newOrderDetail: OrderDetail = {
         id: Math.random(),
         orderDetailId: 0,
         orderId: 0,
         productId: Math.random(), // Genera un ID temporal o usa el ID real que venga de la búsqueda
-        product: { id_Product: Math.random(), name: searchTerm }, // Datos del producto
-        quantity: parseInt(quantity), // Cantidad
-        unitOfMeasure, // Unidad de medida
-        received: false, // Marca como no recibido
+        product: { id_Product: Math.random(), name: searchTerm },
+        quantity: parseInt(quantity),
+        unitOfMeasure,
+        received: false,
       };
-  
+
       setSelectedProducts([...selectedProducts, newOrderDetail]);
-  
-      // Limpiar campos después de agregar el producto
       setSearchTerm('');
       setQuantity('');
       setUnitOfMeasure('');
+      setMessage('Producto agregado correctamente');
     } catch (err) {
-      alert('Producto no encontrado en las órdenes.');
+      setMessage('Producto no encontrado en las órdenes.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,25 +63,25 @@ const OrderComponent: React.FC = () => {
   const handleEditProduct = (index: number, field: string, value: string) => {
     const updatedProducts = [...selectedProducts];
     if (field === 'product') {
-      updatedProducts[index].product.name = value; // Actualiza el nombre del producto
+      updatedProducts[index].product.name = value;
     } else if (field === 'quantity') {
-      updatedProducts[index].quantity = parseInt(value); // Actualiza la cantidad
+      updatedProducts[index].quantity = parseInt(value);
     } else if (field === 'unitOfMeasure') {
-      updatedProducts[index].unitOfMeasure = value; // Actualiza la unidad de medida
+      updatedProducts[index].unitOfMeasure = value;
     }
-    setSelectedProducts(updatedProducts); // Guardar los cambios
+    setSelectedProducts(updatedProducts);
   };
 
   // Validación y envío de la orden
   const handleSubmitOrder = async () => {
-    if (selectedProducts.length === 0) {
-      alert('Debes seleccionar al menos un producto.');
+    if (!requesterArea || !receiver || !comments || selectedProducts.length === 0) {
+      setMessage('Por favor, completa todos los campos y selecciona al menos un producto.');
       return;
     }
 
     const newOrder: Omit<Order, 'id'> = {
       orderDate: new Date().toISOString(),
-      userId: 1, // Reemplaza con el ID del usuario logueado si es necesario
+      userId: userId || 0,
       requesterArea,
       orderDetails: selectedProducts,
       receiver,
@@ -80,14 +89,17 @@ const OrderComponent: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       await createOrder(newOrder);
-      alert('Orden creada exitosamente');
-      setSelectedProducts([]); // Limpiar la lista de productos
-      setRequesterArea(''); // Limpiar área solicitante
-      setReceiver(''); // Limpiar receptor
-      setComments(''); // Limpiar comentarios
+      setMessage('Orden creada exitosamente');
+      setSelectedProducts([]);
+      setRequesterArea('');
+      setReceiver('');
+      setComments('');
     } catch (error) {
-      alert('Ocurrió un error al crear la orden');
+      setMessage('Ocurrió un error al crear la orden');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,9 +107,10 @@ const OrderComponent: React.FC = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold mb-4">Crear Orden de Compra</h2>
 
-      {/* Campo de búsqueda, cantidad, unidad de medida y botón en la misma fila */}
+      {/* Mensaje de éxito o error */}
+      {message && <p className="mb-4 text-center text-sm text-blue-600">{message}</p>}
+
       <div className="mb-4 flex space-x-4">
-        {/* Buscar Producto */}
         <div className="flex-1 relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">Buscar Producto</label>
           <input
@@ -109,7 +122,6 @@ const OrderComponent: React.FC = () => {
           />
         </div>
 
-        {/* Cantidad */}
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
           <input
@@ -118,11 +130,10 @@ const OrderComponent: React.FC = () => {
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="Cantidad"
-            min="1" // No permitir cantidades negativas
+            min="1"
           />
         </div>
 
-        {/* Unidad de Medida */}
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">Unidad de Medida</label>
           <input
@@ -134,18 +145,17 @@ const OrderComponent: React.FC = () => {
           />
         </div>
 
-        {/* Botón Añadir Producto */}
         <div className="flex items-end">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             onClick={addProduct}
+            disabled={loading}
           >
-            Añadir Producto
+            {loading ? 'Cargando...' : 'Añadir Producto'}
           </button>
         </div>
       </div>
 
-      {/* Mostrar productos seleccionados */}
       <div className="mb-4">
         <h3 className="text-lg font-medium mb-2">Productos Seleccionados</h3>
         {selectedProducts.length > 0 ? (
@@ -202,7 +212,6 @@ const OrderComponent: React.FC = () => {
         )}
       </div>
 
-      {/* Campo del área de donde proviene */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">Área Solicitante</label>
         <input
@@ -214,7 +223,6 @@ const OrderComponent: React.FC = () => {
         />
       </div>
 
-      {/* Información adicional de la orden */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">Receptor</label>
         <input
@@ -236,12 +244,12 @@ const OrderComponent: React.FC = () => {
         />
       </div>
 
-      {/* Botón para enviar la orden */}
       <button
         onClick={handleSubmitOrder}
         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-full"
+        disabled={loading}
       >
-        Enviar Orden
+        {loading ? 'Enviando...' : 'Enviar Orden'}
       </button>
     </div>
   );

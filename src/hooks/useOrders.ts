@@ -1,7 +1,8 @@
 // src/hooks/useOrders.ts
 import { useState, useEffect } from 'react';
-import { getOrdersByStatus, approveOrder, rejectOrder } from '../Services/orderService';
+import { getOrdersByStatus, approveOrder, rejectOrder, getOrdersByProductName } from '../Services/orderService';
 import { Order, RequestStatus } from '../types/OrderTypes';
+import { createOrder as createOrderService } from '../Services/orderService';
 
 export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.Pending) => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -29,12 +30,11 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
     } catch (err) {
       console.error('Error al obtener las órdenes:', err);
       setError('Error al obtener las órdenes');
-
     } finally {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchOrdersData(initialStatus);  // Fetch orders based on initial status (default: Pending)
   }, [initialStatus]);
@@ -56,20 +56,43 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
     } catch (err) {
       console.error('Error al rechazar la orden:', err);
       setError('Error al rechazar la orden');
-
     }
   };
+  // Crear una nueva orden
+  const createOrder = async (order: Order) => {
+    setLoading(true);
+    try {
+      const newOrder = await createOrderService(order);
+      setOrders([...orders, newOrder]);
+      setError(null);
+    } catch (err) {
+      setError('Error al crear la orden');
+    } finally {
+      setLoading(false);
+}
+};
+const fetchOrdersByProductName = async (name: string) => {
+  setLoading(true);
+  try {
+    const data = await getOrdersByProductName(name);
+    setOrders(data);
+    setError(null);
+  } catch (err) {
+    setError('Error al obtener órdenes por producto');
+  } finally {
+    setLoading(false);
+}
+};
 
   return {
-    orders, // Para las órdenes completas
-    orderStatuses, // Para los estados de las órdenes
-    approvedOrders,
-    loading,
-    error,
-
-    handleApproveOrder,
-    handleRejectOrder,
-    fetchOrdersData,  // Allow fetching orders for a specific status
+    orders, // Las órdenes obtenidas
+    loading, // Indicador de carga
+    error, // Posible error
+    handleApproveOrder, // Función para aprobar
+    handleRejectOrder, // Función para rechazar
+    fetchOrdersData,  // Permite obtener las órdenes para un estado específico
+    createOrder,  // Permite crear una nueva orden
+fetchOrdersByProductName,  // Permite obtener las órdenes por nombre de producto
 
   };
 };
