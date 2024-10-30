@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchSpecialities, addSpeciality, editSpeciality, deleteSpeciality } from '../services/LandingPageServices'; 
+import { fetchSpecialities, addSpeciality, editSpeciality, deleteSpeciality } from '../Services/LandingPageServices'; 
 import { Speciality } from '../types/Types';
 
 export const useSpecialities = () => {

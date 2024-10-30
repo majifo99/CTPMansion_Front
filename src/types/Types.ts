@@ -10,7 +10,7 @@ export interface AboutUsContent {
   id: number;
   title: string;
   description: string;
-  urlImage: string;
+  url_Image: string;
 }
 export interface Location {
   id: number;
@@ -72,7 +72,7 @@ export interface Room {
   name: string;
   description: string;
   capacity: number;
-  url_Image?: string;   // URL opcional para la imagen de la sala
+  url_Image: string;   // URL opcional para la imagen de la sala
   isConferenceRoom: boolean;
 }
 export interface Laboratory {

@@ -3,9 +3,10 @@ import { useOrders } from '../hooks/useOrders';
 import { Order, OrderDetail, Product } from '../types/Order';
 import { useAuth } from '../contexts/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const OrderComponent: React.FC = () => {
-  const { createOrder } = useOrders();
+  const { handleCreateOrder } = useOrders(); // Cambiado de createOrder a handleCreateOrder
   const { user } = useAuth();
 
   const [selectedProducts, setSelectedProducts] = useState<OrderDetail[]>([]);
@@ -70,7 +71,7 @@ const OrderComponent: React.FC = () => {
     };
 
     try {
-      await createOrder(newOrder);
+      await handleCreateOrder(newOrder); // Cambiado de createOrder a handleCreateOrder
       toast.success('Orden creada exitosamente');
       setRequesterArea('');
       setReceiver('');
@@ -84,10 +85,10 @@ const OrderComponent: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <ToastContainer /> {/* Agrega el contenedor de Toast aquí */}
+      <ToastContainer /> {/* Contenedor de Toast */}
       <h2 className="text-2xl font-semibold mb-4">Crear Orden de Compra</h2>
 
-      {/* Responsive form fields for adding a product */}
+      {/* Formulario para añadir productos */}
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
         <input
           type="text"
@@ -115,6 +116,7 @@ const OrderComponent: React.FC = () => {
         </button>
       </div>
 
+      {/* Lista de productos seleccionados */}
       <div className="mb-4">
         <h3 className="text-lg font-medium mb-2">Productos Seleccionados</h3>
         {selectedProducts.length > 0 ? (
@@ -173,7 +175,7 @@ const OrderComponent: React.FC = () => {
         )}
       </div>
 
-      {/* Other order fields */}
+      {/* Otros campos del formulario de orden */}
       <div className="grid grid-cols-1 gap-4">
         <input
           type="text"

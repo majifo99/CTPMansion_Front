@@ -1,6 +1,5 @@
-// src/hooks/useOrders.ts
 import { useState, useEffect } from 'react';
-import { getOrdersByStatus, approveOrder, rejectOrder } from '../Services/orderService';
+import { getOrdersByStatus, approveOrder, rejectOrder, createOrder } from '../Services/orderService';
 import { Order, RequestStatus } from '../types/OrderTypes';
 
 export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.Pending) => {
@@ -15,12 +14,10 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
       let data: Order[] = [];
 
       if (status === 'All') {
-        // Fetch both Approved and Rejected orders
         const approvedOrders = await getOrdersByStatus(RequestStatus.Approved);
         const rejectedOrders = await getOrdersByStatus(RequestStatus.Rejected);
         data = [...approvedOrders, ...rejectedOrders]; // Combine both arrays
       } else {
-        // Fetch orders for a specific status
         data = await getOrdersByStatus(status);
       }
 
@@ -29,7 +26,6 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
     } catch (err) {
       console.error('Error al obtener las órdenes:', err);
       setError('Error al obtener las órdenes');
-
     } finally {
       setLoading(false);
     }
@@ -56,20 +52,30 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
     } catch (err) {
       console.error('Error al rechazar la orden:', err);
       setError('Error al rechazar la orden');
+    }
+  };
 
+  const handleCreateOrder = async (order: Order) => {
+    setLoading(true);
+    try {
+      const newOrder = await createOrder(order);
+      setOrders((prevOrders) => [...prevOrders, newOrder]);  // Añadir la nueva orden a la lista
+      setError(null);
+    } catch (err) {
+      console.error('Error al crear la orden:', err);
+      setError('Error al crear la orden');
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
-    orders, // Para las órdenes completas
-    orderStatuses, // Para los estados de las órdenes
-    approvedOrders,
-    loading,
-    error,
-
-    handleApproveOrder,
-    handleRejectOrder,
-    fetchOrdersData,  // Allow fetching orders for a specific status
-
+    orders,                 // Lista de órdenes
+    loading,                // Estado de carga
+    error,                  // Mensaje de error si ocurre uno
+    handleApproveOrder,     // Función para aprobar una orden
+    handleRejectOrder,      // Función para rechazar una orden
+    fetchOrdersData,        // Función para obtener órdenes con un estado específico
+    handleCreateOrder,      // Función para crear una nueva orden
   };
 };

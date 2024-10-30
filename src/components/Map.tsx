@@ -33,7 +33,7 @@ const LocationSkeleton = () => (
 
 const LocationSection = () => {
   const { location, loading, error } = useLocation();
-  const position = [10.098611822058782, -85.3739927038014];
+  const position: [number, number] = [10.098611822058782, -85.3739927038014];
 
   if (loading) return <LocationSkeleton />;
 
@@ -68,7 +68,6 @@ const LocationSection = () => {
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 <Marker position={position}>
                   <Popup>

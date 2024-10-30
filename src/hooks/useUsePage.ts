@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchMission, fetchVision } from '../services/LandingPageServices'; // Asegúrate de que la ruta es correcta
+import { fetchMission, fetchVision } from '../Services/LandingPageServices'; // Asegúrate de que la ruta es correcta
 import { Mission, Vision, Value } from '../types/Types'; // Asegúrate de que los tipos están definidos
-import { fetchValues } from '../services/LandingPageServices';
+import { fetchValues } from '../Services/LandingPageServices';
 
 const useUsPage = () => {
   const [mission, setMission] = useState<Mission | null>(null);

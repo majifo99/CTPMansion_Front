@@ -9,6 +9,16 @@ export enum RequestStatus {
     id_Product: number;
     name: string;
   }
+
+
+  export interface NewOrder {
+    orderDate: string;
+    userId: number;
+    requesterArea: string;
+    orderDetails: OrderDetail[];
+    receiver: string;
+    comments: string;
+  }
   
   export interface OrderDetail {
     orderDetailId: number;

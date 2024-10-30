@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchLocation } from '../services/LandingPageServices'; // Ajusta la ruta según sea necesario
+import { fetchLocation } from '../Services/LandingPageServices'; // Ajusta la ruta según sea necesario
 import { Location } from '../types/Types'; // Ajusta la ruta según sea necesario
 
 const useLocation = () => {
