@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const UpdateUDPBalanceComponent: React.FC = () => {
   const { udps, selectedUdp, loading, error, fetchUdpById, updateUDPBalance } = useUDPs();
-  const [amount, setAmount] = useState<string>(''); // Cambiar a cadena vacía para que esté vacío inicialmente
+  const [amount, setAmount] = useState<string>(''); // Mantener como cadena vacía inicialmente
   const [isAdding, setIsAdding] = useState<boolean>(true); // True si se añade, false si se deduce
 
   // Manejador para seleccionar una UDP
@@ -40,12 +40,7 @@ const UpdateUDPBalanceComponent: React.FC = () => {
       ? selectedUdp.balance + amountValue
       : selectedUdp.balance - amountValue;
 
-    if (!isAdding && selectedUdp.balance < amountValue) {
-      toast.error('No puedes deducir más de lo que hay en el balance.');
-      return;
-    }
-
-    // Actualizar el balance
+    // Actualizar el balance sin verificación de balance negativo
     updateUDPBalance(selectedUdp.id_UDP, newBalance)
       .then(() => {
         toast.success('Balance actualizado exitosamente.');
@@ -84,17 +79,22 @@ const UpdateUDPBalanceComponent: React.FC = () => {
           <option value="">-- Selecciona una UDP --</option>
           {udps.map(udp => (
             <option key={udp.id_UDP} value={udp.id_UDP}>
-              {udp.title} (Balance Actual: {udp.balance} colones)
+              {udp.title} (Balance Actual: ₡{udp.balance})
             </option>
           ))}
         </select>
       </div>
 
-      {/* Mostrar balance actual */}
+      {/* Mostrar balance actual con color condicional solo en el monto */}
       {selectedUdp && (
         <div className="mb-4">
           <p className="text-lg">
-            Balance Actual: <strong>{selectedUdp.balance} colones</strong>
+            Balance Actual: 
+            <strong>
+              <span style={{ color: selectedUdp.balance < 0 ? 'red' : 'green' }}>
+                ₡{selectedUdp.balance}
+              </span>
+            </strong>
           </p>
         </div>
       )}
