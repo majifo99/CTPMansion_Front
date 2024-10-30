@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+<<<<<<< HEAD
 import { FaHome, FaCertificate, FaChevronDown, FaChevronUp, FaPlus, FaBars } from 'react-icons/fa';
+=======
+import { FaCartArrowDown, FaCertificate, FaChevronDown, FaChevronUp, FaPlus } from 'react-icons/fa';
+>>>>>>> 661accd10e38f693135d2c5a63d42cee14170556
 import { MdRoom, MdScience } from 'react-icons/md';
 import { GiTeacher, GiTakeMyMoney } from 'react-icons/gi';
 import { IoIosConstruct } from 'react-icons/io';
@@ -86,6 +90,7 @@ const Sidebar: React.FC = () => {
               )}
             </div>
           )}
+<<<<<<< HEAD
 
           {/* Gestiones */}
           {hasRole(['Admin', 'RoomManager', 'ConferenceRoomManager']) && (
@@ -126,9 +131,54 @@ const Sidebar: React.FC = () => {
                   </Link>
                 </div>
               )}
+=======
+        </div>
+
+        {/* Section for Management with dropdown */}
+        <div className="mb-4">
+          <h3
+            className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer"
+            onClick={() => setIsGestionesOpen(!isGestionesOpen)}
+          >
+            Gestiones {isGestionesOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </h3>
+          {isGestionesOpen && (
+            <div className="pl-4">
+              <Link to="/dashboard/roles" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FiUsers className="mr-2" />
+                Gestión de roles
+              </Link>
+              <Link to="/dashboard/salas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <MdRoom className="mr-2" />
+                Salas
+              </Link>
+              <Link to="/dashboard/laboratorios" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <MdScience className="mr-2" />
+                Laboratorios
+              </Link>
+              <Link to="/dashboard/certificaciones" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaCertificate className="mr-2" />
+                Certificaciones
+              </Link>
+
+
+              <Link to="/dashboard/admin-udp-balance" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+              <GiTakeMyMoney className="mr-2" />
+                Balance UDP
+              </Link>
+
+
+
+              <Link to="/dashboard/ordenesdepedido" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaCartArrowDown className="mr-2" />
+                Ordenes de pedido
+              </Link>
+
+>>>>>>> 661accd10e38f693135d2c5a63d42cee14170556
             </div>
           )}
 
+<<<<<<< HEAD
           {/* Creación y Elaboración */}
           {hasRole(['Admin', 'ContentEditor']) && (
             <div className="mb-4">
@@ -172,6 +222,42 @@ const Sidebar: React.FC = () => {
                   </Link>
                 </div>
               )}
+=======
+        {/* Combined Creation and Elaboration section */}
+        <div className="mb-4">
+          <h3
+            className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer"
+            onClick={() => setIsCreacionElaboracionOpen(!isCreacionElaboracionOpen)}
+          >
+            Creación y elaboración {isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </h3>
+          {isCreacionElaboracionOpen && (
+            <div className="pl-4">
+              <Link to="/dashboard/eventos" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <IoIosConstruct className="mr-2" />
+                Eventos
+              </Link>
+              <Link to="/dashboard/udps" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <GiTeacher className="mr-2" />
+                UDPs
+              </Link>
+              <Link to="/dashboard/especialidades" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <BsJournal className="mr-2" />
+                Especialidades
+              </Link>
+              <Link to="/dashboard/talleres" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaCog className="mr-2" />
+                Talleres
+              </Link>
+              <Link to="/dashboard/elaborar-salas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaPlus className="mr-2" />
+                Elaborar salas
+              </Link>
+              <Link to="/dashboard/elaborar-laboratorios" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                <FaPlus className="mr-2" />
+                Elaborar laboratorios
+              </Link>
+>>>>>>> 661accd10e38f693135d2c5a63d42cee14170556
             </div>
           )}
         </nav>

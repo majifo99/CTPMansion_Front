@@ -31,9 +31,13 @@ const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanageme
 const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage'));
 const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/LabRequestPage'));
 const Unauthorized = React.lazy(() => import('../pages/UnauthorizedPage')); // Página de no autorizado
+
 const OrderComponent = React.lazy(() => import('../DashboardPages/OrderComponent'));
 const UpdateUDPBalanceComponent = React.lazy(() => import('../DashboardPages/UpdateUDPBalanceComponent'));
 
+
+
+const OrdenesDePedido = React.lazy(() => import('../DashboardPages/ManageOrders'));
 
 const AppRouter: React.FC = () => {
   return (
@@ -72,6 +76,14 @@ const AppRouter: React.FC = () => {
               <Route path="perfil" element={
                 <ProtectedRoute>
                   <UserProfile />
+                </ProtectedRoute>
+              } />
+              
+
+              {/* Nueva Ruta para Ordenes de pedido */}
+              <Route path="ordenesdepedido" element={
+                <ProtectedRoute requiredRoles={['Admin']}>
+                  <OrdenesDePedido/>
                 </ProtectedRoute>
               } />
 
