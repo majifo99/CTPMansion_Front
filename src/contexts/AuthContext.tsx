@@ -1,20 +1,17 @@
-//authcontext
-import React, { createContext, useState, useEffect } from 'react';
-import {jwtDecode} from 'jwt-decode'; // Asegúrate de importar correctamente jwt-decode
+// src/contexts/AuthContext.tsx
+
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import {jwtDecode} from 'jwt-decode';
+import Cookies from 'js-cookie';
 import { login as authLogin, logout as authLogout } from '../Services/authService';
 
-// Definir la interfaz del usuario
 interface UserType {
-  id: number;            // Agregar el ID del usuario si es necesario
+  id: number;
   name: string;
-  lastName: string;
-  lastName2: string;
   email: string;
-  phoneNumber: string;
-  roles: string[];  // Los roles del usuario decodificados
+  roles: string[];
 }
 
-// Definir la interfaz del contexto de autenticación
 interface AuthContextType {
   token: string | null;
   user: UserType | null;
@@ -22,66 +19,57 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// Crear el contexto
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// AuthProvider: Proveedor del contexto de autenticación
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Para controlar el estado de carga
 
   // Función para decodificar el token JWT y extraer los datos del usuario
   const decodeToken = (token: string): UserType => {
-    const decodedToken: any = jwtDecode(token); // Decodifica el token
-    const decodedUser: UserType = {
-      id: parseInt(decodedToken.nameid),         // Asegúrate de que los campos coincidan con tu JWT
+    const decodedToken: any = jwtDecode(token);
+    return {
+      id: parseInt(decodedToken.nameid),
       name: decodedToken.Name,
-      lastName: decodedToken.lastName,           // Usar campos relevantes del JWT
-      lastName2: decodedToken.lastName2,
       email: decodedToken.Email,
-      phoneNumber: decodedToken.phoneNumber,
-      roles: Array.isArray(decodedToken.role) ? decodedToken.role : [decodedToken.role], // Si es un solo rol, lo convierte en array
+      roles: Array.isArray(decodedToken.role) ? decodedToken.role : [decodedToken.role],
     };
-    return decodedUser;
   };
 
-  // Cargar token desde localStorage al iniciar la aplicación
+  // Cargar el token desde las cookies al iniciar la aplicación
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = Cookies.get('token');
     if (storedToken) {
       setToken(storedToken);
-      const decodedUser = decodeToken(storedToken);
-      setUser(decodedUser);
+      setUser(decodeToken(storedToken));
     }
+    setLoading(false); // Termina de cargar una vez que se verifica el token
   }, []);
 
-  // Función para manejar el login
-  const login = async (email: string, password: string) => {
-    try {
-      const loggedInUser = await authLogin(email, password); // Realiza el login y obtiene el token
-      if (loggedInUser) {
-        const tokenFromStorage = localStorage.getItem('token');
-        if (tokenFromStorage) {
-          setToken(tokenFromStorage);
-          const decodedUser = decodeToken(tokenFromStorage);
-          setUser(decodedUser); // Almacena el usuario decodificado
-        }
-        return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const success = await authLogin(email, password);
+    if (success) {
+      const tokenFromCookie = Cookies.get('token');
+      if (tokenFromCookie) {
+        setToken(tokenFromCookie);
+        setUser(decodeToken(tokenFromCookie));
       }
-      return false;
-    } catch (error) {
-      console.error('Error durante el login:', error);
-      return false;
+      return true;
     }
+    return false;
   };
 
-  // Función para manejar el logout
   const logout = () => {
     authLogout();
-    localStorage.removeItem('token');
+    Cookies.remove('token'); // Elimina el token de las cookies
     setToken(null);
     setUser(null);
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Muestra un cargando mientras el token se carga desde las cookies
+  }
 
   return (
     <AuthContext.Provider value={{ token, user, login, logout }}>
@@ -90,9 +78,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Hook personalizado para utilizar el contexto de autenticación
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth debe usarse dentro de un AuthProvider');
   }

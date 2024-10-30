@@ -19,8 +19,9 @@ api.interceptors.request.use((config) => {
 
 // Función para crear una orden
 export const createOrder = async (order: Order): Promise<Order> => {
+  // Envía el objeto directamente sin "orderDto"
   const response = await api.post('/Order', order, {
-    headers: { 'Content-Type': 'application/json-patch+json' },
+    headers: { 'Content-Type': 'application/json' },
   });
   return response.data;
 };
