@@ -12,7 +12,8 @@ interface HistoryModalProps {
 const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
   const [filter, setFilter] = useState<RequestStatus | 'All'>(RequestStatus.Approved);
   const { orders, loading, error } = useOrders(filter);
-  const [selectedOrder, setSelectedOrder] = useState(null); // To handle modal of order details
+  const [selectedOrder, setSelectedOrder] = useState(null); // Estado para el modal de detalles
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
 
   if (!isOpen) return null;
 
@@ -20,6 +21,11 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
   const handleViewDetails = (order: any) => {
     setSelectedOrder(order);
   };
+
+  // Filtrar las órdenes según el término de búsqueda
+  const filteredOrders = orders.filter((order) =>
+    order.receiver.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div
@@ -31,6 +37,17 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-2xl font-semibold mb-4">Historial de Órdenes</h2>
+
+        {/* Barra de búsqueda para filtrar por receptor */}
+        <div className="flex justify-center mb-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre del receptor..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-md w-1/2"
+          />
+        </div>
 
         {/* Dropdown de filtro */}
         <div className="flex justify-center mb-4">
@@ -51,7 +68,7 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
 
         {/* Lista de órdenes con Scroll */}
         <div className="overflow-y-auto max-h-72"> {/* Añadimos un max-height y overflow-y */}
-          {orders.length === 0 ? (
+          {filteredOrders.length === 0 ? (
             <p>No hay órdenes disponibles.</p>
           ) : (
             <table className="table-auto w-full text-left border-collapse">
@@ -64,7 +81,7 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.orderId} className="hover:bg-gray-50">
                     <td className="px-4 py-2 border text-center">{order.receiver}</td>
                     <td className="px-4 py-2 border text-center">{new Date(order.orderDate).toLocaleDateString()}</td>

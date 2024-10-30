@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 
 const OrderComponent: React.FC = () => {
+
   const { createOrder } = useOrders();
   const { user } = useAuth();
 
@@ -21,6 +22,7 @@ const OrderComponent: React.FC = () => {
       toast.error('Por favor, completa todos los campos para agregar un producto.');
       return;
     }
+
 
     const newProduct: Product = { name: searchTerm };
     const newOrderDetail: OrderDetail = {
@@ -39,7 +41,9 @@ const OrderComponent: React.FC = () => {
 
   const handleProductChange = (index: number, field: string, value: string) => {
     const updatedProducts = [...selectedProducts];
+
     if (field === 'name') {
+
       updatedProducts[index].product.name = value;
     } else if (field === 'quantity') {
       updatedProducts[index].quantity = parseInt(value);
@@ -51,18 +55,22 @@ const OrderComponent: React.FC = () => {
 
   const handleSubmitOrder = async () => {
     if (!requesterArea || !receiver || !comments || selectedProducts.length === 0) {
+
       toast.error('Todos los campos y al menos un producto son requeridos.');
       return;
     }
 
     if (!user) {
       toast.error('No se encontró el usuario autenticado.');
+
       return;
     }
 
     const newOrder: Order = {
       orderDate: new Date().toISOString(),
+
       userId: user.id,
+
       requesterArea,
       orderDetails: selectedProducts,
       receiver,
@@ -70,7 +78,9 @@ const OrderComponent: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       await createOrder(newOrder);
+
       toast.success('Orden creada exitosamente');
       setRequesterArea('');
       setReceiver('');
@@ -79,6 +89,7 @@ const OrderComponent: React.FC = () => {
     } catch (error) {
       console.error('Error al crear la orden:', error);
       toast.error('Ocurrió un error al crear la orden');
+
     }
   };
 
@@ -86,6 +97,7 @@ const OrderComponent: React.FC = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <ToastContainer /> {/* Agrega el contenedor de Toast aquí */}
       <h2 className="text-2xl font-semibold mb-4">Crear Orden de Compra</h2>
+
 
       {/* Responsive form fields for adding a product */}
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
@@ -175,6 +187,7 @@ const OrderComponent: React.FC = () => {
 
       {/* Other order fields */}
       <div className="grid grid-cols-1 gap-4">
+
         <input
           type="text"
           placeholder="Área Solicitante"
@@ -182,6 +195,8 @@ const OrderComponent: React.FC = () => {
           onChange={(e) => setRequesterArea(e.target.value)}
           className="w-full p-2 border rounded"
         />
+
+
         <input
           type="text"
           placeholder="Receptor"
