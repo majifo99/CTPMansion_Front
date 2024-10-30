@@ -7,70 +7,45 @@ const apiUrl = 'https://localhost:7055/api/Order';
 // Helper function to retrieve the JWT token from localStorage
 const getToken = () => localStorage.getItem('token');
 
-<<<<<<< HEAD
+// Instancia de axios con configuración de URL base y autenticación
+const api = axios.create({
+  baseURL: apiUrl,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor para añadir el token a cada solicitud
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Función para crear una orden
 export const createOrder = async (order: Order): Promise<Order> => {
-  // Envía el objeto directamente sin "orderDto"
-  const response = await api.post('/Order', order, {
-    headers: { 'Content-Type': 'application/json' },
-=======
-// Fetch orders by status (e.g., Pending, Approved, Rejected)
+  const response = await api.post('/', order);
+  return response.data;
+};
+
+// Función para obtener órdenes por estado (ej. Pending, Approved, Rejected)
 export const getOrdersByStatus = async (status: RequestStatus | null): Promise<Order[]> => {
-  const token = getToken();
-  
-  // If status is null, fetch all orders
   const url = status !== null 
-    ? `${apiUrl}/orders-by-status?status=${status}` 
-    : `${apiUrl}/orders`; // Adjust to correct endpoint for all orders
+    ? `/orders-by-status?status=${status}` 
+    : '/orders'; // Endpoint para todas las órdenes
 
-  const response = await axios.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,  // Add the token to the request
-    },
->>>>>>> 661accd10e38f693135d2c5a63d42cee14170556
-  });
+  const response = await api.get(url);
   return response.data;
 };
 
-// Approve an order
+// Aprobar una orden
 export const approveOrder = async (id: number): Promise<void> => {
-  const token = getToken();
-  await axios.patch(`${apiUrl}/${id}/approve`, null, {
-    headers: {
-      Authorization: `Bearer ${token}`,  // Add the token to the request
-    },
-  });
+  await api.patch(`/${id}/approve`);
 };
 
-// Reject an order
+// Rechazar una orden
 export const rejectOrder = async (id: number): Promise<void> => {
-  const token = getToken();
-  await axios.patch(`${apiUrl}/${id}/reject`, null, {
-    headers: {
-      Authorization: `Bearer ${token}`,  // Add the token to the request
-    },
-  });
-};
-
-// Create a new order
-export const createOrder = async (order: Order): Promise<Order> => {
-  const token = getToken();
-  const response = await axios.post(apiUrl, order, {
-    headers: { 
-      Authorization: `Bearer ${token}`, // Add token here
-      'Content-Type': 'application/json-patch+json',
-    },
-  });
-  return response.data;
-};
-
-// Fetch orders by product name
-export const getOrdersByProductName = async (name: string): Promise<Order[]> => {
-  const token = getToken();
-  const response = await axios.get(`${apiUrl}/product/${name}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,  // Add the token to the request
-    },
-  });
-  return response.data;
+  await api.patch(`/${id}/reject`);
 };

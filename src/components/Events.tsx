@@ -13,7 +13,7 @@ const EventsPage = () => {
   }, []);
 
   if (loading) return <EventsSkeleton />;
-  if (error) return <p className="text-center text-red-500">Error: {error.message}</p>;
+  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
     <>

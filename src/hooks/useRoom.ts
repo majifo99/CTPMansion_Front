@@ -20,7 +20,7 @@ export const useRooms = () => {
         }
       } catch (err) {
         console.error(err); // Log the error
-        setError(err.message); // Set error message
+        setError(error); // Set error message
       } finally {
         setLoading(false); // Stop loading
       }

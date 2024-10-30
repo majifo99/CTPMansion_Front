@@ -47,7 +47,7 @@ const OurServices: React.FC = () => {
               <ServiceSkeleton key={index} />
             ))
           ) : error ? (
-            <p className="text-center text-red-500 w-full">Error: {error.message}</p>
+            <p className="text-center text-red-500 w-full">Error: {error}</p>
           ) : (
             // Mostrar servicios si ya están cargados
             services.map((service) => (

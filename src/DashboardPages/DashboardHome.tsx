@@ -1,7 +1,7 @@
 // DashboardHome.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaUsers, FaChalkboardTeacher, FaClipboardList, FaChartBar, FaDoorOpen, FaUserShield, FaCalendarPlus, FaFileInvoice, FaListAlt, FaCalendarAlt } from 'react-icons/fa';
+import {  FaDoorOpen, FaUserShield, FaCalendarPlus, FaFileInvoice, FaListAlt, FaCalendarAlt } from 'react-icons/fa';
 import { useEvents } from '../hooks/useEvents'; // Hook personalizado para manejar eventos
 
 const DashboardHome: React.FC = () => {

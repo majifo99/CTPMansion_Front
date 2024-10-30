@@ -3,10 +3,10 @@ import { useOrders } from '../hooks/useOrders';
 import { Order, OrderDetail, Product } from '../types/Order';
 import { useAuth } from '../contexts/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const OrderComponent: React.FC = () => {
-
-  const { createOrder } = useOrders();
+  const { handleCreateOrder } = useOrders(); // Cambiado de createOrder a handleCreateOrder
   const { user } = useAuth();
 
   const [selectedProducts, setSelectedProducts] = useState<OrderDetail[]>([]);
@@ -22,7 +22,6 @@ const OrderComponent: React.FC = () => {
       toast.error('Por favor, completa todos los campos para agregar un producto.');
       return;
     }
-
 
     const newProduct: Product = { name: searchTerm };
     const newOrderDetail: OrderDetail = {
@@ -41,9 +40,7 @@ const OrderComponent: React.FC = () => {
 
   const handleProductChange = (index: number, field: string, value: string) => {
     const updatedProducts = [...selectedProducts];
-
     if (field === 'name') {
-
       updatedProducts[index].product.name = value;
     } else if (field === 'quantity') {
       updatedProducts[index].quantity = parseInt(value);
@@ -55,22 +52,18 @@ const OrderComponent: React.FC = () => {
 
   const handleSubmitOrder = async () => {
     if (!requesterArea || !receiver || !comments || selectedProducts.length === 0) {
-
       toast.error('Todos los campos y al menos un producto son requeridos.');
       return;
     }
 
     if (!user) {
       toast.error('No se encontró el usuario autenticado.');
-
       return;
     }
 
     const newOrder: Order = {
       orderDate: new Date().toISOString(),
-
       userId: user.id,
-
       requesterArea,
       orderDetails: selectedProducts,
       receiver,
@@ -78,9 +71,7 @@ const OrderComponent: React.FC = () => {
     };
 
     try {
-      setLoading(true);
-      await createOrder(newOrder);
-
+      await handleCreateOrder(newOrder); // Cambiado de createOrder a handleCreateOrder
       toast.success('Orden creada exitosamente');
       setRequesterArea('');
       setReceiver('');
@@ -89,17 +80,15 @@ const OrderComponent: React.FC = () => {
     } catch (error) {
       console.error('Error al crear la orden:', error);
       toast.error('Ocurrió un error al crear la orden');
-
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <ToastContainer /> {/* Agrega el contenedor de Toast aquí */}
+      <ToastContainer /> {/* Contenedor de Toast */}
       <h2 className="text-2xl font-semibold mb-4">Crear Orden de Compra</h2>
 
-
-      {/* Responsive form fields for adding a product */}
+      {/* Formulario para añadir productos */}
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
         <input
           type="text"
@@ -127,6 +116,7 @@ const OrderComponent: React.FC = () => {
         </button>
       </div>
 
+      {/* Lista de productos seleccionados */}
       <div className="mb-4">
         <h3 className="text-lg font-medium mb-2">Productos Seleccionados</h3>
         {selectedProducts.length > 0 ? (
@@ -185,9 +175,8 @@ const OrderComponent: React.FC = () => {
         )}
       </div>
 
-      {/* Other order fields */}
+      {/* Otros campos del formulario de orden */}
       <div className="grid grid-cols-1 gap-4">
-
         <input
           type="text"
           placeholder="Área Solicitante"
@@ -195,8 +184,6 @@ const OrderComponent: React.FC = () => {
           onChange={(e) => setRequesterArea(e.target.value)}
           className="w-full p-2 border rounded"
         />
-
-
         <input
           type="text"
           placeholder="Receptor"

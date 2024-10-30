@@ -12,6 +12,8 @@ export interface OrderDetail {
   received: boolean;
 }
 
+
+
 export interface Order {
   orderDate: string;
   userId: number;

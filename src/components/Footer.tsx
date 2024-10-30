@@ -1,8 +1,17 @@
-// src/Footer.tsx
 import { FaFacebookF } from 'react-icons/fa';
-import logo from '../assets/images/image.png'; // Asegúrate de que la ruta sea correcta
+import useLocation from '../hooks/useLocation'; // Ajusta la ruta según sea necesario
 
 const Footer = () => {
+  const { location, loading, error } = useLocation();
+
+  if (loading) {
+    return <p className="text-center text-gray-400">Cargando información de contacto...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">Error al cargar la información de contacto: {error}</p>;
+  }
+
   return (
     <footer className="bg-darkBlue py-16">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,7 +32,7 @@ const Footer = () => {
                 <span className="sr-only">Facebook</span>
                 <FaFacebookF className="w-6 h-6 text-gray-300" />
               </a>
-              {/* Puedes agregar más iconos de redes sociales aquí si lo deseas */}
+              {/* Otros iconos de redes sociales */}
             </div>
           </div>
 
@@ -33,24 +42,22 @@ const Footer = () => {
             <div>
               <h3 className="font-semibold text-lg text-gray-200">Nuestra Dirección</h3>
               <p className="mt-4 text-sm text-gray-400">
-                100 metros sur de la Plaza de Fútbol, La Mansión, Nicoya, Provincia de Guanacaste.
+                {location?.addres}
               </p>
             </div>
             {/* Horario */}
             <div>
               <h3 className="font-semibold text-lg text-gray-200">Horario</h3>
               <p className="mt-4 text-sm text-gray-400">
-                Lunes - Viernes: 9am - 5pm <br />
-                Sábado: 10am - 4pm <br />
-                Domingo: Cerrado
+                {location?.schedule}
               </p>
             </div>
             {/* Contacto */}
             <div className="lg:col-span-2">
               <h3 className="font-semibold text-lg text-gray-200">Contacto</h3>
               <p className="mt-4 text-sm text-gray-400">
-                Correo: <a href="mailto:info@example.com" className="hover:underline text-gray-300">info@example.com</a> <br />
-                Teléfono: <a href="tel:+5061234567" className="hover:underline text-gray-300">+506 1234 567</a>
+                Correo: <a href={`mailto:${location?.email}`} className="hover:underline text-gray-300">{location?.email}</a> <br />
+                Teléfono: <a href={`tel:${location?.phoneNumber}`} className="hover:underline text-gray-300">{location?.phoneNumber}</a>
               </p>
             </div>
           </div>

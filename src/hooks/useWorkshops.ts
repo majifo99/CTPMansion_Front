@@ -6,7 +6,7 @@ import {
   updateWorkshop,
   deleteWorkshop,
   fetchSpecialities,
-} from '../services/LandingPageServices';
+} from '../Services/LandingPageServices';
 
 export const useWorkshops = () => {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getEvents, addEvent, editEvent, deleteEvent } from '../services/LandingPageServices'; // Asumiendo que ya tienes estos servicios
+import { getEvents, addEvent, editEvent, deleteEvent } from '../Services/LandingPageServices'; // Asumiendo que ya tienes estos servicios
 import { Event } from '../types/Types';
 
 export const useEvents = () => {

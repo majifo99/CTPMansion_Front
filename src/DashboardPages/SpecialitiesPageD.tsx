@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSpecialities } from '../hooks/useSpecialities';
 import EditSpecialityModal from '../modals/EditSpecialityModal';
 import DeleteEventModal from '../modals/DeleteEventModal';
-
 import { Speciality } from '../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { ToastContainer, toast } from 'react-toastify';
