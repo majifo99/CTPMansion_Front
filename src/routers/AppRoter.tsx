@@ -4,6 +4,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import ProtectedRoute from './ProtectedRoute';  // Componente de rutas protegidas
 import { AuthProvider } from '../contexts/AuthContext';
 import UserProfile from '../DashboardPages/UserProfile';
+import DashboardHome from '../DashboardPages/DashboardHome';
 
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -67,9 +68,11 @@ const AppRouter: React.FC = () => {
             {/* Rutas del Dashboard protegidas */}
             <Route path="/dashboard" element={
               <ProtectedRoute>
-                <DashboardLayout />
+                <DashboardLayout/>
+                
               </ProtectedRoute>
             }>
+                 <Route index element={<DashboardHome />} /> {/* Ruta de inicio del Dashboard */}
               <Route path="perfil" element={
                 <ProtectedRoute>
                   <UserProfile />

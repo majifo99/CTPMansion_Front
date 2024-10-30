@@ -1,13 +1,18 @@
+// src/Services/authService.ts
+
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";// Asegúrate de que jwtDecode esté importado correctamente
+import {jwtDecode} from 'jwt-decode'; // Importación correcta de jwt-decode
+import Cookies from 'js-cookie';
 
 // Define la estructura esperada del JWT decodificado
 interface DecodedUser {
+  id: number;
   name: string;
   email: string;
-  roles: string[];  // El campo "role" es un array de roles
+  roles: string[];
 }
 
+// Realizar login y almacenar token en cookies
 export const login = async (email: string, password: string): Promise<DecodedUser | null> => {
   try {
     const response = await axios.post(
@@ -17,23 +22,27 @@ export const login = async (email: string, password: string): Promise<DecodedUse
     );
 
     const { token } = response.data;
-    localStorage.setItem('token', token); // Guardar el token en localStorage
 
-    // Decodificar el token JWT
-    const decodedToken: any = jwtDecode(token); // Decodificar el token
+    // Guardar el token en las cookies con una expiración de 1 día
+    Cookies.set('token', token, { expires: 1 }); 
+
+    // Decodificar el token JWT para extraer los datos del usuario
+    const decodedToken: any = jwtDecode(token);
     const decodedUser: DecodedUser = {
+      id: parseInt(decodedToken.nameid),
       name: decodedToken.Name,
       email: decodedToken.Email,
-      roles: decodedToken.role, // Extraer los roles desde el campo "role"
+      roles: Array.isArray(decodedToken.role) ? decodedToken.role : [decodedToken.role],
     };
 
-    return decodedUser;  // Retornar el usuario decodificado con roles
+    return decodedUser; // Retornar el usuario decodificado con roles
   } catch (error) {
     console.error('Error durante el login:', error);
-    return null;  // Manejar errores devolviendo null
+    return null;
   }
 };
 
+// Eliminar el token de las cookies al hacer logout
 export const logout = () => {
-  localStorage.removeItem('token'); // Eliminar token del localStorage al hacer logout
+  Cookies.remove('token');
 };

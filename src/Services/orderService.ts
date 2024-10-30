@@ -7,6 +7,13 @@ const apiUrl = 'https://localhost:7055/api/Order';
 // Helper function to retrieve the JWT token from localStorage
 const getToken = () => localStorage.getItem('token');
 
+<<<<<<< HEAD
+// Función para crear una orden
+export const createOrder = async (order: Order): Promise<Order> => {
+  // Envía el objeto directamente sin "orderDto"
+  const response = await api.post('/Order', order, {
+    headers: { 'Content-Type': 'application/json' },
+=======
 // Fetch orders by status (e.g., Pending, Approved, Rejected)
 export const getOrdersByStatus = async (status: RequestStatus | null): Promise<Order[]> => {
   const token = getToken();
@@ -20,6 +27,7 @@ export const getOrdersByStatus = async (status: RequestStatus | null): Promise<O
     headers: {
       Authorization: `Bearer ${token}`,  // Add the token to the request
     },
+>>>>>>> 661accd10e38f693135d2c5a63d42cee14170556
   });
   return response.data;
 };

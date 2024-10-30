@@ -1,19 +1,15 @@
 // src/types/Order.ts
 
 export interface Product {
-  id_Product: number;
+  id_Product?: number; // Opcional ya que el backend lo asignará automáticamente
   name: string;
 }
 
 export interface OrderDetail {
-  id: number;
-  orderDetailId: number;
-  orderId: number;
-  productId: number;
   product: Product;
   quantity: number;
   unitOfMeasure: string;
-  received: boolean | null;
+  received: boolean;
 }
 
 export interface Order {
