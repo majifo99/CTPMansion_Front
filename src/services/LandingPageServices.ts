@@ -1,5 +1,18 @@
 import axios from 'axios';
+import {
+  Event,
+  AboutUsContent,
+  Location,
+  OurService,
+  Mission,
+  Vision,
+  Value,
+  Workshop,
+  Speciality,
+  Room,
+  CertificationRequest,
 
+} from '../types/Types'; // Ajusta esta ruta según tu estructura de proyecto
 
 // URL base de la API
 const API_URL = 'https://localhost:7055/api';
@@ -24,282 +37,148 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Manejo de respuestas
-const handleResponse = async (url:string) => {
-  try {
-    const response = await apiClient.get(url);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching data from ${url}:`, error);
-    throw error;
-  }
-};
-
 // === Funciones de autenticación ===
-export const login = async (email:string, password:string) => {
-  try {
-    const response = await apiClient.post('/User/login', { email, password });
-    const { token } = response.data;
-    localStorage.setItem('token', token);
-  } catch (error) {
-    console.error('Error logging in:', error);
-    throw error;
-  }
+export const login = async (email: string, password: string): Promise<void> => {
+  const response = await apiClient.post('/User/login', { email, password });
+  const { token } = response.data;
+  localStorage.setItem('token', token);
 };
 
-export const logout = () => {
+export const logout = (): void => {
   localStorage.removeItem('token');
 };
 
 // === Servicios relacionados a eventos ===
-export const getEvents = () => handleResponse('/Events');
+export const getEvents = async (): Promise<Event[]> => handleResponse('/Events');
 
-export const addEvent = async (newEvent:any) => {
-  try {
-    const response = await apiClient.post('/Events', newEvent);
-    return response.data;
-  } catch (error) {
-    console.error('Error adding event:', error);
-    throw error;
-  }
+export const addEvent = async (newEvent: Event): Promise<Event> => {
+  const response = await apiClient.post('/Events', newEvent);
+  return response.data;
 };
 
-export const editEvent = async (eventId:number, updatedEvent:any) => {
-  try {
-    const response = await apiClient.put(`/Events/${eventId}`, updatedEvent);
-    return response.data;
-  } catch (error) {
-    console.error('Error editing event:', error);
-    throw error;
-  }
+export const editEvent = async (eventId: number, updatedEvent: Event): Promise<Event> => {
+  const response = await apiClient.put(`/Events/${eventId}`, updatedEvent);
+  return response.data;
 };
 
-export const deleteEvent = async (eventId:number) => {
-  try {
-    await apiClient.delete(`/Events/${eventId}`);
-  } catch (error) {
-    console.error('Error deleting event:', error);
-    throw error;
-  }
+export const deleteEvent = async (eventId: number): Promise<void> => {
+  await apiClient.delete(`/Events/${eventId}`);
 };
 
 // === Servicios relacionados a especialidades ===
-export const fetchSpecialities = () => handleResponse('/Especiality');
+export const fetchSpecialities = async (): Promise<Speciality[]> => handleResponse('/Especiality');
 
-export const addSpeciality = async (speciality:any) => {
-  try {
-    const response = await apiClient.post('/Especiality', speciality);
-    return response.data;
-  } catch (error) {
-    console.error('Error adding speciality:', error);
-    throw error;
-  }
+export const addSpeciality = async (speciality: Speciality): Promise<Speciality> => {
+  const response = await apiClient.post('/Especiality', speciality);
+  return response.data;
 };
 
-export const editSpeciality = async (id:number, speciality:any) => {
-  try {
-    const response = await apiClient.put(`/Especiality/${id}`, speciality);
-    return response.data;
-  } catch (error) {
-    console.error('Error editing speciality:', error);
-    throw error;
-  }
+export const editSpeciality = async (id: number, speciality: Speciality): Promise<Speciality> => {
+  const response = await apiClient.put(`/Especiality/${id}`, speciality);
+  return response.data;
 };
 
-export const deleteSpeciality = async (id:number) => {
-  try {
-    await apiClient.delete(`/Especiality/${id}`);
-  } catch (error) {
-    console.error('Error deleting speciality:', error);
-    throw error;
-  }
+export const deleteSpeciality = async (id: number): Promise<void> => {
+  await apiClient.delete(`/Especiality/${id}`);
 };
 
-// === Servicios relacionados con el contenido "Sobre Nosotros" ===
-export const getAboutUsContent = async () => {
-  const data = await handleResponse('/AboutUsContentManager');
+export const getAboutUsContent = async (): Promise<AboutUsContent | null> => {
+  const data = await handleResponse<AboutUsContent[]>('/AboutUsContentManager');
   return data.length > 0 ? data[0] : null;
 };
 
 // === Servicios relacionados a la ubicación ===
-export const fetchLocation = async () => {
-  try {
-    const response = await apiClient.get('/Location');
-    return response.data[0]; // Asume que la respuesta es un array y toma el primer elemento
-  } catch (error) {
-    console.error('Error fetching location data:', error);
-    throw new Error('Error al cargar la información de la ubicación.');
-  }
+export const fetchLocation = async (): Promise<Location> => {
+  const response = await apiClient.get('/Location');
+  return response.data[0];
 };
 
 // === Servicios relacionados con nuestros servicios ===
-export const fetchOurServices = () => handleResponse('/OurService');
+export const fetchOurServices = async (): Promise<OurService[]> => handleResponse('/OurService');
 
 // === Servicios relacionados con la misión ===
-export const fetchMission = async () => {
-  try {
-    const response = await apiClient.get('/Missions');
-    return response.data[0];
-  } catch (error) {
-    console.error('Error fetching mission data:', error);
-    throw new Error('Error al cargar la misión.');
-  }
+export const fetchMission = async (): Promise<Mission> => {
+  const response = await apiClient.get('/Missions');
+  return response.data[0];
 };
 
 // === Servicios relacionados con la visión ===
-export const fetchVision = async () => {
-  try {
-    const response = await apiClient.get('/Vision');
-    return response.data[0];
-  } catch (error) {
-    console.error('Error fetching vision data:', error);
-    throw new Error('Error al cargar la visión.');
-  }
+export const fetchVision = async (): Promise<Vision> => {
+  const response = await apiClient.get('/Vision');
+  return response.data[0];
 };
 
 // === Servicios relacionados con valores ===
-export const fetchValues = () => handleResponse('/Value');
+export const fetchValues = async (): Promise<Value[]> => handleResponse('/Value');
 
 // === Servicios relacionados a talleres (Workshops) ===
-export const getAllWorkshops = async () => {
-  try {
-    const response = await apiClient.get('/Workshop');
-    return response.data;
-  } catch (error) {
-    console.error('Error al obtener los talleres:', error);
-    throw error;
-  }
+export const getAllWorkshops = async (): Promise<Workshop[]> => {
+  const response = await apiClient.get('/Workshop');
+  return response.data;
 };
 
-export const getWorkshopById = async (id:number) => {
-  try {
-    const response = await apiClient.get(`/Workshop/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error al obtener el taller:', error);
-    throw error;
-  }
+export const getWorkshopById = async (id: number): Promise<Workshop> => {
+  const response = await apiClient.get(`/Workshop/${id}`);
+  return response.data;
 };
 
-export const createWorkshop = async (workshopData:any) => {
-  try {
-    const response = await apiClient.post('/Workshop', workshopData);
-    return response.data;
-  } catch (error) {
-    console.error('Error al crear el taller:', error);
-    throw error;
-  }
+export const createWorkshop = async (workshopData: Workshop): Promise<Workshop> => {
+  const response = await apiClient.post('/Workshop', workshopData);
+  return response.data;
 };
 
-export const updateWorkshop = async (id:number, workshopData:any) => {
-  try {
-    const response = await apiClient.put(`/Workshop/${id}`, workshopData);
-    return response.data;
-  } catch (error) {
-    console.error('Error al actualizar el taller:', error);
-    throw error;
-  }
+export const updateWorkshop = async (id: number, workshopData: Workshop): Promise<Workshop> => {
+  const response = await apiClient.put(`/Workshop/${id}`, workshopData);
+  return response.data;
 };
 
-export const deleteWorkshop = async (id:number) => {
-  try {
-    await apiClient.delete(`/Workshop/${id}`);
-  } catch (error) {
-    console.error('Error al eliminar el taller:', error);
-    throw error;
-  }
+export const deleteWorkshop = async (id: number): Promise<void> => {
+  await apiClient.delete(`/Workshop/${id}`);
 };
 
 // === Servicios relacionados con los métodos de entrega y nombres de certificación ===
-
-
-
-export const submitCertificateRequest = async (formData: {
-  studentName: string;
-  studentIdentification: string;
-  guardianName: string;
-  guardianIdentification: string;
-  email: string;
-  phoneNumber: string;
-  deliveryMethod: number;
-  certificationName: string;
-}) => {
-  try {
-    const response = await axios.post(`${API_URL}/CertificationRequests`, formData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.data; // Retorna la respuesta si necesitas utilizarla en tu aplicación
-  } catch (error) {
-    console.error('Error al enviar la solicitud de certificado:', error);
-    throw new Error('Error al enviar la solicitud de certificado');
-  }
+export const submitCertificateRequest = async (formData: CertificationRequest): Promise<CertificationRequest> => {
+  const response = await apiClient.post('/CertificationRequests', formData);
+  return response.data;
 };
 
-export const getDeliveryMethods = async () => {
-  try {
-    const response = await apiClient.get('/Enums/deliveryMethods');
-    console.log("Delivery Methods Data:", response.data); // Verifica que los datos sean un array de { id, name }
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching delivery methods:', error);
-    throw error;
-  }
+export const getDeliveryMethods = async (): Promise<{ id: number; name: string }[]> => {
+  const response = await apiClient.get('/Enums/deliveryMethods');
+  return response.data;
 };
 
-export const getCertificationNames = async () => {
-  try {
-    const response = await apiClient.get('/CertificationName'); // Verifica que los datos sean un array de { id, name }
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching certification names:', error);
-    throw error;
-  }
+export const getCertificationNames = async (): Promise<{ id: number; name: string }[]> => {
+  const response = await apiClient.get('/CertificationName');
+  return response.data;
 };
 
 // === Servicios relacionados con solicitudes de certificación ===
-export const getRequests = async () => {
-  try {
-    const response = await apiClient.get('/CertificationRequests');
-    return response.data;
-  } catch (error) {
-    throw new Error('Error al obtener las solicitudes');
-  }
+export const getRequests = async (): Promise<CertificationRequest[]> => {
+  const response = await apiClient.get('/CertificationRequests');
+  return response.data;
 };
 
-export const rejectRequest = async (id:number) => {
-  try {
-    await apiClient.post(`/CertificationRequests/${id}/reject`);
-  } catch (error) {
-    throw new Error('Error al rechazar la solicitud');
-  }
+export const rejectRequest = async (id: number): Promise<void> => {
+  await apiClient.post(`/CertificationRequests/${id}/reject`);
 };
 
-export const approveRequest = async (id:number) => {
-  try {
-    await apiClient.post(`/CertificationRequests/${id}/approve`);
-  } catch (error) {
-    throw new Error('Error al aprobar la solicitud');
-  }
+export const approveRequest = async (id: number): Promise<void> => {
+  await apiClient.post(`/CertificationRequests/${id}/approve`);
 };
 
-export const setDeliveryDeadline = async (id:number, deliveryDays:number) => {
-  try {
-    await apiClient.post(`/CertificationRequests/${id}/set-delivery-deadline`, null, {
-      params: { deliveryDays },
-    });
-  } catch (error) {
-    throw new Error('Error al establecer la fecha límite de entrega');
-  }
+export const setDeliveryDeadline = async (id: number, deliveryDays: number): Promise<void> => {
+  await apiClient.post(`/CertificationRequests/${id}/set-delivery-deadline`, null, {
+    params: { deliveryDays },
+  });
 };
 
 // === Servicios relacionados con solicitudes de sala (Room Requests) ===
-export const createRoomRequest = async (roomRequest:any) => {
-  try {
-    await apiClient.post(`/RoomRequest`, roomRequest);
-  } catch (error) {
-    console.error('Error creating room request:', error);
-    throw error;
-  }
+export const createRoomRequest = async (roomRequest: Room): Promise<void> => {
+  await apiClient.post('/RoomRequest', roomRequest);
+};
+
+// Función genérica para manejar respuestas
+const handleResponse = async <T>(url: string): Promise<T> => {
+  const response = await apiClient.get(url);
+  return response.data;
 };
