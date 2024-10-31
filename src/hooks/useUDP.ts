@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { UDP } from '../types/Types';
 import { addUDP, deleteUDP, editUDP, getUDPs, getUDPById, patchUDPBalance } from '../services/udpService';
@@ -9,7 +8,27 @@ export const useUDPs = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Obtener todas las UDPs al montar el componente
+  
+
+  useEffect(() => {
+    fetchUDPsData();
+  }, []);
+
+  // Función para seleccionar una UDP por ID y actualizar `selectedUdp`
+  const fetchUdpById = async (id: number) => {
+    try {
+      const udp = await getUDPById(id);
+      if (udp) {
+        setSelectedUdp(udp);
+        console.log('UDP seleccionada:', udp);
+      } else {
+        setError('UDP no encontrada');
+      }
+    } catch (error) {
+      console.error('Error al obtener la UDP:', error);
+      setError('Error al obtener la UDP');
+    }
+  };
   const fetchUDPsData = async () => {
     setLoading(true);
     try {
@@ -67,8 +86,7 @@ export const useUDPs = () => {
     try {
       setLoading(true);
       await patchUDPBalance(id, newBalance);
-      const udp = await getUDPById(id);
-      setSelectedUdp(udp);
+      await fetchUdpById(id); // Actualizar `selectedUdp` después de modificar el balance
     } catch (error) {
       console.error('Error al actualizar el balance:', error);
       setError('Error al actualizar el balance');
@@ -82,7 +100,7 @@ export const useUDPs = () => {
     selectedUdp,
     loading,
     error,
-    fetchUdpById: getUDPById,
+    fetchUdpById,
     updateUDPBalance,
     handleAddUDP,
     handleEditUDP,

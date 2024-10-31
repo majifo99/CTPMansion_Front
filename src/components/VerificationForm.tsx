@@ -22,7 +22,7 @@ const VerificationForm = () => {
     }
 
     try {
-      const response = await axios.post(`https://localhost:7055/api/User/verify-email?userId=${userId}&verificationCode=${verificationCode}`);
+      const response = await axios.post(`https://ctplamansion.onrender.com/api/User/verify-email?userId=${userId}&verificationCode=${verificationCode}`);
 
       if (response.status === 200) {
         setSuccess(true);

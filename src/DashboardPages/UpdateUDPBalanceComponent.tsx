@@ -11,6 +11,7 @@ const UpdateUDPBalanceComponent: React.FC = () => {
   // Manejador para seleccionar una UDP
   const handleSelectUdp = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const udpId = parseInt(e.target.value);
+    console.log('UDP seleccionada con ID:', udpId);
     if (!isNaN(udpId)) {
       fetchUdpById(udpId);
     }
@@ -19,6 +20,7 @@ const UpdateUDPBalanceComponent: React.FC = () => {
   // Validación para que la cantidad no sea negativa
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    console.log('Cantidad ingresada:', value);
     if (parseFloat(value) < 0) {
       toast.error('La cantidad no puede ser negativa.');
     } else {
@@ -27,10 +29,15 @@ const UpdateUDPBalanceComponent: React.FC = () => {
   };
 
   // Manejador para actualizar el balance de la UDP
-  const handleUpdateBalance = () => {
-    if (!selectedUdp) return;
+  const handleUpdateBalance = async () => {
+    console.log('Botón "Actualizar Balance" presionado');
+    if (!selectedUdp) {
+      console.log('No se ha seleccionado ninguna UDP');
+      return;
+    }
 
     const amountValue = parseFloat(amount); // Convertir cadena a número
+    console.log('Cantidad para actualizar el balance:', amountValue);
     if (isNaN(amountValue) || amountValue <= 0) {
       toast.error('La cantidad debe ser un número válido mayor a 0.');
       return;
@@ -40,15 +47,17 @@ const UpdateUDPBalanceComponent: React.FC = () => {
       ? selectedUdp.balance + amountValue
       : selectedUdp.balance - amountValue;
 
-    // Actualizar el balance sin verificación de balance negativo
-    updateUDPBalance(selectedUdp.id_UDP, newBalance)
-      .then(() => {
-        toast.success('Balance actualizado exitosamente.');
-        setAmount(''); // Reiniciar la cantidad después de la operación
-      })
-      .catch(() => {
-        toast.error('Error al actualizar el balance. Inténtalo nuevamente.');
-      });
+    console.log(`Actualizando balance de UDP con ID ${selectedUdp.id_UDP}. Nuevo balance: ${newBalance}`);
+
+    try {
+      await updateUDPBalance(selectedUdp.id_UDP, newBalance);
+      console.log('Balance actualizado exitosamente en el servidor');
+      toast.success('Balance actualizado exitosamente.');
+      setAmount(''); // Reiniciar la cantidad después de la operación
+    } catch (error) {
+      console.error('Error al actualizar el balance:', error);
+      toast.error('Error al actualizar el balance. Inténtalo nuevamente.');
+    }
   };
 
   return (
@@ -116,13 +125,19 @@ const UpdateUDPBalanceComponent: React.FC = () => {
         <label className="block text-sm font-medium mb-2">Acción</label>
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => setIsAdding(true)}
+            onClick={() => {
+              console.log('Acción seleccionada: Agregar');
+              setIsAdding(true);
+            }}
             className={`p-2 w-full rounded ${isAdding ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
           >
             Agregar
           </button>
           <button
-            onClick={() => setIsAdding(false)}
+            onClick={() => {
+              console.log('Acción seleccionada: Deducir');
+              setIsAdding(false);
+            }}
             className={`p-2 w-full rounded ${!isAdding ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
           >
             Deducir
