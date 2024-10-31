@@ -1,8 +1,13 @@
-// src/types/Order.ts
+
+
+
 
 export interface Product {
-  id_Product?: number; // Opcional ya que el backend lo asignará automáticamente
+
+  id_Product?: number;
+
   name: string;
+
 }
 
 export interface OrderDetail {
@@ -15,13 +20,25 @@ export interface OrderDetail {
 
 
 export interface Order {
+
+  orderId: number;
+
+  status: number;
+
   orderDate: string;
+
   userId: number;
+
   requesterArea: string;
+
   orderDetails: OrderDetail[];
+
   receiver: string;
+
   comments: string;
+
 }
+
 
 export interface ApprovedOrder extends Order {
   approvedDate: string;

@@ -1,4 +1,4 @@
-// src/types/OrderTypes.ts
+
 export enum RequestStatus {
     Pending = 0,
     Approved = 1,
@@ -6,10 +6,13 @@ export enum RequestStatus {
   }
   
   export interface Product {
-    id_Product: number;
-    name: string;
-  }
 
+    id_Product?: number;
+  
+    name: string;
+  
+  }
+  
 
   export interface NewOrder {
     orderDate: string;
@@ -21,7 +24,7 @@ export enum RequestStatus {
   }
   
   export interface OrderDetail {
-    orderDetailId: number;
+ 
     product: Product;
     quantity: number;
     unitOfMeasure: string;

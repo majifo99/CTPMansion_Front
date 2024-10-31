@@ -62,6 +62,8 @@ const OrderComponent: React.FC = () => {
     }
 
     const newOrder: Order = {
+      orderId: 0, // or generate a unique ID
+      status: 0, // or set an appropriate status
       orderDate: new Date().toISOString(),
       userId: user.id,
       requesterArea,
