@@ -99,7 +99,9 @@ export interface CertificationRequest {
   email: string;
   phoneNumber: string;
   deliveryMethod: number | string;
-  certificationName: string;
+  certificationId: number; // Asegúrate de tener un ID aquí
+  certificationNameId: number;
+  responseDate?: string; // Añade este campo
 }
 
 

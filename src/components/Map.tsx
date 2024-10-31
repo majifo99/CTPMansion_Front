@@ -3,14 +3,13 @@ import 'leaflet/dist/leaflet.css';
 import { PiMapPinSimpleDuotone } from 'react-icons/pi';
 import useLocation from '../hooks/useLocation'; // Ajusta la ruta según sea necesario
 
-// Skeleton de carga
 const LocationSkeleton = () => (
   <section className="bg-white mt-[60px] z-10">
     <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-20 lg:px-8">
       <div className="max-w-2xl lg:max-w-4xl mx-auto text-center">
         <h2 className="text-4xl font-extrabold text-teal-600 relative inline-block animate-pulse">
           Visítanos
-          <span className="block h-1 w-3/4 mx-auto bg-gradient-to-r from-teal-500 to-blue-500 mt-1 rounded-full"></span>
+          <span className="block h-1 w-3/4 mx-auto  bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mt-1 rounded-full"></span>
         </h2>
         <p className="mt-4 text-lg text-gray-400 animate-pulse">
           Cargando información de ubicación...
@@ -49,9 +48,9 @@ const LocationSection = () => {
     <section className="bg-white mt-[60px] z-10">
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-20 lg:px-8">
         <div className="max-w-2xl lg:max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-extrabold text-teal-600 relative inline-block">
+          <h2 className="text-4xl font-extrabold text-[#34436B] relative inline-block">
             Visítanos
-            <span className="block h-1 w-3/4 mx-auto bg-gradient-to-r from-teal-500 to-blue-500 mt-1 rounded-full"></span>
+            <span className="block h-1 w-3/4 mx-auto  bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mt-1 rounded-full"></span>
           </h2>
           <p className="mt-4 text-lg text-gray-500">
             Estamos ubicados en un lugar accesible y estratégico.
@@ -64,6 +63,7 @@ const LocationSection = () => {
               <MapContainer 
                 center={position} 
                 zoom={19} 
+                scrollWheelZoom={false}
                 className="h-full w-full rounded-lg"
               >
                 <TileLayer
@@ -82,18 +82,18 @@ const LocationSection = () => {
           <div className="p-6 bg-gray-50 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
             <div className="max-w-full mx-auto">
               <div className="px-4 py-9">
-                <h3 className="text-xl font-semibold text-teal-700">Nuestra Dirección</h3>
+                <h3 className="text-xl font-semibold text-[#34436B]">Nuestra Dirección</h3>
                 <p className="mt-2 text-gray-600 flex items-center">
                   <PiMapPinSimpleDuotone className="text-teal-500 w-5 h-5 mr-2" />
                   {location.addres}
                 </p>
               </div>
               <div className="border-t border-gray-200 px-4 py-6">
-                <h3 className="text-xl font-semibold text-teal-700">Horario</h3>
+                <h3 className="text-xl font-semibold text-[#34436B]">Horario</h3>
                 <p className="mt-2 text-gray-600">{location.schedule}</p>
               </div>
               <div className="border-t border-gray-200 px-4 py-6">
-                <h3 className="text-xl font-semibold text-teal-700">Contacto</h3>
+                <h3 className="text-xl font-semibold text-[#34436B]">Contacto</h3>
                 <p className="mt-2 text-gray-600">Email: {location.email}</p>
                 <p className="mt-1 text-gray-600">Teléfono: {location.phoneNumber}</p>
               </div>

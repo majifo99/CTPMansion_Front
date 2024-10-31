@@ -9,13 +9,28 @@ import { Room } from '../types/Types';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 const localizer = momentLocalizer(moment);
 
 interface DecodedToken {
   nameid: string;
 }
+
+// Define el tipo específico para el formulario
+type RoomRequestForm = {
+  managerName: string;
+  managerLastName: string;
+  managerLastName2: string;
+  course: string;
+  activityDescription: string;
+  numberOfAttendees: number;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  needs: string;
+};
 
 const getUserIdFromToken = (): string | null => {
   const token = localStorage.getItem('token');
@@ -28,7 +43,7 @@ const getUserIdFromToken = (): string | null => {
 
 const RoomRequestCard: React.FC = () => {
   const { rooms, roomRequests, loading, error, fetchRoomRequestsData } = useRoomsAndRequests();
-  const { register, handleSubmit, reset } = useForm<Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>>();
+  const { register, handleSubmit, reset } = useForm<RoomRequestForm>();
   const { isSubmitting, submitRoomRequest } = useRoomRequest();
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedRoomForRequest, setSelectedRoomForRequest] = useState<Room | null>(null);
@@ -42,11 +57,12 @@ const RoomRequestCard: React.FC = () => {
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
-  const onSubmit = async (data: Omit<RoomRequest, 'id_RoomRequest' | 'status' | 'roomId'>) => {
+  const onSubmit = async (data: RoomRequestForm) => {
     if (selectedRoomForRequest && userId) {
       const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
       const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
 
+      // Validaciones
       if (startDateTime.day() === 6 || startDateTime.day() === 0) {
         notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
         return;
@@ -70,7 +86,8 @@ const RoomRequestCard: React.FC = () => {
         return;
       }
 
-      const requestPayload: RoomRequest = {
+      // Construcción del payload de la solicitud
+      const requestPayload: Omit<RoomRequest, 'id_RoomRequest'> = {
         ...data,
         roomId: selectedRoomForRequest.id_Room,
         userId,
@@ -91,7 +108,7 @@ const RoomRequestCard: React.FC = () => {
     }
   };
 
-  const renderInputField = (id: keyof RoomRequest, label: string, placeholder: string, validation?: object, type: string = 'text') => (
+  const renderInputField = (id: keyof RoomRequestForm, label: string, placeholder: string, validation?: object, type: string = 'text') => (
     <div className="flex flex-col mb-2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <input
@@ -104,7 +121,7 @@ const RoomRequestCard: React.FC = () => {
     </div>
   );
 
-  const renderDropdownField = (id: keyof RoomRequest, label: string, options: number[]) => (
+  const renderDropdownField = (id: keyof RoomRequestForm, label: string, options: number[]) => (
     <div className="flex flex-col mb-2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <select

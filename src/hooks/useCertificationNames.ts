@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCertificationNames } from '../services/LandingPageServices';
+import { getCertificationNames } from '../Services/LandingPageServices';
 
 export const useCertificationNames = () => {
     const [certificationNames, setCertificationNames] = useState<string[]>([]);

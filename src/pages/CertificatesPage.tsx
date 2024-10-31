@@ -1,34 +1,55 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { useCertificateRequest } from '../hooks/useCertificateRequest'; 
+import { useCertificateRequest } from '../hooks/useCertificateRequest';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Importar el CSS para las notificaciones
+import 'react-toastify/dist/ReactToastify.css';
+
+type FormData = {
+    studentName: string;
+    studentLastName1: string;
+    studentLastName2: string;
+    studentId: string;
+    guardianName: string;
+    guardianLastName1: string;
+    guardianLastName2: string;
+    EncargadoId: string;
+    email: string;
+    phoneNumber: string;
+    deliveryMethod: number;
+    certificationType: string;
+};
+
+type DeliveryMethod = {
+    id: number;
+    name: string;
+};
+
+type CertificationName = {
+    id: number;
+    name: string;
+};
 
 const CertificatesPage = () => {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm();
-    const { deliveryMethods, certificationNames, isSubmitting, error: submitError, success, submitRequest } = useCertificateRequest(); 
-    const [captchaToken, setCaptchaToken] = useState(null); 
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
+    const { deliveryMethods, certificationNames, isSubmitting, error: submitError, success, submitRequest } = useCertificateRequest();
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
-    // Manejo del cambio en CAPTCHA
-    const onCaptchaChange = (token) => {
+    const onCaptchaChange = (token: string | null) => {
         setCaptchaToken(token);
     };
 
-    // Mostrar notificaciones de éxito o error
     const notifySuccess = () => toast.success('Solicitud realizada correctamente!');
     const notifyError = () => toast.error('Error al realizar la solicitud.');
 
-    // Envío del formulario
-    const onSubmit = (data) => {
+    const onSubmit = (data: FormData) => {
         if (!captchaToken) {
             alert('Por favor completa el CAPTCHA');
             return;
         }
 
-        // Datos que se enviarán al backend
         const requestData = {
             studentName: data.studentName,
             studentLastName1: data.studentLastName1,
@@ -44,19 +65,23 @@ const CertificatesPage = () => {
             certificationName: data.certificationType,
         };
 
-        // Llamada para enviar la solicitud
         submitRequest(requestData)
             .then(() => {
                 reset();
-                notifySuccess();  // Mostrar notificación de éxito
+                notifySuccess();
             })
             .catch(() => {
-                notifyError();  // Mostrar notificación de error
+                notifyError();
             });
     };
 
-    // Función para renderizar los campos del formulario
-    const renderInputField = (id, label, placeholder, validation, type = 'text') => (
+    const renderInputField = (
+        id: keyof FormData,
+        label: string,
+        placeholder: string,
+        validation: object,
+        type: string = 'text'
+    ) => (
         <div>
             <label htmlFor={id} className="block mb-2 text-sm font-medium text-gray-900">
                 {label}
@@ -68,7 +93,7 @@ const CertificatesPage = () => {
                 {...register(id, validation)}
                 className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-3"
             />
-            {errors[id] && <p className="text-red-600 text-sm">{errors[id].message}</p>}
+            {errors[id]?.message && <p className="text-red-600 text-sm">{errors[id]?.message as string}</p>}
         </div>
     );
 
@@ -82,7 +107,6 @@ const CertificatesPage = () => {
                             Solicitud de Certificado
                         </h3>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                            {/* Campos del Estudiante */}
                             <div className="grid grid-cols-2 gap-6">
                                 {renderInputField('studentId', 'Cédula del Estudiante', '102340567', { required: 'La cédula del estudiante es requerida' })}
                                 {renderInputField('studentName', 'Nombre del Estudiante', 'Juan', { required: 'El nombre del estudiante es requerido' })}
@@ -90,7 +114,6 @@ const CertificatesPage = () => {
                                 {renderInputField('studentLastName2', 'Segundo Apellido del Estudiante', 'Rodríguez', { required: 'El segundo apellido es requerido' })}
                             </div>
 
-                            {/* Campos del Encargado */}
                             <div className="grid grid-cols-2 gap-6">
                                 {renderInputField('EncargadoId', 'Cédula del Encargado', '102340567', { required: 'La cédula del encargado es requerida' })}
                                 {renderInputField('guardianName', 'Nombre del Encargado', 'Luis', { required: 'El nombre del encargado es requerido' })}
@@ -98,12 +121,10 @@ const CertificatesPage = () => {
                                 {renderInputField('guardianLastName2', 'Segundo Apellido del Encargado', 'Rodríguez', { required: 'El segundo apellido es requerido' })}
                             </div>
 
-                            {/* Email y Teléfono */}
                             {renderInputField('email', 'Email', 'name@gmail.com', { required: 'El e-mail es requerido' }, 'email')}
                             {renderInputField('phoneNumber', 'Teléfono', '123456789', { required: 'El teléfono es requerido' }, 'tel')}
 
-                            {/* Método de Entrega */}
-                            <div>
+                             <div>
                                 <label htmlFor="deliveryMethod" className="block mb-2 text-sm font-medium text-gray-900">
                                     Método de Entrega
                                 </label>
@@ -117,8 +138,8 @@ const CertificatesPage = () => {
                                     >
                                         <option value="">Selecciona el Método de Entrega</option>
                                         {deliveryMethods.map((method, index) => (
-                                            <option key={index} value={method}>
-                                                {method}
+                                            <option key={index} value={method.id}>
+                                                {method.name}
                                             </option>
                                         ))}
                                     </select>
@@ -126,7 +147,6 @@ const CertificatesPage = () => {
                                 {errors.deliveryMethod && <p className="text-red-600 text-sm">{errors.deliveryMethod.message}</p>}
                             </div>
 
-                            {/* Tipo de Certificación */}
                             <div>
                                 <label htmlFor="certificationType" className="block mb-2 text-sm font-medium text-gray-900">
                                     Tipo de Certificación
@@ -140,23 +160,20 @@ const CertificatesPage = () => {
                                         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-3"
                                     >
                                         <option value="">Selecciona el Certificado</option>
-                                        {certificationNames.map((cert) => (
+                                        {certificationNames.map((cert: CertificationName) => (
                                             <option key={cert.id} value={cert.name}>
                                                 {cert.name}
                                             </option>
                                         ))}
                                     </select>
                                 )}
-                                {errors.certificationType && <p className="text-red-600 text-sm">{errors.certificationType.message}</p>}
+                                {errors.certificationType && <p className="text-red-600 text-sm">{errors.certificationType.message as string}</p>}
                             </div>
 
-                            {/* CAPTCHA */}
                             <div className="mt-6">
                                 <ReCAPTCHA sitekey="6Le8YzwqAAAAACwDjRqrSHOh6vNwre9LH78Lj_Lw" onChange={onCaptchaChange} />
                             </div>
 
-                     
-                            {/* Botón de Envío */}
                             <div className="flex justify-end mt-6">
                                 <button
                                     type="submit"
@@ -170,7 +187,7 @@ const CertificatesPage = () => {
                     </div>
                 </section>
             </main>
-            <ToastContainer /> {/* Contenedor de las notificaciones */}
+            <ToastContainer />
             <Footer />
         </>
     );

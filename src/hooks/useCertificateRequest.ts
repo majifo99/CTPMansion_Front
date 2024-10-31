@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getDeliveryMethods, getCertificationNames, submitCertificateRequest } from '../services/LandingPageServices';
+import { getDeliveryMethods, getCertificationNames, submitCertificateRequest } from '../Services/LandingPageServices';
 
 export const useCertificateRequest = () => {
     const [deliveryMethods, setDeliveryMethods] = useState<{ id: number; name: string }[]>([]);
@@ -9,14 +9,20 @@ export const useCertificateRequest = () => {
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        // Cargar métodos de entrega y nombres de certificación cuando se monta el componente
         const fetchData = async () => {
             try {
                 const [deliveryMethodsData, certificationNamesData] = await Promise.all([
                     getDeliveryMethods(),
                     getCertificationNames(),
                 ]);
-                setDeliveryMethods(deliveryMethodsData);
+    
+                // Transformar los datos de métodos de entrega para que tengan `id` y `name`
+                const transformedDeliveryMethods = (deliveryMethodsData as string[]).map((name, index) => ({
+                    id: index + 1,
+                    name: name,
+                }));
+                
+                setDeliveryMethods(transformedDeliveryMethods);
                 setCertificationNames(certificationNamesData);
             } catch (error) {
                 setError('Error al cargar los datos de la API.');
@@ -25,7 +31,7 @@ export const useCertificateRequest = () => {
         };
         fetchData();
     }, []);
-
+    
     // Función para manejar el envío de la solicitud
     const submitRequest = async (formData: {
         studentName: string;

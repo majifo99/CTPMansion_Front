@@ -21,3 +21,5 @@ export interface RoomRequest {
   userId: string;                  // ID del usuario que realiza la solicitud
   status?: RequestStatus;          // Estado de la solicitud (Pendiente, Aprobada, Rechazada)
 }
+
+

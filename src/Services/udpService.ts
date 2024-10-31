@@ -1,4 +1,4 @@
-// src/services/udpService.ts
+// src/Services/udpService.ts
 import axios from 'axios';
 import { UDP } from '../types/Types';
 
@@ -36,20 +36,20 @@ export const getUDPById = async (id: number): Promise<UDP | null> => {
   }
 };
 
-// PATCH: Actualizar el balance de una UDP
+// Actualizar el balance de una UDP (PATCH)
 export const patchUDPBalance = async (id: number, newBalance: number): Promise<UDP> => {
   const patchData = [
     {
       "path": "/balance", 
       "op": "replace",     
-      "value": newBalance   // El nuevo valor del balance
+      "value": newBalance   
     }
   ];
 
   try {
     const response = await api.patch(`/UDP/${id}`, patchData, {
       headers: {
-        'Content-Type': 'application/json-patch+json', // Asegurar que el contenido sea JSON Patch
+        'Content-Type': 'application/json-patch+json',
       },
     });
     return response.data;
@@ -60,16 +60,33 @@ export const patchUDPBalance = async (id: number, newBalance: number): Promise<U
 };
 
 // Crear nueva UDP
-export const addUDP = async (udp: UDP) => {
-  return await api.post('/UDP', udp);
+export const addUDP = async (udp: Omit<UDP, 'id_UDP'>): Promise<UDP> => {
+  try {
+    const response = await api.post('/UDP', udp);
+    return response.data;
+  } catch (error) {
+    console.error("Error al agregar UDP:", error);
+    throw error;
+  }
 };
 
-// Actualizar una UDP
-export const editUDP = async (id: number, udp: UDP) => {
-  return await api.put(`/UDP/${id}`, udp);
+// Actualizar una UDP (PUT)
+export const editUDP = async (id: number, udp: UDP): Promise<UDP> => {
+  try {
+    const response = await api.put(`/UDP/${id}`, udp);
+    return response.data;
+  } catch (error) {
+    console.error("Error al editar UDP:", error);
+    throw error;
+  }
 };
 
 // Eliminar una UDP
-export const deleteUDP = async (id: number) => {
-  return await api.delete(`/UDP/${id}`);
+export const deleteUDP = async (id: number): Promise<void> => {
+  try {
+    await api.delete(`/UDP/${id}`);
+  } catch (error) {
+    console.error("Error al eliminar UDP:", error);
+    throw error;
+  }
 };
