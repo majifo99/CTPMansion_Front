@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { addUserRole, getUserRoles, getUsers, removeUserRole } from '../Services/userService';
+import { addUserRole, getUserRoles, getUsers, removeUserRole } from '../services/userService';
 
 interface User {
   id: number;

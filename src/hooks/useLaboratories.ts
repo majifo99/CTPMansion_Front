@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { addLaboratory, deleteLaboratory, fetchLaboratories as fetchLabService, updateLaboratory } from '../Services/LaboratoryService';
+import { addLaboratory, deleteLaboratory, fetchLaboratories as fetchLabService, updateLaboratory } from '../services/LaboratoryService';
 
 import { Laboratory } from '../types/Types';
 

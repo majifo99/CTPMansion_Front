@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchRooms } from '../Services/RoomService';
+import { fetchRooms } from '../services/RoomService';
 import { Room } from '../types/Types'; // Import Room type
 
 export const useRooms = () => {

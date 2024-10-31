@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchLaboratories, fetchLabRequests, approveLabRequest, rejectLabRequest } from '../Services/LaboratoryService';
+import { fetchLaboratories, fetchLabRequests, approveLabRequest, rejectLabRequest } from '../services/LaboratoryService';
 import { Laboratory } from '../types/Types';
 import { LabRequest } from '../types/LaboratoryRequestType';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchRooms, addRoom, editRoom, deleteRoom, fetchRoomRequests, approveRoomRequest, rejectRoomRequest } from '../Services/RoomServices'; // Importamos los servicios de API
+import { fetchRooms, addRoom, editRoom, deleteRoom, fetchRoomRequests, approveRoomRequest, rejectRoomRequest } from '../services/RoomServices'; // Importamos los servicios de API
 import { Room } from '../types/Types'; // Importamos el tipo 'Room'
 import { RoomRequest } from '../types/RoomRequestType'; // Importamos RoomRequest para gestionar las solicitudes de sala
 

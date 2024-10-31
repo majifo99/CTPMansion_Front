@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getOrdersByStatus, approveOrder, rejectOrder, createOrder } from '../Services/orderService';
+import { getOrdersByStatus, approveOrder, rejectOrder, createOrder } from '../services/orderService';
 import { Order, RequestStatus } from '../types/OrderTypes';
 
 export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.Pending) => {

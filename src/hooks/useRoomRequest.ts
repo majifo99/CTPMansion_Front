@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createRoomRequest } from '../Services/LandingPageServices';
+import { createRoomRequest } from '../services/LandingPageServices';
 import { RoomRequest } from '../types/RoomRequestType';
 
 export const useRoomRequest = () => {

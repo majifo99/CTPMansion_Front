@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { OurService } from '../types/Types';
-import { fetchOurServices } from '../Services/LandingPageServices';
+import { fetchOurServices } from '../services/LandingPageServices';
 
 export const useOurServices = () => {
   const [services, setServices] = useState<OurService[]>([]);
