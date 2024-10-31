@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getEvents, addEvent, editEvent, deleteEvent } from '../services/LandingPageServices'; 
+import { getEvents, addEvent, editEvent, deleteEvent } from '../services/LandingPageServices'; // Ajusta la ruta según tu estructura de archivos
 import { Event } from '../types/Types';
 
 export const useEvents = () => {
