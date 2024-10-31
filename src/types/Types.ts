@@ -80,7 +80,7 @@ export interface Laboratory {
   name: string;
   description: string;
   capacity: number;
-  url_Image?: string;
+  url_Image: string;
 }
 
 
