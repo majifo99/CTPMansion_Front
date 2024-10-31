@@ -116,7 +116,7 @@ isConferenceRoom: boolean; // Flag indicating if the room is a conference room
 roomRequests: any;  // Flag indicating if the room is a conference room
 }
 
-export interface UserProfileType {
+export interface UserProfile{
 id: number;
 name: string;
 lastName: string;

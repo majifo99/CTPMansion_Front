@@ -3,17 +3,10 @@
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode'; // Importación correcta de jwt-decode
 import Cookies from 'js-cookie';
-
-// Define la estructura esperada del JWT decodificado
-interface DecodedUser {
-  id: number;
-  name: string;
-  email: string;
-  roles: string[];
-}
+import { DecodedUser, LoginResponse } from '../types/AuthServiceTypes'; // Importa los tipos
 
 // Realizar login y almacenar token en cookies
-export const login = async (email: string, password: string): Promise<DecodedUser | null> => {
+export const login = async (email: string, password: string): Promise<LoginResponse> => {
   try {
     const response = await axios.post(
       'https://localhost:7055/api/User/login',
@@ -27,12 +20,13 @@ export const login = async (email: string, password: string): Promise<DecodedUse
     Cookies.set('token', token, { expires: 1 }); 
 
     // Decodificar el token JWT para extraer los datos del usuario
-    const decodedToken: any = jwtDecode(token);
+    const decodedToken: DecodedUser = jwtDecode(token);
+
     const decodedUser: DecodedUser = {
-      id: parseInt(decodedToken.nameid),
-      name: decodedToken.Name,
-      email: decodedToken.Email,
-      roles: Array.isArray(decodedToken.role) ? decodedToken.role : [decodedToken.role],
+      id: parseInt(decodedToken.id.toString()),
+      name: decodedToken.name,
+      email: decodedToken.email,
+      roles: Array.isArray(decodedToken.roles) ? decodedToken.roles : [decodedToken.roles],
     };
 
     return decodedUser; // Retornar el usuario decodificado con roles
@@ -43,6 +37,6 @@ export const login = async (email: string, password: string): Promise<DecodedUse
 };
 
 // Eliminar el token de las cookies al hacer logout
-export const logout = () => {
+export const logout = (): void => {
   Cookies.remove('token');
 };

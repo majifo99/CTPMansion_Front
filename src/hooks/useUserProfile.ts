@@ -1,8 +1,11 @@
+// src/hooks/useUserProfile.ts
+
 import { useState, useEffect } from 'react';
-import { getUserById, updateUser } from '../services/userService'; // Ajustar la ruta según sea necesario
+import { getUserById, updateUser } from '../services/userService';
+import { UserProfile } from '../types/Types';
 
 export const useUserProfile = (userId: number | undefined, token: string | undefined) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null); // Ahora usa UserProfile
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -29,7 +32,7 @@ export const useUserProfile = (userId: number | undefined, token: string | undef
   }, [userId, token]);
 
   // Actualizar los datos del usuario
-  const handleUpdateUser = async (updatedData: any) => {
+  const handleUpdateUser = async (updatedData: Partial<UserProfile>) => {
     try {
       setLoading(true);
       const updatedUser = await updateUser(userId!, updatedData, token!);
