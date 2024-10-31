@@ -13,7 +13,7 @@ export const useUserProfile = (userId: number | undefined, token: string | undef
       try {
         if (userId && token) {
           setLoading(true);
-          const userData = await getUserById(userId, token);
+          const userData = await getUserById(userId);
           setUser(userData);
           setLoading(false);
         }
@@ -32,7 +32,7 @@ export const useUserProfile = (userId: number | undefined, token: string | undef
   const handleUpdateUser = async (updatedData: any) => {
     try {
       setLoading(true);
-      const updatedUser = await updateUser(userId!, updatedData, token!);
+      const updatedUser = await updateUser(userId!, updatedData);
       setUser(updatedUser);
       setUpdateSuccess(true);
       setLoading(false);

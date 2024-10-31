@@ -1,13 +1,15 @@
 // src/Services/udpService.ts
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Importar js-cookie para manejar las cookies
 import { UDP } from '../types/Types';
 
 const api = axios.create({
   baseURL: 'https://ctplamansion.onrender.com/api',
 });
 
+// Interceptor para agregar el token JWT a cada solicitud
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
+  const token = Cookies.get('token'); // Obtener el token desde las cookies
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }

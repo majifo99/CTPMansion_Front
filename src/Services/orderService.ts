@@ -1,11 +1,12 @@
 // src/Services/orderService.ts
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Importar js-cookie para manejar las cookies
 import { Order, RequestStatus } from '../types/OrderTypes';
 
 const apiUrl = 'https://ctplamansion.onrender.com/api/Order';
 
-// Helper function to retrieve the JWT token from localStorage
-const getToken = () => localStorage.getItem('token');
+// Helper function para obtener el JWT token desde cookies
+const getToken = () => Cookies.get('token');
 
 // Instancia de axios con configuración de URL base y autenticación
 const api = axios.create({
@@ -17,7 +18,7 @@ const api = axios.create({
 
 // Interceptor para añadir el token a cada solicitud
 api.interceptors.request.use((config) => {
-  const token = getToken();
+  const token = getToken(); // Obtener el token desde las cookies
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }

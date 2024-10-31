@@ -39,12 +39,12 @@ const RolesManagement: React.FC = () => {
 
       const fetchUsersAndRoles = async () => {
         try {
-          const usersData = await getUsers(storedToken);
+          const usersData = await getUsers();
           setUsers(Array.isArray(usersData) ? usersData : []);
 
           const rolesData: { [key: number]: Role[] } = {};
           for (const user of usersData) {
-            const userRoles = await getUserRoles(user.id, storedToken);
+            const userRoles = await getUserRoles(user.id);
             rolesData[user.id] = userRoles;
           }
           setRoles(rolesData);
@@ -62,12 +62,12 @@ const RolesManagement: React.FC = () => {
     if (!token) return;
     try {
       if (isAssigned) {
-        await removeUserRole(userId, roleId, token);
+        await removeUserRole(userId, roleId);
       } else {
-        await addUserRole(userId, roleId, token);
+        await addUserRole(userId, roleId);
       }
 
-      const updatedRoles = await getUserRoles(userId, token);
+      const updatedRoles = await getUserRoles(userId);
       setRoles((prevRoles) => ({ ...prevRoles, [userId]: updatedRoles }));
     } catch (error) {
       console.error('Error al cambiar roles:', error);

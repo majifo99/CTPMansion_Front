@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import Cookies from 'js-cookie'; // Importamos js-cookie
 
 // URL base de la API
 const API_URL = 'https://ctplamansion.onrender.com/api';
@@ -15,7 +15,7 @@ const apiClient = axios.create({
 // Interceptor para agregar el token JWT a cada solicitud
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = Cookies.get('token'); // Obtiene el token de las cookies
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,7 +25,7 @@ apiClient.interceptors.request.use(
 );
 
 // Manejo de respuestas
-const handleResponse = async (url:string) => {
+const handleResponse = async (url: string) => {
   try {
     const response = await apiClient.get(url);
     return response.data;
@@ -36,11 +36,11 @@ const handleResponse = async (url:string) => {
 };
 
 // === Funciones de autenticación ===
-export const login = async (email:string, password:string) => {
+export const login = async (email: string, password: string) => {
   try {
     const response = await apiClient.post('/User/login', { email, password });
     const { token } = response.data;
-    localStorage.setItem('token', token);
+    Cookies.set('token', token, { expires: 1 }); // Guarda el token en cookies con 1 día de expiración
   } catch (error) {
     console.error('Error logging in:', error);
     throw error;
@@ -48,13 +48,13 @@ export const login = async (email:string, password:string) => {
 };
 
 export const logout = () => {
-  localStorage.removeItem('token');
+  Cookies.remove('token'); // Elimina el token de las cookies
 };
 
 // === Servicios relacionados a eventos ===
 export const getEvents = () => handleResponse('/Events');
 
-export const addEvent = async (newEvent:any) => {
+export const addEvent = async (newEvent: any) => {
   try {
     const response = await apiClient.post('/Events', newEvent);
     return response.data;
@@ -64,7 +64,7 @@ export const addEvent = async (newEvent:any) => {
   }
 };
 
-export const editEvent = async (eventId:number, updatedEvent:any) => {
+export const editEvent = async (eventId: number, updatedEvent: any) => {
   try {
     const response = await apiClient.put(`/Events/${eventId}`, updatedEvent);
     return response.data;
@@ -74,7 +74,7 @@ export const editEvent = async (eventId:number, updatedEvent:any) => {
   }
 };
 
-export const deleteEvent = async (eventId:number) => {
+export const deleteEvent = async (eventId: number) => {
   try {
     await apiClient.delete(`/Events/${eventId}`);
   } catch (error) {
@@ -86,7 +86,7 @@ export const deleteEvent = async (eventId:number) => {
 // === Servicios relacionados a especialidades ===
 export const fetchSpecialities = () => handleResponse('/Especiality');
 
-export const addSpeciality = async (speciality:any) => {
+export const addSpeciality = async (speciality: any) => {
   try {
     const response = await apiClient.post('/Especiality', speciality);
     return response.data;
@@ -96,7 +96,7 @@ export const addSpeciality = async (speciality:any) => {
   }
 };
 
-export const editSpeciality = async (id:number, speciality:any) => {
+export const editSpeciality = async (id: number, speciality: any) => {
   try {
     const response = await apiClient.put(`/Especiality/${id}`, speciality);
     return response.data;
@@ -106,7 +106,7 @@ export const editSpeciality = async (id:number, speciality:any) => {
   }
 };
 
-export const deleteSpeciality = async (id:number) => {
+export const deleteSpeciality = async (id: number) => {
   try {
     await apiClient.delete(`/Especiality/${id}`);
   } catch (error) {
@@ -125,7 +125,7 @@ export const getAboutUsContent = async () => {
 export const fetchLocation = async () => {
   try {
     const response = await apiClient.get('/Location');
-    return response.data[0]; // Asume que la respuesta es un array y toma el primer elemento
+    return response.data[0];
   } catch (error) {
     console.error('Error fetching location data:', error);
     throw new Error('Error al cargar la información de la ubicación.');
@@ -171,7 +171,7 @@ export const getAllWorkshops = async () => {
   }
 };
 
-export const getWorkshopById = async (id:number) => {
+export const getWorkshopById = async (id: number) => {
   try {
     const response = await apiClient.get(`/Workshop/${id}`);
     return response.data;
@@ -181,7 +181,7 @@ export const getWorkshopById = async (id:number) => {
   }
 };
 
-export const createWorkshop = async (workshopData:any) => {
+export const createWorkshop = async (workshopData: any) => {
   try {
     const response = await apiClient.post('/Workshop', workshopData);
     return response.data;
@@ -191,7 +191,7 @@ export const createWorkshop = async (workshopData:any) => {
   }
 };
 
-export const updateWorkshop = async (id:number, workshopData:any) => {
+export const updateWorkshop = async (id: number, workshopData: any) => {
   try {
     const response = await apiClient.put(`/Workshop/${id}`, workshopData);
     return response.data;
@@ -201,7 +201,7 @@ export const updateWorkshop = async (id:number, workshopData:any) => {
   }
 };
 
-export const deleteWorkshop = async (id:number) => {
+export const deleteWorkshop = async (id: number) => {
   try {
     await apiClient.delete(`/Workshop/${id}`);
   } catch (error) {
@@ -211,9 +211,6 @@ export const deleteWorkshop = async (id:number) => {
 };
 
 // === Servicios relacionados con los métodos de entrega y nombres de certificación ===
-
-
-
 export const submitCertificateRequest = async (formData: {
   studentName: string;
   studentIdentification: string;
@@ -230,7 +227,7 @@ export const submitCertificateRequest = async (formData: {
         'Content-Type': 'application/json',
       },
     });
-    return response.data; // Retorna la respuesta si necesitas utilizarla en tu aplicación
+    return response.data;
   } catch (error) {
     console.error('Error al enviar la solicitud de certificado:', error);
     throw new Error('Error al enviar la solicitud de certificado');
@@ -240,7 +237,7 @@ export const submitCertificateRequest = async (formData: {
 export const getDeliveryMethods = async () => {
   try {
     const response = await apiClient.get('/Enums/deliveryMethods');
-    console.log("Delivery Methods Data:", response.data); // Verifica que los datos sean un array de { id, name }
+    console.log("Delivery Methods Data:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching delivery methods:', error);
@@ -250,7 +247,7 @@ export const getDeliveryMethods = async () => {
 
 export const getCertificationNames = async () => {
   try {
-    const response = await apiClient.get('/CertificationName'); // Verifica que los datos sean un array de { id, name }
+    const response = await apiClient.get('/CertificationName');
     return response.data;
   } catch (error) {
     console.error('Error fetching certification names:', error);
@@ -268,7 +265,7 @@ export const getRequests = async () => {
   }
 };
 
-export const rejectRequest = async (id:number) => {
+export const rejectRequest = async (id: number) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/reject`);
   } catch (error) {
@@ -276,7 +273,7 @@ export const rejectRequest = async (id:number) => {
   }
 };
 
-export const approveRequest = async (id:number) => {
+export const approveRequest = async (id: number) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/approve`);
   } catch (error) {
@@ -284,7 +281,7 @@ export const approveRequest = async (id:number) => {
   }
 };
 
-export const setDeliveryDeadline = async (id:number, deliveryDays:number) => {
+export const setDeliveryDeadline = async (id: number, deliveryDays: number) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/set-delivery-deadline`, null, {
       params: { deliveryDays },
@@ -295,7 +292,7 @@ export const setDeliveryDeadline = async (id:number, deliveryDays:number) => {
 };
 
 // === Servicios relacionados con solicitudes de sala (Room Requests) ===
-export const createRoomRequest = async (roomRequest:any) => {
+export const createRoomRequest = async (roomRequest: any) => {
   try {
     await apiClient.post(`/RoomRequest`, roomRequest);
   } catch (error) {

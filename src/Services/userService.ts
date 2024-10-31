@@ -1,16 +1,30 @@
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Importar js-cookie para manejar cookies
 
 // URL base para tu API
 const BASE_URL = 'https://ctplamansion.onrender.com/api';
 
+// Crear una instancia de Axios con el token de autorización incluido
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor para agregar el token JWT a cada solicitud
+apiClient.interceptors.request.use((config) => {
+  const token = Cookies.get('token'); // Obtener el token desde las cookies
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Obtener la lista de usuarios
-export const getUsers = async (token: string): Promise<any> => {
+export const getUsers = async (): Promise<any> => {
   try {
-    const response = await axios.get(`${BASE_URL}/User`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get('/User');
     return response.data;
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
@@ -19,13 +33,9 @@ export const getUsers = async (token: string): Promise<any> => {
 };
 
 // Obtener roles de un usuario
-export const getUserRoles = async (userId: number, token: string): Promise<any> => {
+export const getUserRoles = async (userId: number): Promise<any> => {
   try {
-    const response = await axios.get(`${BASE_URL}/UserRole/${userId}/roles`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get(`/UserRole/${userId}/roles`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener roles para el usuario ${userId}:`, error);
@@ -34,12 +44,9 @@ export const getUserRoles = async (userId: number, token: string): Promise<any> 
 };
 
 // Agregar rol a un usuario
-export const addUserRole = async (userId: number, roleId: number, token: string): Promise<void> => {
+export const addUserRole = async (userId: number, roleId: number): Promise<void> => {
   try {
-    await axios.post(`${BASE_URL}/UserRole/add`, null, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    await apiClient.post('/UserRole/add', null, {
       params: {
         userId,
         roleId,
@@ -52,12 +59,9 @@ export const addUserRole = async (userId: number, roleId: number, token: string)
 };
 
 // Quitar rol a un usuario
-export const removeUserRole = async (userId: number, roleId: number, token: string): Promise<void> => {
+export const removeUserRole = async (userId: number, roleId: number): Promise<void> => {
   try {
-    await axios.post(`${BASE_URL}/UserRole/remove`, null, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    await apiClient.post('/UserRole/remove', null, {
       params: {
         userId,
         roleId,
@@ -70,13 +74,9 @@ export const removeUserRole = async (userId: number, roleId: number, token: stri
 };
 
 // Obtener datos del usuario por ID
-export const getUserById = async (userId: number, token: string): Promise<any> => {
+export const getUserById = async (userId: number): Promise<any> => {
   try {
-    const response = await axios.get(`${BASE_URL}/User/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get(`/User/${userId}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener los datos del usuario ${userId}:`, error);
@@ -85,14 +85,9 @@ export const getUserById = async (userId: number, token: string): Promise<any> =
 };
 
 // Actualizar el perfil del usuario
-export const updateUser = async (userId: number, updatedData: any, token: string): Promise<any> => {
+export const updateUser = async (userId: number, updatedData: any): Promise<any> => {
   try {
-    const response = await axios.put(`${BASE_URL}/User/${userId}`, updatedData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await apiClient.put(`/User/${userId}`, updatedData);
     return response.data;
   } catch (error) {
     console.error(`Error al actualizar los datos del usuario ${userId}:`, error);
