@@ -47,12 +47,6 @@ export const useLabsAndRequests = () => {
   }, []);
 
   // Función de recarga con retraso opcional
-  const delayedFetchData = async (delay: number = 2000) => {
-    setTimeout(async () => {
-      await fetchLabsData();
-      await fetchLabRequestsData();
-    }, delay);
-  };
 
   // Aprobar solicitud de laboratorio
   const handleApproveLabRequest = async (id: number) => {

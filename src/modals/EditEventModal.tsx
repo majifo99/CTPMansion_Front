@@ -9,16 +9,17 @@ interface EditEventModalProps {
   onSave: (event: Event) => void;
 }
 
-const formatDateForInput = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toISOString().slice(0, 16); // Convierte a 'YYYY-MM-DDTHH:mm'
+const formatDateForInput = (date: string | Date) => {
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+  return parsedDate.toISOString().slice(0, 16); // Formato 'YYYY-MM-DDTHH:mm'
 };
 
 const EditEventModal: React.FC<EditEventModalProps> = ({ show, event, onClose, onSave }) => {
   if (!show) return null;
 
-  // Formateamos la fecha si estamos editando un evento.
-  const eventWithFormattedDate = event ? { ...event, date: formatDateForInput(event.date) } : null;
+  const eventWithFormattedDate = event
+    ? { ...event, date: new Date(formatDateForInput(event.date)) } // Convertimos de vuelta a Date
+    : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
