@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUserById, updateUser } from '../Services/userService'; // Ajustar la ruta según sea necesario
+import { getUserById, updateUser } from '../services/userService'; // Ajustar la ruta según sea necesario
 
 export const useUserProfile = (userId: number | undefined, token: string | undefined) => {
   const [user, setUser] = useState<any>(null);

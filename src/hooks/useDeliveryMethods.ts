@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getDeliveryMethods } from '../Services/LandingPageServices';
+import { getDeliveryMethods } from '../services/LandingPageServices';
 
 export const useDeliveryMethods = () => {
     const [deliveryMethods, setDeliveryMethods] = useState<string[]>([]);

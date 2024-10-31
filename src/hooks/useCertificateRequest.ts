@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getDeliveryMethods, getCertificationNames, submitCertificateRequest } from '../Services/LandingPageServices';
+import { getDeliveryMethods, getCertificationNames, submitCertificateRequest } from '../services/LandingPageServices';
 
 export const useCertificateRequest = () => {
     const [deliveryMethods, setDeliveryMethods] = useState<{ id: number; name: string }[]>([]);
@@ -21,7 +21,7 @@ export const useCertificateRequest = () => {
                     id: index + 1,
                     name: name,
                 }));
-                
+
                 setDeliveryMethods(transformedDeliveryMethods);
                 setCertificationNames(certificationNamesData);
             } catch (error) {

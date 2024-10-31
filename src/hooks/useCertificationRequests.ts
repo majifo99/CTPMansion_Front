@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getRequests, getCertificationNames, rejectRequest, approveRequest, setDeliveryDeadline } from '../Services/LandingPageServices';
+import { getRequests, getCertificationNames, rejectRequest, approveRequest, setDeliveryDeadline } from '../services/LandingPageServices';
 import { CertificationRequest } from '../types/Types';
 
 const useCertificationRequests = () => {

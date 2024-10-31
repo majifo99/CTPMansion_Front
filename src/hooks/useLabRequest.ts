@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LabRequest } from '../types/LaboratoryRequestType';
-import { createLabRequest } from '../Services/LaboratoryService';
+import { createLabRequest } from '../services/LaboratoryService';
 
 
 export const useLabRequest = () => {

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { login, logout } from '../Services/authService';
+import { login, logout } from '../services/authService';
 
 
 export const useAuth = () => {

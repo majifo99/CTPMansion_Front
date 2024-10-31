@@ -1,7 +1,7 @@
 // src/hooks/useUDPs.ts
 import { useState, useEffect } from 'react';
 import { UDP } from '../types/Types';
-import { addUDP, deleteUDP, editUDP, getUDPs, getUDPById, patchUDPBalance } from '../Services/udpService';
+import { addUDP, deleteUDP, editUDP, getUDPs, getUDPById, patchUDPBalance } from '../services/udpService';
 
 export const useUDPs = () => {
   const [udps, setUdps] = useState<UDP[]>([]);
