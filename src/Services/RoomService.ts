@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Room } from '../types/Types'; // Importar el tipo Room
 
-const API_URL = 'https://localhost:7055/api/Room'; // Ajustar la URL base según sea necesario
+const API_URL = 'https://ctplamansion.onrender.com/api/Room'; // Ajustar la URL base según sea necesario
 
 // Crear una instancia de Axios con configuración predeterminada
 const apiClient = axios.create({

@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { Order, RequestStatus } from '../types/OrderTypes';
 
-const apiUrl = 'https://localhost:7055/api/Order';
+const apiUrl = 'https://ctplamansion.onrender.com/api/Order';
 
 // Helper function to retrieve the JWT token from localStorage
 const getToken = () => localStorage.getItem('token');

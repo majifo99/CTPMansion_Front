@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL base para tu API
-const BASE_URL = 'https://localhost:7055/api';
+const BASE_URL = 'https://ctplamansion.onrender.com/api';
 
 // Obtener la lista de usuarios
 export const getUsers = async (token: string): Promise<any> => {

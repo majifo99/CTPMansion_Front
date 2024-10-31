@@ -16,7 +16,7 @@ interface DecodedUser {
 export const login = async (email: string, password: string): Promise<DecodedUser | null> => {
   try {
     const response = await axios.post(
-      'https://localhost:7055/api/User/login',
+      'https://ctplamansion.onrender.com/api/User/login',
       { email, password },
       { headers: { 'Content-Type': 'application/json-patch+json' } }
     );
