@@ -3,7 +3,7 @@ import { BiBookReader, BiBusSchool } from "react-icons/bi";
 import { TbBallFootball, TbBowlSpoon, TbUserHeart, TbUserQuestion, TbPigMoney, TbHome } from "react-icons/tb";
 import { useOurServices } from '../hooks/useOurServices';
 
-const iconMapper = {
+const iconMapper:any = {
   BiBookReader: <BiBookReader className="w-12 h-12 text-[#ff7a59]" />,
   BiBusSchool: <BiBusSchool className="w-12 h-12 text-[#e1cf97]" />,
   TbBallFootball: <TbBallFootball className="w-12 h-12 text-[#2E4A5A]" />,

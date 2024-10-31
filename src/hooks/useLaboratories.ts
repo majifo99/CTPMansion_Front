@@ -39,7 +39,7 @@ export const useLaboratories = () => {
       fetchLaboratoriesData();
 
     } catch (err) {
-      handleError('Error adding laboratory', err);
+      Error('Error adding laboratory');
     }
   };
 
@@ -50,7 +50,7 @@ export const useLaboratories = () => {
       fetchLaboratoriesData();
 
     } catch (err) {
-      handleError('Error editing laboratory', err);
+      Error('Error editing laboratory');
     }
   };
 
@@ -61,7 +61,7 @@ export const useLaboratories = () => {
       fetchLaboratoriesData();
 
     } catch (err) {
-      handleError('Error deleting laboratory', err);
+      Error('Error deleting laboratory');
     }
   };
 

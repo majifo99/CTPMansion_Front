@@ -27,7 +27,7 @@ const UDPsPage: React.FC = () => {
       await handleEditUDP(editingUDP.id_UDP, udpData);
       toast.success('UDP editado con éxito!');
     } else {
-      await handleAddUDP(udpData);  // handleAddUDP se llama sin `id_UDP`
+      await handleAddUDP(udpData);
       toast.success('UDP creado con éxito!');
     }
     handleCloseEditModal();
@@ -40,6 +40,7 @@ const UDPsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      <ToastContainer />
       <h1 className="text-3xl font-bold mb-6 text-center">Gestión de UDPs</h1>
       <div className="flex justify-end mb-6">
         <button
@@ -108,7 +109,6 @@ const UDPsPage: React.FC = () => {
         onClose={handleCloseEditModal}
         onSave={handleSaveUDP}
       />
-      <ToastContainer />
     </div>
   );
 };

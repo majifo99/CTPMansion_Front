@@ -5,16 +5,31 @@ import { Event } from '../types/Types';
 interface EventFormProps {
   event: Event | null;
   onSave: (event: Event) => void;
-  onCancel: () => void; // Prop para manejar el cierre del modal
+  onCancel: () => void;
 }
 
 const EventForm: React.FC<EventFormProps> = ({ event, onSave, onCancel }) => {
-  const { control, handleSubmit, reset } = useForm<Event>({
-    defaultValues: event || { id: 0, title: '', description: '', date: new Date().toISOString(), url_Image: '' },
+  const { control, handleSubmit, reset } = useForm<Omit<Event, 'date'> & { date: string }>({
+    defaultValues: event
+      ? {
+          ...event,
+          date: event.date ? new Date(event.date).toISOString().slice(0, 16) : "", // Convert Date to string for input
+        }
+      : {
+          id: 0,
+          title: '',
+          description: '',
+          date: '', // Deja el campo en blanco
+          url_Image: '',
+        },
   });
 
-  const onSubmit = (data: Event) => {
-    onSave(data);
+  const onSubmit = (data: Omit<Event, 'date'> & { date: string }) => {
+    const formattedData: Event = {
+      ...data,
+      date: data.date ? new Date(data.date) : new Date(), // Convert string back to Date for Event type
+    };
+    onSave(formattedData);
     reset();
   };
 
@@ -86,7 +101,6 @@ const EventForm: React.FC<EventFormProps> = ({ event, onSave, onCancel }) => {
         />
       </div>
 
-      {/* Botones de Guardar y Cancelar alineados horizontalmente */}
       <div className="flex justify-end space-x-4 mt-4">
         <button
           type="button"

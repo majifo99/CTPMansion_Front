@@ -27,16 +27,16 @@ const RoomsPage: React.FC = () => {
   };
 
   // Guardar sala (agregar o editar)
-  const handleSaveRoom = (room: Room) => {
+  const handleSaveRoom = async (room: Room): Promise<void> => {
     if (editingRoom) {
-      handleEditRoom(editingRoom.id_Room, room);
-      toast.success('Sala editada correctamente');
+        await handleEditRoom(editingRoom.id_Room, room); // Suponiendo que esta función devuelve una promesa
+        toast.success('Sala editada correctamente');
     } else {
-      handleAddRoom(room);
-      toast.success('Sala agregada correctamente');
+        await handleAddRoom(room); // Suponiendo que esta función devuelve una promesa
+        toast.success('Sala agregada correctamente');
     }
     handleCloseEditModal();
-  };
+};
 
   // Abrir modal de eliminación
   const handleOpenDeleteModal = (id: number) => {

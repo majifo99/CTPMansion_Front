@@ -1,10 +1,9 @@
 import React from 'react';
-import LaboratoryForm from '../DashboardPages/LaboratoryForm';
-import { Laboratory } from '../types/LaboratoryRequestType';
+import { Laboratory } from '../types/Types';
 
 interface EditLaboratoryModalProps {
   show: boolean;
-  laboratory: Laboratory | null;
+  laboratory?: Laboratory | null;
   onClose: () => void;
   onSave: (laboratory: Laboratory) => void;
 }
@@ -13,12 +12,16 @@ const EditLaboratoryModal: React.FC<EditLaboratoryModalProps> = ({ show, laborat
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-md max-w-lg w-full shadow-lg">
-        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-900">
-          {laboratory ? 'Editar Laboratorio' : 'Agregar Laboratorio'}
-        </h2>
-        <LaboratoryForm laboratory={laboratory} onSave={onSave} onCancel={onClose} />
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded shadow-lg w-1/2">
+        <h2 className="text-xl font-bold mb-4">Editar Laboratorio</h2>
+        {/* Aquí iría el formulario para editar los detalles del laboratorio */}
+        <button onClick={() => onSave(laboratory!)} className="bg-blue-500 text-white px-4 py-2 rounded">
+          Guardar
+        </button>
+        <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded ml-2">
+          Cancelar
+        </button>
       </div>
     </div>
   );

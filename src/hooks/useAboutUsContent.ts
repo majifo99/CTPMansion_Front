@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAboutUsContent } from '../services/LandingPageServices'; // Asegúrate de ajustar la ruta según tu estructura de archivos
+import { getAboutUsContent } from '../Services/LandingPageServices'; // Asegúrate de ajustar la ruta según tu estructura de archivos
 import { AboutUsContent } from '../types/Types';
 
 export const useAboutUsContent = () => {

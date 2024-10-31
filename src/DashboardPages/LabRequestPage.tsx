@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLabsAndRequests } from '../hooks/useLabs';
-import { useForm } from 'react-hook-form';
+import { useForm, RegisterOptions } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useLabRequest } from '../hooks/useLabRequest';
@@ -26,11 +26,13 @@ const getUserIdFromToken = (): string | null => {
   return null;
 };
 
+type LabRequestFormField = Omit<LabRequest, 'id_LaboratoryRequest' | 'status'>;
+
 const LabRequestPage: React.FC = () => {
   const { labs, labRequests, loading, error, fetchLabRequestsData } = useLabsAndRequests();
   const [selectedLab, setSelectedLab] = useState<Laboratory | null>(null);
-  const [activeModal, setActiveModal] = useState<"form" | "calendar" | null>(null); // Controla qué modal está activo
-  const { register, handleSubmit, reset } = useForm<Omit<LabRequest, 'id_LabRequest' | 'status'>>();
+  const [activeModal, setActiveModal] = useState<"form" | "calendar" | null>(null);
+  const { register, handleSubmit, reset } = useForm<LabRequestFormField>();
   const { isSubmitting, submitLabRequest } = useLabRequest();
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -42,7 +44,7 @@ const LabRequestPage: React.FC = () => {
   const notifySuccess = () => toast.success('Solicitud de laboratorio enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
-  const onSubmit = async (data: Omit<LabRequest, 'id_LabRequest' | 'status'>) => {
+  const onSubmit = async (data: LabRequestFormField) => {
     if (selectedLab && userId) {
       const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
       const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
@@ -78,10 +80,10 @@ const LabRequestPage: React.FC = () => {
         return;
       }
 
-      const labRequest = {
+      const labRequest: LabRequest = {
         ...data,
-        id_LabRequest: 0,
-        userId: parseInt(userId, 10),
+        id_LaboratoryRequest: 0,
+        userId: userId,
         laboratoryId: selectedLab.id_Laboratory,
         status: 0,
         startDate: data.startDate,
@@ -105,7 +107,13 @@ const LabRequestPage: React.FC = () => {
     }
   };
 
-  const renderInputField = (id: string, label: string, placeholder: string, validation: any, type = 'text') => (
+  const renderInputField = (
+    id: keyof LabRequestFormField,
+    label: string,
+    placeholder: string,
+    validation: RegisterOptions<LabRequestFormField>,
+    type = 'text'
+  ) => (
     <div className="flex flex-col mb-4 w-full md:w-1/2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <input
@@ -118,7 +126,11 @@ const LabRequestPage: React.FC = () => {
     </div>
   );
 
-  const renderDropdownField = (id: string, label: string, options: number[]) => (
+  const renderDropdownField = (
+    id: keyof LabRequestFormField,
+    label: string,
+    options: number[]
+  ) => (
     <div className="flex flex-col mb-4 w-full md:w-1/2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
       <select

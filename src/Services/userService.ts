@@ -1,11 +1,10 @@
-
 import axios from 'axios';
 
 // URL base para tu API
 const BASE_URL = 'https://localhost:7055/api';
 
 // Obtener la lista de usuarios
-export const getUsers = async (token) => {
+export const getUsers = async (token: string): Promise<any> => {
   try {
     const response = await axios.get(`${BASE_URL}/User`, {
       headers: {
@@ -20,7 +19,7 @@ export const getUsers = async (token) => {
 };
 
 // Obtener roles de un usuario
-export const getUserRoles = async (userId, token) => {
+export const getUserRoles = async (userId: number, token: string): Promise<any> => {
   try {
     const response = await axios.get(`${BASE_URL}/UserRole/${userId}/roles`, {
       headers: {
@@ -35,7 +34,7 @@ export const getUserRoles = async (userId, token) => {
 };
 
 // Agregar rol a un usuario
-export const addUserRole = async (userId, roleId, token) => {
+export const addUserRole = async (userId: number, roleId: number, token: string): Promise<void> => {
   try {
     await axios.post(`${BASE_URL}/UserRole/add`, null, {
       headers: {
@@ -53,7 +52,7 @@ export const addUserRole = async (userId, roleId, token) => {
 };
 
 // Quitar rol a un usuario
-export const removeUserRole = async (userId, roleId, token) => {
+export const removeUserRole = async (userId: number, roleId: number, token: string): Promise<void> => {
   try {
     await axios.post(`${BASE_URL}/UserRole/remove`, null, {
       headers: {
@@ -71,7 +70,7 @@ export const removeUserRole = async (userId, roleId, token) => {
 };
 
 // Obtener datos del usuario por ID
-export const getUserById = async (userId: number, token: string) => {
+export const getUserById = async (userId: number, token: string): Promise<any> => {
   try {
     const response = await axios.get(`${BASE_URL}/User/${userId}`, {
       headers: {
@@ -86,7 +85,7 @@ export const getUserById = async (userId: number, token: string) => {
 };
 
 // Actualizar el perfil del usuario
-export const updateUser = async (userId: number, updatedData: any, token: string) => {
+export const updateUser = async (userId: number, updatedData: any, token: string): Promise<any> => {
   try {
     const response = await axios.put(`${BASE_URL}/User/${userId}`, updatedData, {
       headers: {

@@ -17,9 +17,9 @@ const images = [
 const GallerySkeleton = () => {
   return (
     <div className="my-10 mx-auto max-w-4xl">
-      <h2 className="text-4xl font-extrabold text-center text-teal-600 mb-2 relative">
+      <h2 className="text-4xl font-extrabold text-center text-[#34436B] mb-2 relative">
         ¡Explora Nuestra Galería del Colegio!
-        <div className="w-3/4 h-1 bg-gradient-to-r from-teal-500 to-green-500 mx-auto mt-1 rounded-full"></div>
+        <div className="w-3/4 h-1  bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></div>
       </h2>
 
       <div className="flex overflow-x-hidden space-x-4 p-4 animate-pulse">

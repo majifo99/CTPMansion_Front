@@ -25,7 +25,7 @@ apiClient.interceptors.request.use(
 );
 
 // Manejo de respuestas
-const handleResponse = async (url) => {
+const handleResponse = async (url:string) => {
   try {
     const response = await apiClient.get(url);
     return response.data;
@@ -36,7 +36,7 @@ const handleResponse = async (url) => {
 };
 
 // === Funciones de autenticación ===
-export const login = async (email, password) => {
+export const login = async (email:string, password:string) => {
   try {
     const response = await apiClient.post('/User/login', { email, password });
     const { token } = response.data;
@@ -54,7 +54,7 @@ export const logout = () => {
 // === Servicios relacionados a eventos ===
 export const getEvents = () => handleResponse('/Events');
 
-export const addEvent = async (newEvent) => {
+export const addEvent = async (newEvent:any) => {
   try {
     const response = await apiClient.post('/Events', newEvent);
     return response.data;
@@ -64,7 +64,7 @@ export const addEvent = async (newEvent) => {
   }
 };
 
-export const editEvent = async (eventId, updatedEvent) => {
+export const editEvent = async (eventId:number, updatedEvent:any) => {
   try {
     const response = await apiClient.put(`/Events/${eventId}`, updatedEvent);
     return response.data;
@@ -74,7 +74,7 @@ export const editEvent = async (eventId, updatedEvent) => {
   }
 };
 
-export const deleteEvent = async (eventId) => {
+export const deleteEvent = async (eventId:number) => {
   try {
     await apiClient.delete(`/Events/${eventId}`);
   } catch (error) {
@@ -86,7 +86,7 @@ export const deleteEvent = async (eventId) => {
 // === Servicios relacionados a especialidades ===
 export const fetchSpecialities = () => handleResponse('/Especiality');
 
-export const addSpeciality = async (speciality) => {
+export const addSpeciality = async (speciality:any) => {
   try {
     const response = await apiClient.post('/Especiality', speciality);
     return response.data;
@@ -96,7 +96,7 @@ export const addSpeciality = async (speciality) => {
   }
 };
 
-export const editSpeciality = async (id, speciality) => {
+export const editSpeciality = async (id:number, speciality:any) => {
   try {
     const response = await apiClient.put(`/Especiality/${id}`, speciality);
     return response.data;
@@ -106,7 +106,7 @@ export const editSpeciality = async (id, speciality) => {
   }
 };
 
-export const deleteSpeciality = async (id) => {
+export const deleteSpeciality = async (id:number) => {
   try {
     await apiClient.delete(`/Especiality/${id}`);
   } catch (error) {
@@ -171,7 +171,7 @@ export const getAllWorkshops = async () => {
   }
 };
 
-export const getWorkshopById = async (id) => {
+export const getWorkshopById = async (id:number) => {
   try {
     const response = await apiClient.get(`/Workshop/${id}`);
     return response.data;
@@ -181,7 +181,7 @@ export const getWorkshopById = async (id) => {
   }
 };
 
-export const createWorkshop = async (workshopData) => {
+export const createWorkshop = async (workshopData:any) => {
   try {
     const response = await apiClient.post('/Workshop', workshopData);
     return response.data;
@@ -191,7 +191,7 @@ export const createWorkshop = async (workshopData) => {
   }
 };
 
-export const updateWorkshop = async (id, workshopData) => {
+export const updateWorkshop = async (id:number, workshopData:any) => {
   try {
     const response = await apiClient.put(`/Workshop/${id}`, workshopData);
     return response.data;
@@ -201,7 +201,7 @@ export const updateWorkshop = async (id, workshopData) => {
   }
 };
 
-export const deleteWorkshop = async (id) => {
+export const deleteWorkshop = async (id:number) => {
   try {
     await apiClient.delete(`/Workshop/${id}`);
   } catch (error) {
@@ -236,9 +236,11 @@ export const submitCertificateRequest = async (formData: {
     throw new Error('Error al enviar la solicitud de certificado');
   }
 };
+
 export const getDeliveryMethods = async () => {
   try {
     const response = await apiClient.get('/Enums/deliveryMethods');
+    console.log("Delivery Methods Data:", response.data); // Verifica que los datos sean un array de { id, name }
     return response.data;
   } catch (error) {
     console.error('Error fetching delivery methods:', error);
@@ -248,7 +250,7 @@ export const getDeliveryMethods = async () => {
 
 export const getCertificationNames = async () => {
   try {
-    const response = await apiClient.get('/CertificationName');
+    const response = await apiClient.get('/CertificationName'); // Verifica que los datos sean un array de { id, name }
     return response.data;
   } catch (error) {
     console.error('Error fetching certification names:', error);
@@ -266,7 +268,7 @@ export const getRequests = async () => {
   }
 };
 
-export const rejectRequest = async (id) => {
+export const rejectRequest = async (id:number) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/reject`);
   } catch (error) {
@@ -274,7 +276,7 @@ export const rejectRequest = async (id) => {
   }
 };
 
-export const approveRequest = async (id) => {
+export const approveRequest = async (id:number) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/approve`);
   } catch (error) {
@@ -282,7 +284,7 @@ export const approveRequest = async (id) => {
   }
 };
 
-export const setDeliveryDeadline = async (id, deliveryDays) => {
+export const setDeliveryDeadline = async (id:number, deliveryDays:number) => {
   try {
     await apiClient.post(`/CertificationRequests/${id}/set-delivery-deadline`, null, {
       params: { deliveryDays },
@@ -293,7 +295,7 @@ export const setDeliveryDeadline = async (id, deliveryDays) => {
 };
 
 // === Servicios relacionados con solicitudes de sala (Room Requests) ===
-export const createRoomRequest = async (roomRequest) => {
+export const createRoomRequest = async (roomRequest:any) => {
   try {
     await apiClient.post(`/RoomRequest`, roomRequest);
   } catch (error) {

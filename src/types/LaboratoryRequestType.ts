@@ -29,3 +29,4 @@ export type Laboratory = {
   capacity: number;
   url_Image: string;
 };
+

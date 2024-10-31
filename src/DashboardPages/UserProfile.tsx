@@ -16,7 +16,8 @@ const UserProfile: React.FC = () => {
   const { user: authUser, token } = useAuth(); // Obtener el usuario autenticado y el token desde el contexto
   const userId = authUser?.id;
 
-  const { user, loading, error, updateSuccess, handleUpdateUser } = useUserProfile(userId, token); // Pasar el ID del usuario y el token
+  const { user, loading, error, updateSuccess, handleUpdateUser } = useUserProfile(userId, token || undefined);
+ // Pasar el ID del usuario y el token
 
   const [editMode, setEditMode] = useState(false); // Control del modo de edición
   

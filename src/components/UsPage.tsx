@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import useUsPage from '../hooks/useUsePage';
 
-const iconMapper = {
+const iconMapper: any = {
   Respeto: <FaHandshake className="text-burntOrange w-12 h-12" />,          
   Compromiso: <FaPeopleCarry className="text-burntOrange w-12 h-12" />,     
   Empatía: <RiEmpathizeFill className="text-burntOrange w-12 h-12" />,      
@@ -93,7 +93,6 @@ const UsPage = () => {
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );

@@ -72,8 +72,12 @@ export const deleteLaboratory = async (id: number): Promise<void> => {
 export const createLabRequest = async (labRequest: LabRequest): Promise<void> => {
   try {
     await apiClient.post(`/LaboratoryRequest`, labRequest);
-  } catch (error) {
-    console.error('Error creating lab request:', error.response?.data || error.message);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error('Error creating lab request:', error.response.data);
+    } else {
+      console.error('Error creating lab request:', error);
+    }
     throw error;
   }
 };
