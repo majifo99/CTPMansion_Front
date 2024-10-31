@@ -22,10 +22,7 @@ type FormData = {
     certificationType: string;
 };
 
-type DeliveryMethod = {
-    id: number;
-    name: string;
-};
+
 
 type CertificationName = {
     id: number;
@@ -34,7 +31,7 @@ type CertificationName = {
 
 const CertificatesPage = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
-    const { deliveryMethods, certificationNames, isSubmitting, error: submitError, success, submitRequest } = useCertificateRequest();
+    const { deliveryMethods, certificationNames, isSubmitting, submitRequest } = useCertificateRequest();
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
     const onCaptchaChange = (token: string | null) => {

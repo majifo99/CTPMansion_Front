@@ -4,8 +4,8 @@ import { Room } from '../types/Types';
 
 interface RoomFormProps {
   room: Room | null;
-  onSave: (room: Room) => Promise<void>; // Asume que onSave es una promesa
-  onCancel: () => void; // Añadimos onCancel para el botón de cancelar
+  onSave: (room: Room) => Promise<void>;
+  onCancel: () => void;
 }
 
 const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
@@ -104,9 +104,9 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
           control={control}
           render={({ field }) => (
             <input
-              {...field}
               type="checkbox"
-              checked={field.value}
+              checked={field.value}  // Para indicar si el checkbox está marcado
+              onChange={(e) => field.onChange(e.target.checked)} // Pasar el valor booleano a `field.onChange`
               className="h-5 w-5"
             />
           )}
