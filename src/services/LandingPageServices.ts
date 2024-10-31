@@ -15,7 +15,7 @@ import {
 } from '../types/Types'; // Ajusta esta ruta según tu estructura de proyecto
 
 // URL base de la API
-const API_URL = 'https://localhost:7055/api';
+const API_URL = 'https://ctplamansion.onrender.com/api';
 
 // Crear una instancia de axios con la URL base y encabezados predeterminados
 const apiClient = axios.create({

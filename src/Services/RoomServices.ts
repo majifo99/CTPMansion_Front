@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Room } from '../types/Types'; // Definimos un tipo de 'Room' en Types para gestionar las salas
 import { RoomRequest } from '../types/RoomRequestType'; // Importamos RoomRequestType para gestionar las solicitudes de sala
 
-const API_URL = 'https://localhost:7055/api';
+const API_URL = 'https://ctplamansion.onrender.com/api';
 
 // Crear una instancia de Axios con configuración predeterminada
 const apiClient = axios.create({

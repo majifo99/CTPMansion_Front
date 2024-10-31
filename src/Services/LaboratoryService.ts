@@ -2,7 +2,7 @@ import axios from "axios";
 import { Laboratory } from "../types/Types";
 import { LabRequest } from "../types/LaboratoryRequestType";
 
-const API_URL = 'https://localhost:7055/api';
+const API_URL = 'https://ctplamansion.onrender.com/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,

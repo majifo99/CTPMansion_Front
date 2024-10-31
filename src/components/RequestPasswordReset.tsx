@@ -21,7 +21,7 @@ const RequestPasswordReset: React.FC = () => {
         setIsProcessing(true);
         try {
             const response = await axios.post(
-                'https://localhost:7055/api/User/send-password-reset-token',
+                'https://ctplamansion.onrender.com/api/User/send-password-reset-token',
                 `"${email}"`,
                 { headers: { 'Content-Type': 'application/json-patch+json' } }
             );

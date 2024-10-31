@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { Product } from '../types/Product';
 
-const BASE_URL = 'https://localhost:7055/api/Product';
+const BASE_URL = 'https://ctplamansion.onrender.com/api/Product';
 
 const getToken = () => localStorage.getItem('token');
 

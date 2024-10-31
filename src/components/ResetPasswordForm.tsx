@@ -37,7 +37,7 @@ const ResetPasswordForm: React.FC = () => {
         }
 
         try {
-            const response = await axios.post('https://localhost:7055/api/User/reset-password', {
+            const response = await axios.post('https://ctplamansion.onrender.com/api/User/reset-password', {
                 email,
                 token,
                 newPassword

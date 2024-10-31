@@ -28,7 +28,7 @@ const RegisterForm: React.FC = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setIsSubmitting(true); // Cambia el estado del botón a "Procesando..."
     try {
-      const response = await fetch('https://localhost:7055/api/User/register', {
+      const response = await fetch('https://ctplamansion.onrender.com/api/User/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

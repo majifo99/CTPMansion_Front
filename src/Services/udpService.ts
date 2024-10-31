@@ -3,7 +3,7 @@ import axios from 'axios';
 import { UDP } from '../types/Types';
 
 const api = axios.create({
-  baseURL: 'https://localhost:7055/api',
+  baseURL: 'https://ctplamansion.onrender.com/api',
 });
 
 api.interceptors.request.use(config => {
