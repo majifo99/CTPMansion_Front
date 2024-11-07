@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
 import ProtectedRoute from './ProtectedRoute';  // Componente de rutas protegidas
 import { AuthProvider } from '../contexts/AuthContext';
-import UserProfile from '../DashboardPages/UserProfile';
-import DashboardHome from '../DashboardPages/DashboardHome';
+import UserProfile from '../DashboardPages/Main/UserProfile';
+import DashboardHome from '../DashboardPages/Main/DashboardHome';
 
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -13,31 +13,31 @@ const Events = React.lazy(() => import('../components/Events'));
 const WorkshopsPage = React.lazy(() => import('../components/WorkshopsPage'));
 const CertificatesPage = React.lazy(() => import('../pages/CertificatesPage'));
 const DashboardLayout = React.lazy(() => import('../layouts/DashboardLayout'));
-const CertificacionesPage = React.lazy(() => import('../DashboardPages/CertificationRequestsTable'));
+const CertificacionesPage = React.lazy(() => import('../DashboardPages/Managing/CertificationRequestsTable'));
 const Register = React.lazy(() => import('../components/RegisterForm'));
 const VerificationForm = React.lazy(() => import('../components/VerificationForm'));
 const LoginForm = React.lazy(() => import('../components/LoginForm'));
 const RequestPasswordReset = React.lazy(() => import('../components/RequestPasswordReset'));
 const ResetPasswordForm = React.lazy(() => import('../components/ResetPasswordForm'));
-const SalasPage = React.lazy(() => import('../DashboardPages/ManageRoomRequests'));
-const RoomsPage = React.lazy(() => import('../DashboardPages/RoomsPage'));
-const LabRequestPage = React.lazy(() => import('../DashboardPages/ManageLabRequests'));
-const EventosPage = React.lazy(() => import('../DashboardPages/EventosPage'));
-const UDPsPage = React.lazy(() => import('../DashboardPages/UDPsPage'));  // <-- Asegúrate de que el path es correcto
-const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/SpecialitiesPageD'));
-const TalleresPage = React.lazy(() => import('../DashboardPages/WorkshopsPageD'));
-const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/LaboratoriesPage'));
-const RolesManagement = React.lazy(() => import('../DashboardPages/Rolesmanagement'));
-const SolicitarSala = React.lazy(() => import('../DashboardPages/RoomRequestPage'));
-const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/LabRequestPage'));
+const SalasPage = React.lazy(() => import('../DashboardPages/Managing/ManageRoomRequests'));
+const RoomsPage = React.lazy(() => import('../DashboardPages/CRUD/Rooms/RoomsPage'));
+const LabRequestPage = React.lazy(() => import('../DashboardPages/Managing/ManageLabRequests'));
+const EventosPage = React.lazy(() => import('../DashboardPages/CRUD/Eventos/EventosPage'));
+const UDPsPage = React.lazy(() => import('../DashboardPages/CRUD/UDPs/UDPsPage'));  // <-- Asegúrate de que el path es correcto
+const SpecialitiesPageD = React.lazy(() => import('../DashboardPages/CRUD/Specialities/SpecialitiesPageD'));
+const TalleresPage = React.lazy(() => import('../DashboardPages/CRUD/Workshops/WorkshopsPageD'));
+const ElaborarLaboratoriosPage = React.lazy(() => import('../DashboardPages/CRUD/Labs/LaboratoriesPage'));
+const RolesManagement = React.lazy(() => import('../DashboardPages/Managing/Rolesmanagement'));
+const SolicitarSala = React.lazy(() => import('../DashboardPages/Requests/RoomRequestPage'));
+const SolicitarLaboratorio = React.lazy(() => import('../DashboardPages/Requests/LabRequestPage'));
 const Unauthorized = React.lazy(() => import('../pages/UnauthorizedPage')); // Página de no autorizado
 
-const OrderComponent = React.lazy(() => import('../DashboardPages/OrderComponent'));
-const UpdateUDPBalanceComponent = React.lazy(() => import('../DashboardPages/UpdateUDPBalanceComponent'));
+const OrderComponent = React.lazy(() => import('../DashboardPages/Requests/OrderComponent'));
+const UpdateUDPBalanceComponent = React.lazy(() => import('../DashboardPages/Managing/UpdateUDPBalanceComponent'));
 
 
 
-const OrdenesDePedido = React.lazy(() => import('../DashboardPages/ManageOrders'));
+const OrdenesDePedido = React.lazy(() => import('../DashboardPages/Managing/ManageOrders'));
 
 const AppRouter: React.FC = () => {
   return (

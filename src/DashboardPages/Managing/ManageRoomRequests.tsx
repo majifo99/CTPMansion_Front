@@ -1,8 +1,8 @@
 import React from 'react';
-import { useRoomsAndRequests } from '../hooks/useRooms'; // Importa el hook que maneja las solicitudes de sala
+import { useRoomsAndRequests } from '../../hooks/useRooms'; // Importa el hook que maneja las solicitudes de sala
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RequestStatus } from '../types/RoomRequestType'; // Importamos el enum para manejar el estado de las solicitudes
+import { RequestStatus } from '../../types/RoomRequestType'; // Importamos el enum para manejar el estado de las solicitudes
 
 const ManageRoomRequests: React.FC = () => {
   const {

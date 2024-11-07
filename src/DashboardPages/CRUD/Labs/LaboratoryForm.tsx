@@ -1,20 +1,19 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Workshop, Speciality } from '../types/Types';
+import { Laboratory } from '../../../types/LaboratoryRequestType';
 
-interface WorkshopFormProps {
-  workshop: Workshop | null;
-  specialities: Speciality[];
-  onSave: (workshop: Omit<Workshop, 'id'>) => void;
-  onCancel: () => void; // Prop para manejar el cierre del modal
+interface LaboratoryFormProps {
+  laboratory: Laboratory | null;
+  onSave: (laboratory: Laboratory) => void;
+  onCancel: () => void;
 }
 
-const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onSave, onCancel }) => {
-  const { control, handleSubmit, reset } = useForm<Omit<Workshop, 'id'>>({
-    defaultValues: workshop || { title: '', description: '', especiality: '', url_Image: '' },
+const LaboratoryForm: React.FC<LaboratoryFormProps> = ({ laboratory, onSave, onCancel }) => {
+  const { control, handleSubmit, reset } = useForm<Laboratory>({
+    defaultValues: laboratory || { id_Laboratory: 0, name: '', description: '', capacity: 0, url_Image: '' },
   });
 
-  const onSubmit = (data: Omit<Workshop, 'id'>) => {
+  const onSubmit = (data: Laboratory) => {
     onSave(data);
     reset();
   };
@@ -22,16 +21,16 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-gray-800">
       <div className="flex flex-col">
-        <label className="mb-2 font-semibold">Título</label>
+        <label className="mb-2 font-semibold">Nombre</label>
         <Controller
-          name="title"
+          name="name"
           control={control}
           render={({ field }) => (
             <input
               {...field}
               type="text"
               className="border border-gray-300 p-2 rounded-md"
-              placeholder="Ingrese el título"
+              placeholder="Ingrese el nombre"
               required
             />
           )}
@@ -55,29 +54,24 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
       </div>
 
       <div className="flex flex-col">
-        <label className="mb-2 font-semibold">Especialidad</label>
+        <label className="mb-2 font-semibold">Capacidad</label>
         <Controller
-          name="especiality"
+          name="capacity"
           control={control}
           render={({ field }) => (
-            <select
+            <input
               {...field}
+              type="number"
               className="border border-gray-300 p-2 rounded-md"
+              placeholder="Ingrese la capacidad"
               required
-            >
-              <option value="">Seleccione una especialidad</option>
-              {specialities.map((speciality) => (
-                <option key={speciality.id} value={speciality.title}>
-                  {speciality.title}
-                </option>
-              ))}
-            </select>
+            />
           )}
         />
       </div>
 
       <div className="flex flex-col">
-        <label className="mb-2 font-semibold">URL de Imagen</label>
+        <label className="mb-2 font-semibold">Imagen URL</label>
         <Controller
           name="url_Image"
           control={control}
@@ -116,4 +110,4 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
   );
 };
 
-export default WorkshopForm;
+export default LaboratoryForm;

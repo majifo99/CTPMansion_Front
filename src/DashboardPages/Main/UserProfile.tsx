@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useUserProfile } from '../hooks/useUserProfile';
-import { useAuth } from '../contexts/AuthContext';
+import { useUserProfile } from '../../hooks/useUserProfile';
+import { useAuth } from '../../contexts/AuthContext';
 import ClipLoader from 'react-spinners/ClipLoader';
 
 interface UserProfileFormData {

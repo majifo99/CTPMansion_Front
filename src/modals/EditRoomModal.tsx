@@ -1,5 +1,5 @@
 import React from 'react';
-import RoomForm from '../DashboardPages/RoomForm';
+import RoomForm from '../DashboardPages/CRUD/Rooms/RoomForm';
 import { Room } from '../types/Types';
 
 interface EditRoomModalProps {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useEvents } from '../hooks/useEvents';
-import EditEventModal from '../modals/EditEventModal';
-import DeleteEventModal from '../modals/DeleteEventModal';
-import { Event } from '../types/Types';
+import { useEvents } from '../../../hooks/useEvents';
+import EditEventModal from '../../../modals/EditEventModal';
+import DeleteEventModal from '../../../modals/DeleteEventModal';
+import { Event } from '../../../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

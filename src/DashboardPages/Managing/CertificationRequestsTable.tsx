@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { CertificationRequest } from '../types/Types'; // Define la estructura de las solicitudes
-import useCertificationRequests from '../hooks/useCertificationRequests'; // Hook personalizado
-import Modal from '../modals/ModalRequest'; // Modal personalizado
+import { CertificationRequest } from '../../types/Types'; // Define la estructura de las solicitudes
+import useCertificationRequests from '../../hooks/useCertificationRequests'; // Hook personalizado
+import Modal from '../../modals/ModalRequest'; // Modal personalizado
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Estilos de Toastify
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";

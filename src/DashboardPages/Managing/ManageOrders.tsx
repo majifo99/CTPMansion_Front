@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useOrders } from '../hooks/useOrders';
-import { RequestStatus, Order } from '../types/OrderTypes';
-import ProductDetailsModal from '../modals/ProductDetailsModal';
-import HistoryModal from '../modals/HistoryModal'; // Modal de historial
+import { useOrders } from '../../hooks/useOrders';
+import { RequestStatus, Order } from '../../types/OrderTypes';
+import ProductDetailsModal from '../../modals/ProductDetailsModal';
+import HistoryModal from '../../modals/HistoryModal'; // Modal de historial
 
 const ManageOrders: React.FC = () => {
   const { orders, loading, error, handleApproveOrder, handleRejectOrder } = useOrders(RequestStatus.Pending);

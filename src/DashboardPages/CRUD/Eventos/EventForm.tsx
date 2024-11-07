@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Event } from '../types/Types';
+import { Event } from '../../../types/Types';
 
 interface EventFormProps {
   event: Event | null;

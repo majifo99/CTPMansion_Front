@@ -1,11 +1,11 @@
 // src/DashboardPages/UDPsPage.tsx
 import React, { useState } from 'react';
-import { useUDPs } from '../hooks/useUDP';
-import EditUDPModal from '../modals/EditUDPModal';
+import { useUDPs } from '../../../hooks/useUDP';
+import EditUDPModal from '../../../modals/EditUDPModal';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { UDP } from '../types/Types';
+import { UDP } from '../../../types/Types';
 
 const UDPsPage: React.FC = () => {
   const { udps, loading, error, handleAddUDP, handleEditUDP, handleDeleteUDP } = useUDPs();

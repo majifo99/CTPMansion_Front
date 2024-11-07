@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useRoomsAndRequests } from '../hooks/useRooms';
-import EditRoomModal from '../modals/EditRoomModal';
-import DeleteEventModal from '../modals/DeleteEventModal';
-import { Room } from '../types/Types';
+import { useRoomsAndRequests } from '../../../hooks/useRooms';
+import EditRoomModal from '../../../modals/EditRoomModal';
+import DeleteEventModal from '../../../modals/DeleteEventModal';
+import { Room } from '../../../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

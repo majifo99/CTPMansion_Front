@@ -1,5 +1,5 @@
 import React from 'react';
-import RoomsPage from '../../DashboardPages/RoomsPage';
+import RoomsPage from '../../DashboardPages/CRUD/Rooms/RoomsPage';
 
 const ElaborarSalasPage: React.FC = () => {
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { addUserRole, getUserRoles, getUsers, removeUserRole } from '../services/userService';
+import { addUserRole, getUserRoles, getUsers, removeUserRole } from '../../services/userService';
 
 interface User {
   id: number;
@@ -30,36 +30,29 @@ const RolesManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<{ [key: number]: Role[] }>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
+    const fetchUsersAndRoles = async () => {
+      try {
+        const usersData = await getUsers();
+        setUsers(Array.isArray(usersData) ? usersData : []);
 
-      const fetchUsersAndRoles = async () => {
-        try {
-          const usersData = await getUsers();
-          setUsers(Array.isArray(usersData) ? usersData : []);
-
-          const rolesData: { [key: number]: Role[] } = {};
-          for (const user of usersData) {
-            const userRoles = await getUserRoles(user.id);
-            rolesData[user.id] = userRoles;
-          }
-          setRoles(rolesData);
-        } catch (error) {
-          console.error('Error al obtener usuarios o roles:', error);
-          setUsers([]);
+        const rolesData: { [key: number]: Role[] } = {};
+        for (const user of usersData) {
+          const userRoles = await getUserRoles(user.id);
+          rolesData[user.id] = userRoles;
         }
-      };
+        setRoles(rolesData);
+      } catch (error) {
+        console.error('Error al obtener usuarios o roles:', error);
+        setUsers([]);
+      }
+    };
 
-      fetchUsersAndRoles();
-    }
+    fetchUsersAndRoles();
   }, []);
 
   const handleRoleChange = async (userId: number, roleId: number, isAssigned: boolean) => {
-    if (!token) return;
     try {
       if (isAssigned) {
         await removeUserRole(userId, roleId);

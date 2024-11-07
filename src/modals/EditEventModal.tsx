@@ -1,5 +1,5 @@
 import React from 'react';
-import EventForm from '../DashboardPages/EventForm';
+import EventForm from '../DashboardPages/CRUD/Eventos/EventForm';
 import { Event } from '../types/Types';
 
 interface EditEventModalProps {

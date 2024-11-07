@@ -37,13 +37,14 @@ const Sidebar: React.FC = () => {
         {/* Logo y Nombre del Sidebar */}
         {!isSidebarCollapsed && <h2 className="text-xl font-bold mb-6 text-center">CTP La Mansión</h2>}
 
-        {/* Link to Dashboard Home */}
-        <Link to="/dashboard" className="flex items-center mb-4 p-2 rounded hover:bg-gray-700 justify-center">
+        
+        <nav>
+          {/* Link to Dashboard Home */}
+        <Link to="/dashboard" className="flex items-center mb-4 p-2 rounded hover:bg-gray-700 justify-left">
           <FaHome size={24} className="mr-2" />
           {!isSidebarCollapsed && <span className="text-lg">Inicio</span>}
         </Link>
 
-        <nav>
           {/* Solicitudes */}
           {hasRole(['RoomandLabRequester']) && (
             <div className="mb-4">

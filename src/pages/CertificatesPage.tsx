@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+//import { useState } from 'react';
 import { useCertificateRequest } from '../hooks/useCertificateRequest';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ReCAPTCHA from 'react-google-recaptcha';
+// import ReCAPTCHA from 'react-google-recaptcha'; // Comentado para desactivar CAPTCHA temporalmente
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,8 +22,6 @@ type FormData = {
     certificationType: string;
 };
 
-
-
 type CertificationName = {
     id: number;
     name: string;
@@ -32,20 +30,20 @@ type CertificationName = {
 const CertificatesPage = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
     const { deliveryMethods, certificationNames, isSubmitting, submitRequest } = useCertificateRequest();
-    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+    // const [captchaToken, setCaptchaToken] = useState<string | null>(null); // Comentado para desactivar CAPTCHA temporalmente
 
-    const onCaptchaChange = (token: string | null) => {
-        setCaptchaToken(token);
-    };
+    // const onCaptchaChange = (token: string | null) => { // Comentado para desactivar CAPTCHA temporalmente
+    //     setCaptchaToken(token);
+    // };
 
     const notifySuccess = () => toast.success('Solicitud realizada correctamente!');
     const notifyError = () => toast.error('Error al realizar la solicitud.');
 
     const onSubmit = (data: FormData) => {
-        if (!captchaToken) {
-            alert('Por favor completa el CAPTCHA');
-            return;
-        }
+        // if (!captchaToken) { // Comentado para desactivar CAPTCHA temporalmente
+        //     alert('Por favor completa el CAPTCHA');
+        //     return;
+        // }
 
         const requestData = {
             studentName: data.studentName,
@@ -121,7 +119,7 @@ const CertificatesPage = () => {
                             {renderInputField('email', 'Email', 'name@gmail.com', { required: 'El e-mail es requerido' }, 'email')}
                             {renderInputField('phoneNumber', 'Teléfono', '123456789', { required: 'El teléfono es requerido' }, 'tel')}
 
-                             <div>
+                            <div>
                                 <label htmlFor="deliveryMethod" className="block mb-2 text-sm font-medium text-gray-900">
                                     Método de Entrega
                                 </label>
@@ -142,6 +140,7 @@ const CertificatesPage = () => {
                                     </select>
                                 )}
                                 {errors.deliveryMethod && <p className="text-red-600 text-sm">{errors.deliveryMethod.message}</p>}
+                                *Los títulos solo se pueden solicitar físicos*
                             </div>
 
                             <div>
@@ -167,9 +166,10 @@ const CertificatesPage = () => {
                                 {errors.certificationType && <p className="text-red-600 text-sm">{errors.certificationType.message as string}</p>}
                             </div>
 
-                            <div className="mt-6">
+                            {/* CAPTCHA comentado para desactivar */}
+                            {/* <div className="mt-6">
                                 <ReCAPTCHA sitekey="6Le8YzwqAAAAACwDjRqrSHOh6vNwre9LH78Lj_Lw" onChange={onCaptchaChange} />
-                            </div>
+                            </div> */}
 
                             <div className="flex justify-end mt-6">
                                 <button

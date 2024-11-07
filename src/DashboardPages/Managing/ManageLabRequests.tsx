@@ -1,8 +1,8 @@
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RequestStatus } from '../types/LaboratoryRequestType';
-import { useLabsAndRequests } from '../hooks/useLabs';
+import { RequestStatus } from '../../types/LaboratoryRequestType';
+import { useLabsAndRequests } from '../../hooks/useLabs';
 
 const ManageLabRequests: React.FC = () => {
   const {
