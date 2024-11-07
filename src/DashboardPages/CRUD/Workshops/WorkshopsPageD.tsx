@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useWorkshops } from '../hooks/useWorkshops';
-import EditWorkshopModal from '../modals/EditWorkshopModal';
-import DeleteWorkshopModal from '../modals/DeleteEventModal';
-import { Workshop } from '../types/Types';
+import { useWorkshops } from '../../../hooks/useWorkshops';
+import EditWorkshopModal from '../../../modals/EditWorkshopModal';
+import DeleteWorkshopModal from '../../../modals/DeleteEventModal';
+import { Workshop } from '../../../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

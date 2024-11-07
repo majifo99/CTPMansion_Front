@@ -1,6 +1,7 @@
 import React from 'react';
-import WorkshopForm from '../DashboardPages/CRUD/WorkshopForm';
+
 import { Workshop, Speciality } from '../types/Types';
+import WorkshopForm from '../DashboardPages/CRUD/Workshops/WorkshopForm';
 
 interface EditWorkshopModalProps {
   show: boolean;
