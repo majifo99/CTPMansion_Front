@@ -12,7 +12,7 @@ const Navbar = () => {
   return (
     <div className="w-full min-h-[80px] flex justify-between items-center fixed top-0 z-50 bg-gradient-to-r from-darkBlue to-[#13152A] text-white shadow-md transition duration-300">
       <div className="flex items-center justify-between w-full px-4">
-        <img src="https://i.ibb.co/pdq8Pcj/La-Mansion.png" alt="Logo" className="h-12 w-12 object-cover" />
+        <img src="https://i.ibb.co/7YKJXpB/La-Mansion.webp" alt="Logo" className="h-12 w-12 object-cover" />
 
         {/* Desktop Menu */}
         <ul className="hidden sm:flex space-x-6 ml-auto">
@@ -70,14 +70,14 @@ const Navbar = () => {
             </Link>
           </li>
 
-          <li className="relative group">
+        {/*  <li className="relative group">
             <Link
               to="/login"
               className="relative pb-1 transition-all duration-300 hover:text-teal-400 after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 after:bg-teal-400 hover:after:w-full after:transition-all after:duration-300"
             >
               Admin
             </Link>
-          </li>
+          </li> */}
         </ul>
 
         {/* Social Icons & Mobile Menu Icon */}
@@ -124,9 +124,10 @@ const Navbar = () => {
           <li onClick={handleNav}>
             <Link to="/certificates">Solicitud de Certificados</Link>
           </li>
-          <li onClick={handleNav}>
+            {/* <li onClick={handleNav}>
+              </li> 
             <Link to="/login">Admin</Link>
-          </li>
+          </li>*/}
         </ul>
       </div>
     </div>

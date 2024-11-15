@@ -18,7 +18,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           {/* Sección de Información */}
           <div>
-            <img src="https://i.ibb.co/pdq8Pcj/La-Mansion.png" className="mr-5 h-10" alt="Logo de la Institución" />
+            <img src="https://i.ibb.co/7YKJXpB/La-Mansion.webp" className="mr-5 h-10" alt="Logo de la Institución" />
             <p className="mt-4 text-sm text-gray-300">
               Somos una institución dedicada a brindar la mejor educación para nuestros estudiantes, comprometidos con la excelencia y el crecimiento integral.
             </p>

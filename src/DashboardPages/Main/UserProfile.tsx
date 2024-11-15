@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { useAuth } from '../../contexts/AuthContext';
 import ClipLoader from 'react-spinners/ClipLoader';
+import UserRequestModal from '../../modals/UserRequestModal';
 
 interface UserProfileFormData {
   name: string;
@@ -13,15 +14,14 @@ interface UserProfileFormData {
 }
 
 const UserProfile: React.FC = () => {
-  const { user: authUser, token } = useAuth(); // Obtener el usuario autenticado y el token desde el contexto
+  const { user: authUser } = useAuth(); // No necesitamos token explícito porque usamos cookies
   const userId = authUser?.id;
 
-  const { user, loading, error, updateSuccess, handleUpdateUser } = useUserProfile(userId, token || undefined);
- // Pasar el ID del usuario y el token
+  const { user, loading, error, updateSuccess, handleUpdateUser } = useUserProfile(userId);
 
-  const [editMode, setEditMode] = useState(false); // Control del modo de edición
-  
-  // Configuración de react-hook-form
+  const [editMode, setEditMode] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); // Control del modal
+
   const {
     register,
     handleSubmit,
@@ -29,7 +29,6 @@ const UserProfile: React.FC = () => {
     formState: { errors },
   } = useForm<UserProfileFormData>();
 
-  // Rellenar los datos en el formulario cuando se carguen
   useEffect(() => {
     if (user) {
       reset({
@@ -42,39 +41,40 @@ const UserProfile: React.FC = () => {
     }
   }, [user, reset]);
 
-  // Manejar el envío del formulario para actualizar el perfil
   const onSubmit = async (data: UserProfileFormData) => {
     try {
       await handleUpdateUser(data);
-      setEditMode(false); // Desactivar el modo de edición después de guardar
+      setEditMode(false);
     } catch (error) {
       console.error('Error actualizando el perfil:', error);
     }
   };
 
-  const handleEditClick = () => {
-    setEditMode(true);
-  };
+  const handleEditClick = () => setEditMode(true);
 
   const handleCancelClick = () => {
-    reset(); // Restaurar los valores iniciales si se cancela la edición
+    reset();
     setEditMode(false);
   };
 
-  if (loading) {
-    return <ClipLoader color="#3b82f6" size={100} />;
-  }
-
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+  if (loading) return <ClipLoader color="#3b82f6" size={100} />;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="p-6 mx-auto bg-white rounded-xl shadow-md w-full max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-center">Perfil de Usuario</h1>
       {updateSuccess && <div className="text-green-500 mb-4">Perfil actualizado exitosamente.</div>}
 
-      {/* Mostrar campos en solo lectura si no está en modo edición */}
+      {/* Botón para abrir el modal */}
+      <button
+        onClick={() => setModalOpen(true)}
+        className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition duration-300 mb-6"
+      >
+        Ver Solicitudes
+      </button>
+
+      <UserRequestModal isOpen={modalOpen} onClose={() => setModalOpen(false)} userId={userId?.toString()} />
+
       {!editMode ? (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

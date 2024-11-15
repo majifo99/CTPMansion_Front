@@ -1,41 +1,40 @@
-import axios from 'axios';
 import Cookies from 'js-cookie';
-import { LabRequest } from '../types/LaboratoryRequestType';
-import { RoomRequest } from '../types/RoomRequestType';
-import { Order } from '../types/OrderTypes';
 
 const API_URL = 'https://ctplamansion.onrender.com/api';
 
-const apiClient = axios.create({
-  baseURL: API_URL,
-  withCredentials: true, // Enviar cookies con las solicitudes
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+export const fetchLaboratoryRequests = async (userId: string) => {
+  const token = Cookies.get('token');
+  if (!token) throw new Error('No se encontró el token de autenticación.');
 
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  const response = await fetch(`${API_URL}/LaboratoryRequest/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-export const fetchUserLabRequests = async (userId: number): Promise<LabRequest[]> => {
-  const response = await apiClient.get(`/LaboratoryRequest/user/${userId}`);
-  return response.data;
+  if (!response.ok) throw new Error('Error al obtener solicitudes de laboratorio');
+  return await response.json();
 };
 
-export const fetchUserRoomRequests = async (userId: number): Promise<RoomRequest[]> => {
-  const response = await apiClient.get(`/RoomRequest/user/${userId}`);
-  return response.data;
+export const fetchRoomRequests = async (userId: string) => {
+  const token = Cookies.get('token');
+  if (!token) throw new Error('No se encontró el token de autenticación.');
+
+  const response = await fetch(`${API_URL}/RoomRequest/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) throw new Error('Error al obtener solicitudes de salas');
+  return await response.json();
 };
 
-export const fetchUserOrders = async (userId: number): Promise<Order[]> => {
-  const response = await apiClient.get(`/Order/user/${userId}`);
-  return response.data;
+// Nueva función para obtener solicitudes de órdenes
+export const fetchOrderRequests = async (userId: string) => {
+  const token = Cookies.get('token');
+  if (!token) throw new Error('No se encontró el token de autenticación.');
+
+  const response = await fetch(`${API_URL}/Order/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) throw new Error('Error al obtener solicitudes de órdenes');
+  return await response.json();
 };
