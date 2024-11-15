@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 
 const API_URL = 'https://ctplamansion.onrender.com/api';
 
-export const fetchLaboratoryRequests = async (userId: string) => {
+export const fetchUserLabRequests = async (userId: string) => {
   const token = Cookies.get('token');
   if (!token) throw new Error('No se encontró el token de autenticación.');
 
@@ -14,7 +14,7 @@ export const fetchLaboratoryRequests = async (userId: string) => {
   return await response.json();
 };
 
-export const fetchRoomRequests = async (userId: string) => {
+export const fetchUserRoomRequests = async (userId: string) => {
   const token = Cookies.get('token');
   if (!token) throw new Error('No se encontró el token de autenticación.');
 
@@ -27,7 +27,7 @@ export const fetchRoomRequests = async (userId: string) => {
 };
 
 // Nueva función para obtener solicitudes de órdenes
-export const fetchOrderRequests = async (userId: string) => {
+export const fetchUserOrders = async (userId: string) => {
   const token = Cookies.get('token');
   if (!token) throw new Error('No se encontró el token de autenticación.');
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchLaboratoryRequests, fetchRoomRequests, fetchOrderRequests } from '../services/UserRequestService';
+import { fetchUserLabRequests, fetchUserRoomRequests, fetchUserOrders } from '../services/UserRequestService';
 import { LabRequest, RequestStatus } from '../types/LaboratoryRequestType';
 import { Order, OrderDetail } from '../types/OrderTypes';
 import { RoomRequest } from '../types/RoomRequestType';
@@ -24,13 +24,13 @@ const UserRequestModal: React.FC<UserRequestModalProps> = ({ isOpen, onClose, us
         setLoading(true);
         setError(null);
         try {
-          const labData = await fetchLaboratoryRequests(userId);
+          const labData = await fetchUserLabRequests(userId);
           setLaboratoryRequests(labData);
-
-          const roomData = await fetchRoomRequests(userId);
+         
+          const roomData = await fetchUserRoomRequests(userId);
           setRoomRequests(roomData);
 
-          const orderData = await fetchOrderRequests(userId);
+          const orderData = await fetchUserOrders(userId);
           setOrderRequests(orderData);
         } catch (error) {
           console.error("Error fetching requests:", error);

@@ -16,9 +16,9 @@ export const useUserRequests = (userId: number) => {
         try {
           setLoading(true);
           const [lab, room, ord] = await Promise.all([
-            fetchUserLabRequests(userId),
-            fetchUserRoomRequests(userId),
-            fetchUserOrders(userId),
+            fetchUserLabRequests(userId.toString()),
+            fetchUserRoomRequests(userId.toString()),
+            fetchUserOrders(userId.toString()),
           ]);
           setLabRequests(lab);
           setRoomRequests(room);
