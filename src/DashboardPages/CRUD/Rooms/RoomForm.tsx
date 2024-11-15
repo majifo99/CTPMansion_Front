@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Room } from '../types/Types';
+import { Room } from '../../../types/Types';
 
 interface RoomFormProps {
   room: Room | null;

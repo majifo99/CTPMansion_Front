@@ -1,11 +1,14 @@
 // src/services/productService.ts
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Importar js-cookie para manejar las cookies
 import { Product } from '../types/Product';
 
 const BASE_URL = 'https://ctplamansion.onrender.com/api/Product';
 
-const getToken = () => localStorage.getItem('token');
+// Helper function para obtener el JWT token desde cookies
+const getToken = () => Cookies.get('token');
 
+// Configuración de encabezados de autorización
 const authHeaders = () => {
   const token = getToken();
   return {
@@ -45,7 +48,7 @@ const productService = {
     const response = await axios.post<Product>(BASE_URL, product, authHeaders());
     return response.data;
   },
-  
+
   // PUT: Actualizar un producto por ID
   updateProduct: async (id: number, product: Omit<Product, 'id_Product'>): Promise<Product> => {
     const response = await axios.put<Product>(`${BASE_URL}/${id}`, product, authHeaders());

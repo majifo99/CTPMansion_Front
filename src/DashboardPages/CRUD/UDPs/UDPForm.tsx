@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { UDP } from '../types/Types';
+import { UDP } from '../../../types/Types';
 
 
 interface UDPFormProps {

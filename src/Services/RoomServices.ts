@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { Room } from '../types/Types'; // Definimos un tipo de 'Room' en Types para gestionar las salas
-import { RoomRequest } from '../types/RoomRequestType'; // Importamos RoomRequestType para gestionar las solicitudes de sala
+import Cookies from 'js-cookie'; // Importamos js-cookie para manejar las cookies
+import { Room } from '../types/Types';
+import { RoomRequest } from '../types/RoomRequestType';
 
 const API_URL = 'https://ctplamansion.onrender.com/api';
 
@@ -15,9 +16,9 @@ const apiClient = axios.create({
 // Interceptor para agregar el token JWT a cada solicitud
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Obtener el token desde localStorage
+    const token = Cookies.get('token'); // Obtener el token desde las cookies
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Agregar el token a la cabecera de autorización
+      config.headers.Authorization = `Bearer ${token}`; // Agregar el token en el encabezado de autorización
     }
     return config;
   },

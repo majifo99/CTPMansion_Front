@@ -1,23 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useRoomsAndRequests } from '../hooks/useRooms';
-import { useRoomRequest } from '../hooks/useRoomRequest';
+import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext'; // Importa el contexto de autenticación
+import { useRoomsAndRequests } from '../../hooks/useRooms';
+import { useRoomRequest } from '../../hooks/useRoomRequest';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { RoomRequest, RequestStatus } from '../types/RoomRequestType';
-import { Room } from '../types/Types';
+import { RoomRequest, RequestStatus } from '../../types/RoomRequestType';
+import { Room } from '../../types/Types';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import {jwtDecode} from 'jwt-decode';
 
 const localizer = momentLocalizer(moment);
 
-interface DecodedToken {
-  nameid: string;
-}
-
-// Define el tipo específico para el formulario
 type RoomRequestForm = {
   managerName: string;
   managerLastName: string;
@@ -32,79 +27,72 @@ type RoomRequestForm = {
   needs: string;
 };
 
-const getUserIdFromToken = (): string | null => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    const decodedToken = jwtDecode<DecodedToken>(token);
-    return decodedToken.nameid;
-  }
-  return null;
-};
-
 const RoomRequestCard: React.FC = () => {
   const { rooms, roomRequests, loading, error, fetchRoomRequestsData } = useRoomsAndRequests();
   const { register, handleSubmit, reset } = useForm<RoomRequestForm>();
   const { isSubmitting, submitRoomRequest } = useRoomRequest();
-  const [userId, setUserId] = useState<string | null>(null);
+  const { user } = useAuth(); // Obtiene el usuario actual desde el contexto de autenticación
   const [selectedRoomForRequest, setSelectedRoomForRequest] = useState<Room | null>(null);
   const [selectedRoomForCalendar, setSelectedRoomForCalendar] = useState<Room | null>(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-  useEffect(() => {
-    setUserId(getUserIdFromToken());
-  }, []);
 
   const notifySuccess = () => toast.success('Solicitud de sala enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
   const onSubmit = async (data: RoomRequestForm) => {
-    if (selectedRoomForRequest && userId) {
-      const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
-      const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
+    if (!selectedRoomForRequest) {
+      notifyError('No se pudo obtener la sala seleccionada.');
+      return;
+    }
 
-      // Validaciones
-      if (startDateTime.day() === 6 || startDateTime.day() === 0) {
-        notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
-        return;
-      }
-      if (startDateTime.isBefore(moment())) {
-        notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
-        return;
-      }
-      if (startDateTime.isSameOrAfter(endDateTime)) {
-        notifyError("La hora de inicio debe ser anterior a la hora de fin.");
-        return;
-      }
+    if (!user) {
+      notifyError('Usuario no autenticado');
+      return;
+    }
 
-      const duration = moment.duration(endDateTime.diff(startDateTime));
-      if (duration.asMinutes() < 30) {
-        notifyError("La duración mínima de la solicitud es de 30 minutos.");
-        return;
-      }
-      if (duration.asHours() > 8) {
-        notifyError("La duración máxima de la solicitud es de 8 horas.");
-        return;
-      }
+    const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
+    const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
 
-      // Construcción del payload de la solicitud
-      const requestPayload: Omit<RoomRequest, 'id_RoomRequest'> = {
-        ...data,
-        roomId: selectedRoomForRequest.id_Room,
-        userId,
-        status: RequestStatus.Pending
-      };
-      
-      try {
-        await submitRoomRequest(requestPayload);
-        reset();
-        notifySuccess();
-        setSelectedRoomForRequest(null);
-        fetchRoomRequestsData();
-      } catch (error) {
-        notifyError('Error al enviar la solicitud.');
-      }
-    } else {
-      notifyError('No se pudo obtener el usuario o la sala seleccionada.');
+    // Validaciones
+    if (startDateTime.day() === 6 || startDateTime.day() === 0) {
+      notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
+      return;
+    }
+    if (startDateTime.isBefore(moment())) {
+      notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
+      return;
+    }
+    if (startDateTime.isSameOrAfter(endDateTime)) {
+      notifyError("La hora de inicio debe ser anterior a la hora de fin.");
+      return;
+    }
+
+    const duration = moment.duration(endDateTime.diff(startDateTime));
+    if (duration.asMinutes() < 30) {
+      notifyError("La duración mínima de la solicitud es de 30 minutos.");
+      return;
+    }
+    if (duration.asHours() > 8) {
+      notifyError("La duración máxima de la solicitud es de 8 horas.");
+      return;
+    }
+
+    // Construcción del payload de la solicitud
+    const requestPayload: Omit<RoomRequest, 'id_RoomRequest'> = {
+      ...data,
+      roomId: selectedRoomForRequest.id_Room,
+      status: RequestStatus.Pending,
+      userId: user.id.toString(), // Obtiene el ID del usuario desde el contexto
+    };
+
+    try {
+      await submitRoomRequest(requestPayload);
+      reset();
+      notifySuccess();
+      setSelectedRoomForRequest(null);
+      fetchRoomRequestsData();
+    } catch (error) {
+      notifyError('Error al enviar la solicitud.');
     }
   };
 

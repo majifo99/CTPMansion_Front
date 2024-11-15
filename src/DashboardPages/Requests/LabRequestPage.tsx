@@ -1,109 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { useLabsAndRequests } from '../hooks/useLabs';
+import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext'; // Importa el contexto de autenticación
+import { useLabsAndRequests } from '../../hooks/useLabs';
 import { useForm, RegisterOptions } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useLabRequest } from '../hooks/useLabRequest';
-import { Laboratory } from '../types/Types';
-import { jwtDecode } from 'jwt-decode';
-import { LabRequest } from '../types/LaboratoryRequestType';
+import { useLabRequest } from '../../hooks/useLabRequest';
+import { Laboratory } from '../../types/Types';
+import { LabRequest } from '../../types/LaboratoryRequestType';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
-interface DecodedToken {
-  nameid: string;
-}
-
-const getUserIdFromToken = (): string | null => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    const decodedToken = jwtDecode<DecodedToken>(token);
-    return decodedToken.nameid;
-  }
-  return null;
-};
-
-type LabRequestFormField = Omit<LabRequest, 'id_LaboratoryRequest' | 'status'>;
+type LabRequestFormField = Omit<LabRequest, 'id_LaboratoryRequest' | 'status' | 'userId'>;
 
 const LabRequestPage: React.FC = () => {
   const { labs, labRequests, loading, error, fetchLabRequestsData } = useLabsAndRequests();
+  const { user } = useAuth(); // Obtiene el usuario actual desde el contexto de autenticación
   const [selectedLab, setSelectedLab] = useState<Laboratory | null>(null);
   const [activeModal, setActiveModal] = useState<"form" | "calendar" | null>(null);
   const { register, handleSubmit, reset } = useForm<LabRequestFormField>();
   const { isSubmitting, submitLabRequest } = useLabRequest();
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const userIdFromToken = getUserIdFromToken();
-    setUserId(userIdFromToken);
-  }, []);
 
   const notifySuccess = () => toast.success('Solicitud de laboratorio enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
 
   const onSubmit = async (data: LabRequestFormField) => {
-    if (selectedLab && userId) {
-      const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
-      const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
+    if (!selectedLab) {
+      notifyError('No se pudo obtener el laboratorio seleccionado.');
+      return;
+    }
 
-      // Validaciones de reglas de negocio
-      if (startDateTime.day() === 6 || startDateTime.day() === 0) {
-        notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
-        return;
-      }
-      if (startDateTime.isBefore(moment())) {
-        notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
-        return;
-      }
-      if (startDateTime.hour() < 6 || startDateTime.hour() >= 16 || (startDateTime.hour() === 16 && startDateTime.minute() > 20)) {
-        notifyError("La hora de inicio debe estar dentro del horario de laboratorio (6:00 am - 4:20 pm).");
-        return;
-      }
-      if (endDateTime.hour() < 6 || endDateTime.hour() >= 16 || (endDateTime.hour() === 16 && endDateTime.minute() > 20)) {
-        notifyError("La hora de fin debe estar dentro del horario de laboratorio (6:00 am - 4:20 pm).");
-        return;
-      }
-      if (startDateTime.isSameOrAfter(endDateTime)) {
-        notifyError("La hora de inicio debe ser anterior a la hora de fin.");
-        return;
-      }
-      const duration = moment.duration(endDateTime.diff(startDateTime));
-      if (duration.asMinutes() < 30) {
-        notifyError("La duración mínima de la solicitud es de 30 minutos.");
-        return;
-      }
-      if (duration.asHours() > 8) {
-        notifyError("La duración máxima de la solicitud es de 8 horas.");
-        return;
-      }
+    if (!user) {
+      notifyError('Usuario no autenticado');
+      return;
+    }
 
-      const labRequest: LabRequest = {
-        ...data,
-        id_LaboratoryRequest: 0,
-        userId: userId,
-        laboratoryId: selectedLab.id_Laboratory,
-        status: 0,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        startTime: data.startTime,
-        endTime: data.endTime
-      };
+    const startDateTime = moment(`${data.startDate} ${data.startTime}`, "YYYY-MM-DD HH:mm");
+    const endDateTime = moment(`${data.endDate} ${data.endTime}`, "YYYY-MM-DD HH:mm");
 
-      try {
-        await submitLabRequest(labRequest);
-        reset();
-        notifySuccess();
-        setSelectedLab(null);
-        setActiveModal(null); // Cierra el formulario después de enviar
-        fetchLabRequestsData();
-      } catch {
-        notifyError('Error al enviar la solicitud.');
-      }
-    } else {
-      notifyError('No se pudo obtener el usuario o el laboratorio seleccionado.');
+    // Validaciones de reglas de negocio
+    if (startDateTime.day() === 6 || startDateTime.day() === 0) {
+      notifyError("No se permiten reservas los fines de semana (sábado y domingo).");
+      return;
+    }
+    if (startDateTime.isBefore(moment())) {
+      notifyError("La fecha de inicio no puede ser anterior a la fecha actual.");
+      return;
+    }
+    if (startDateTime.hour() < 6 || startDateTime.hour() >= 16 || (startDateTime.hour() === 16 && startDateTime.minute() > 20)) {
+      notifyError("La hora de inicio debe estar dentro del horario de laboratorio (6:00 am - 4:20 pm).");
+      return;
+    }
+    if (endDateTime.hour() < 6 || endDateTime.hour() >= 16 || (endDateTime.hour() === 16 && endDateTime.minute() > 20)) {
+      notifyError("La hora de fin debe estar dentro del horario de laboratorio (6:00 am - 4:20 pm).");
+      return;
+    }
+    if (startDateTime.isSameOrAfter(endDateTime)) {
+      notifyError("La hora de inicio debe ser anterior a la hora de fin.");
+      return;
+    }
+
+    const duration = moment.duration(endDateTime.diff(startDateTime));
+    if (duration.asMinutes() < 30) {
+      notifyError("La duración mínima de la solicitud es de 30 minutos.");
+      return;
+    }
+    if (duration.asHours() > 8) {
+      notifyError("La duración máxima de la solicitud es de 8 horas.");
+      return;
+    }
+
+    const labRequest: LabRequest = {
+      ...data,
+      id_LaboratoryRequest: 0,
+      laboratoryId: selectedLab.id_Laboratory,
+      userId: user.id.toString(), // Obtiene el ID del usuario desde el contexto
+      status: 0,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      startTime: data.startTime,
+      endTime: data.endTime
+    };
+
+    try {
+      await submitLabRequest(labRequest);
+      reset();
+      notifySuccess();
+      setSelectedLab(null);
+      setActiveModal(null); // Cierra el formulario después de enviar
+      fetchLabRequestsData();
+    } catch {
+      notifyError('Error al enviar la solicitud.');
     }
   };
 

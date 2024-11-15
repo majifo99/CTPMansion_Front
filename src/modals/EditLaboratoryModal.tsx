@@ -1,5 +1,5 @@
 import React from 'react';
-import LaboratoryForm from '../DashboardPages/LaboratoryForm';
+import LaboratoryForm from '../DashboardPages/CRUD/Labs/LaboratoryForm';
 import { Laboratory } from '../types/LaboratoryRequestType';
 
 interface EditLaboratoryModalProps {

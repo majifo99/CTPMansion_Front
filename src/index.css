@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Asegura que no haya desplazamiento horizontal */
+html, body {
+  overflow-x: hidden;
+}
+
 .sidebar {
   height: 100vh;
   overflow-y: auto;
@@ -13,7 +18,7 @@
   }
 
   body {
-    font-family: Arial, sans-serif; /* Cambia a Arial */
+    font-family: Arial, sans-serif;
   }
 
   li {
@@ -25,12 +30,12 @@
   }
 
   h1 {
-    font-family: Arial, sans-serif; /* Cambia a Arial */
+    font-family: Arial, sans-serif;
   }
 }
 
 h2 {
-  font-family: Arial, sans-serif; /* Cambia a Arial */
+  font-family: Arial, sans-serif;
   font-style: italic;
   color: #34436B;
   font-weight: 700;
@@ -39,21 +44,3 @@ h2 {
   padding: 0 20px;
 }
 
-h2::before,
-h2::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 1px;
-  width: 30px;
-  background: #13152A;
-}
-
-h2::before {
-  left: -40px;
-}
-
-h2::after {
-  right: -40px;
-}

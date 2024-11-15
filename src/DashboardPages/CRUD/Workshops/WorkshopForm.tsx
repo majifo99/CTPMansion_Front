@@ -1,26 +1,26 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Speciality } from '../types/Types';
+import { Workshop, Speciality } from '../../../types/Types';
 
-interface SpecialityFormProps {
-  speciality: Speciality | null;
-  onSave: (speciality: Speciality) => void;
-  onCancel: () => void; // Añade onCancel como prop para cerrar el modal
+interface WorkshopFormProps {
+  workshop: Workshop | null;
+  specialities: Speciality[];
+  onSave: (workshop: Omit<Workshop, 'id'>) => void;
+  onCancel: () => void; // Prop para manejar el cierre del modal
 }
 
-const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onCancel }) => {
-  const { control, handleSubmit, reset } = useForm<Speciality>({
-    defaultValues: speciality || { id: 0, title: '', description: '', url_Image: '' },
+const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onSave, onCancel }) => {
+  const { control, handleSubmit, reset } = useForm<Omit<Workshop, 'id'>>({
+    defaultValues: workshop || { title: '', description: '', especiality: '', url_Image: '' },
   });
 
-  // Enviar el formulario y guardar la especialidad
-  const onSubmit = (data: Speciality) => {
+  const onSubmit = (data: Omit<Workshop, 'id'>) => {
     onSave(data);
     reset();
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-gray-800">
       <div className="flex flex-col">
         <label className="mb-2 font-semibold">Título</label>
         <Controller
@@ -30,7 +30,7 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
             <input
               {...field}
               type="text"
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese el título"
               required
             />
@@ -46,10 +46,32 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
           render={({ field }) => (
             <textarea
               {...field}
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese la descripción"
               required
             />
+          )}
+        />
+      </div>
+
+      <div className="flex flex-col">
+        <label className="mb-2 font-semibold">Especialidad</label>
+        <Controller
+          name="especiality"
+          control={control}
+          render={({ field }) => (
+            <select
+              {...field}
+              className="border border-gray-300 p-2 rounded-md"
+              required
+            >
+              <option value="">Seleccione una especialidad</option>
+              {specialities.map((speciality) => (
+                <option key={speciality.id} value={speciality.title}>
+                  {speciality.title}
+                </option>
+              ))}
+            </select>
           )}
         />
       </div>
@@ -63,7 +85,7 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
             <input
               {...field}
               type="text"
-              className="border border-gray-300 p-2 rounded-md text-gray-800"
+              className="border border-gray-300 p-2 rounded-md"
               placeholder="Ingrese la URL de la imagen"
               required
             />
@@ -77,13 +99,16 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
           type="button"
           onClick={() => {
             reset();
-            onCancel(); // Llama a onCancel para cerrar el modal
+            onCancel();
           }}
           className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
         >
           Cancelar
         </button>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+        >
           Guardar
         </button>
       </div>
@@ -91,4 +116,4 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
   );
 };
 
-export default SpecialityForm;
+export default WorkshopForm;

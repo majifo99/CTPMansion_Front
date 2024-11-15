@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { Laboratory } from "../types/Types";
 import { LabRequest } from "../types/LaboratoryRequestType";
 
@@ -11,9 +12,10 @@ const apiClient = axios.create({
   },
 });
 
+// Interceptor para agregar el token desde cookies
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = Cookies.get('token'); // Obtén el token de las cookies
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

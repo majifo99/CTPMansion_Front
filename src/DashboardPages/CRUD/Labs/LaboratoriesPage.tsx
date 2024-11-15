@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useLaboratories } from '../hooks/useLaboratories';
-import EditLaboratoryModal from '../modals/EditLaboratoryModal';
-import DeleteEventModal from '../modals/DeleteEventModal'; 
+import { useLaboratories } from '../../../hooks/useLaboratories';
+import EditLaboratoryModal from '../../../modals/EditLaboratoryModal';
+import DeleteEventModal from '../../../modals/DeleteEventModal'; 
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Laboratory } from '../types/Types';
+import { Laboratory } from '../../../types/Types';
 
 const LaboratoriesPage: React.FC = () => {
   const { laboratories, loading, error, handleAddLaboratory, handleEditLaboratory, handleDeleteLaboratory } = useLaboratories();

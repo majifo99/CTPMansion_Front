@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useOrders } from '../hooks/useOrders';
-import { Order, OrderDetail, Product } from '../types/Order';
-import { useAuth } from '../contexts/AuthContext';
+import { useOrders } from '../../hooks/useOrders';
+import { Order, OrderDetail, Product } from '../../types/Order';
+import { useAuth } from '../../contexts/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
