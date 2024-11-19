@@ -4,6 +4,7 @@ const Hero: React.FC = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
+    // Pre-carga la imagen antes de renderizarla como fondo
     const img = new Image();
     img.src = "https://i.ibb.co/1TLW24f/ctp-m.webp";
     img.onload = () => setImageLoaded(true);
@@ -11,14 +12,24 @@ const Hero: React.FC = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {/* Imagen de fondo */}
-      <div
-        className={`absolute top-0 left-0 w-full h-full bg-cover bg-center transition-opacity duration-700 ${
-          imageLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{ backgroundImage: `url("https://i.ibb.co/1TLW24f/ctp-m.webp")` }}
-        aria-hidden="true"
-      ></div>
+      {/* Placeholder mientras la imagen carga */}
+      {!imageLoaded && (
+        <div
+          className="absolute top-0 left-0 w-full h-full bg-gray-900"
+          aria-hidden="true"
+        ></div>
+      )}
+
+      {/* Imagen de fondo, mostrada sin efecto de transición */}
+      {imageLoaded && (
+        <div
+          className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
+          style={{
+            backgroundImage: `url("https://i.ibb.co/1TLW24f/ctp-m.webp")`,
+          }}
+          aria-hidden="true"
+        ></div>
+      )}
 
       {/* Capa de degradado */}
       <div className="absolute inset-0 bg-gradient-to-b from-darkBlue/70 via-darkBlue/50 to-darkBlue/70"></div>
