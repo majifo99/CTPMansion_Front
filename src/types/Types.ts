@@ -25,6 +25,7 @@ export interface OurService {
   id: number;
   title: string;
   icon: string; 
+  description:string;
 }
 
 

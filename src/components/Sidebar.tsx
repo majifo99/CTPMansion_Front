@@ -172,7 +172,7 @@ const Sidebar: React.FC = () => {
                 >
                   <div className="flex items-center">
                     <IoIosConstruct size={24} />
-                    {!isSidebarCollapsed && <span className="ml-2">Creación y elaboración</span>}
+                    {!isSidebarCollapsed && <span className="ml-2">Creación y Elaboración</span>}
                   </div>
                   {!isSidebarCollapsed && (isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />)}
                 </h3>
