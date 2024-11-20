@@ -1,4 +1,3 @@
-// components/LoginForm.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -14,19 +13,27 @@ const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Estado de carga
   const { isDarkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
 
   // Manejar el submit del formulario
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true); // Activar el estado de carga
+
     const loginSuccess = await login(email, password);
-    if (!loginSuccess) {
-      setErrorMessage('Credenciales inválidas. Por favor, intenta de nuevo.');
-      setIsModalOpen(true);
-    } else {
-      navigate('/dashboard'); // Redirigir al usuario en caso de éxito
-    }
+
+    setTimeout(() => {
+      if (!loginSuccess) {
+        setIsLoading(false); // Desactivar el estado de carga en caso de error
+        setErrorMessage('Credenciales inválidas. Por favor, intenta de nuevo.');
+        setIsModalOpen(true);
+      } else {
+        setIsLoading(false); // Desactivar el estado de carga antes de redirigir
+        navigate('/dashboard');
+      }
+    }, 2000); // Simulación de un retraso de 2 segundos
   };
 
   // Cerrar el modal de error
@@ -98,22 +105,12 @@ const LoginForm: React.FC = () => {
 
           <button
             type="submit"
-            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+            disabled={isLoading}
+            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'} ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Iniciar Sesión
+            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
-
-        <div className="text-center mt-4">
-          <button onClick={() => navigate('/register')} className="text-sm text-blue-500 hover:underline">
-            ¿No tienes una cuenta? Regístrate
-          </button>
-        </div>
-        <div className="text-center mt-4">
-          <button onClick={() => navigate('/request-password-reset')} className="text-sm text-blue-500 hover:underline">
-            ¿Olvidaste tu contraseña?
-          </button>
-        </div>
       </div>
 
       {/* Modal de error */}

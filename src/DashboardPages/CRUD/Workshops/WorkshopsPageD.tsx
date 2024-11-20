@@ -8,7 +8,18 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const WorkshopsPage: React.FC = () => {
-  const { workshops, specialities, loading, error, handleAddWorkshop, handleEditWorkshop, handleDeleteWorkshop } = useWorkshops();
+  const {
+    workshops,
+    specialities,
+    loading,
+    error,
+    handleAddWorkshop,
+    handleEditWorkshop,
+    handleDeleteWorkshop,
+  } = useWorkshops();
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5); // Número de talleres por página
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [editingWorkshop, setEditingWorkshop] = useState<Workshop | null>(null);
@@ -56,6 +67,14 @@ const WorkshopsPage: React.FC = () => {
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>{error}</p>;
 
+  // Cálculo de talleres para la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentWorkshops = workshops.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(workshops.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Gestión de Talleres</h1>
@@ -80,13 +99,17 @@ const WorkshopsPage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {workshops.map((workshop) => (
+          {currentWorkshops.map((workshop) => (
             <tr key={workshop.id}>
               <td className="border px-4 py-2">{workshop.title}</td>
               <td className="border px-4 py-2">{workshop.description}</td>
               <td className="border px-4 py-2">{workshop.especiality}</td>
               <td className="border px-4 py-2">
-                <img src={workshop.url_Image} alt={workshop.title} className="h-16 w-16 object-cover rounded-lg mx-auto" />
+                <img
+                  src={workshop.url_Image}
+                  alt={workshop.title}
+                  className="h-16 w-16 object-cover rounded-lg mx-auto"
+                />
               </td>
               <td className="border px-4 py-2 flex justify-center">
                 <button
@@ -107,11 +130,30 @@ const WorkshopsPage: React.FC = () => {
         </tbody>
       </table>
 
+      {/* Paginación */}
+      <div className="flex justify-center mt-6">
+        <nav className="inline-flex">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </nav>
+      </div>
+
       {/* Modal para crear/editar taller */}
       <EditWorkshopModal
         show={showEditModal}
         workshop={editingWorkshop}
-        specialities={specialities} 
+        specialities={specialities}
         onClose={handleCloseEditModal}
         onSave={handleSaveWorkshop}
       />
