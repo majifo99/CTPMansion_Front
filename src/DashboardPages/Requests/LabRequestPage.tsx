@@ -204,6 +204,12 @@ const LabRequestPage: React.FC = () => {
             key={lab.id_Laboratory}
             className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
           >
+            {/* Imagen del laboratorio */}
+            <img
+              src={lab.url_Image}
+              alt={lab.name}
+              className="w-full h-48 object-cover mb-4 rounded-lg"
+            />
             <h3 className="font-semibold text-lg mb-2">{lab.name}</h3>
             <p className="flex-grow">{lab.description}</p>
             <p className="mt-2 text-sm">Capacidad: {lab.capacity}</p>
