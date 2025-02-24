@@ -12,6 +12,11 @@ const EventsPage = () => {
     AOS.init({ duration: 1000, once: true });
   }, []);
 
+  // Ordenar los eventos por fecha más próxima
+  const sortedEvents = events.sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   if (loading) return <EventsSkeleton />;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
@@ -28,35 +33,41 @@ const EventsPage = () => {
             </h2>
           </div>
 
-          {/* Lista de eventos */}
-          <div className="flex flex-wrap -m-4">
-            {events.map((event) => (
+          {/* Línea de tiempo de eventos */}
+          <div className="relative border-l-2 border-gray-300 pl-6">
+            {sortedEvents.map((event, index) => (
               <div
                 key={event.id}
-                className="p-4 md:w-1/3"
+                className="mb-10 ml-6"
                 data-aos="fade-up"
+                data-aos-delay={`${index * 100}`}
               >
-                <div className="h-full bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-                  <img
-                    className="lg:h-48 md:h-36 w-full object-cover object-center"
-                    src={event.url_Image}
-                    alt={event.title}
-                  />
-                  <div className="p-6">
-                    <h3 className="title-font text-xl font-semibold text-gray-800 mb-2">
-                      {event.title}
-                    </h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      {new Date(event.date).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <p className="leading-relaxed text-gray-700">
-                      {event.description}
-                    </p>
+                <div className="absolute -left-4 w-8 h-8 rounded-full bg-gradient-to-r from-teal-500 to-blue-500 flex items-center justify-center shadow-lg">
+                  <span className="text-white font-semibold text-sm">
+                    {new Date(event.date).getDate()}
+                  </span>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    {event.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-4">
+                    {new Date(event.date).toLocaleDateString('es-ES', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  <p className="leading-relaxed text-gray-700">
+                    {event.description}
+                  </p>
+                  <div className="mt-4">
+                    <img
+                      className="w-full h-40 object-cover rounded-lg shadow-md"
+                      src={event.url_Image}
+                      alt={event.title}
+                    />
                   </div>
                 </div>
               </div>

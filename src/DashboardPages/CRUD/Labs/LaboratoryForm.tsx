@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Laboratory } from '../../../types/LaboratoryRequestType';
+import ImageUploader from '../../../components/ImageUploader'; // Asegúrate de importar correctamente el componente
 
 interface LaboratoryFormProps {
   laboratory: Laboratory | null;
@@ -9,13 +10,17 @@ interface LaboratoryFormProps {
 }
 
 const LaboratoryForm: React.FC<LaboratoryFormProps> = ({ laboratory, onSave, onCancel }) => {
-  const { control, handleSubmit, reset } = useForm<Laboratory>({
+  const { control, handleSubmit, reset, setValue } = useForm<Laboratory>({
     defaultValues: laboratory || { id_Laboratory: 0, name: '', description: '', capacity: 0, url_Image: '' },
   });
 
   const onSubmit = (data: Laboratory) => {
     onSave(data);
     reset();
+  };
+
+  const handleImageUpload = (url: string) => {
+    setValue('url_Image', url); // Actualiza la URL de la imagen en el formulario
   };
 
   return (
@@ -71,23 +76,22 @@ const LaboratoryForm: React.FC<LaboratoryFormProps> = ({ laboratory, onSave, onC
       </div>
 
       <div className="flex flex-col">
-        <label className="mb-2 font-semibold">Imagen URL</label>
+        {/* Componente ImageUploader */}
+        <ImageUploader onImageUpload={handleImageUpload} />
+        {/* Campo oculto para almacenar la URL de la imagen */}
         <Controller
           name="url_Image"
           control={control}
           render={({ field }) => (
             <input
               {...field}
-              type="text"
-              className="border border-gray-300 p-2 rounded-md"
-              placeholder="Ingrese la URL de la imagen"
+              type="hidden"
               required
             />
           )}
         />
       </div>
 
-      {/* Botones de Guardar y Cancelar alineados horizontalmente */}
       <div className="flex justify-end space-x-4 mt-4">
         <button
           type="button"

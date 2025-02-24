@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Workshop, Speciality } from '../../../types/Types';
+import ImageUploader from '../../../components/ImageUploader'; // Asegúrate de importar correctamente el componente
 
 interface WorkshopFormProps {
   workshop: Workshop | null;
@@ -10,9 +11,14 @@ interface WorkshopFormProps {
 }
 
 const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onSave, onCancel }) => {
-  const { control, handleSubmit, reset } = useForm<Omit<Workshop, 'id'>>({
+  const { control, handleSubmit, reset, setValue } = useForm<Omit<Workshop, 'id'>>({
     defaultValues: workshop || { title: '', description: '', especiality: '', url_Image: '' },
   });
+
+  // Maneja la carga de la imagen y actualiza el valor en el formulario
+  const handleImageUpload = (url: string) => {
+    setValue('url_Image', url); // Actualiza el valor de la URL de la imagen en el formulario
+  };
 
   const onSubmit = (data: Omit<Workshop, 'id'>) => {
     onSave(data);
@@ -77,18 +83,12 @@ const WorkshopForm: React.FC<WorkshopFormProps> = ({ workshop, specialities, onS
       </div>
 
       <div className="flex flex-col">
-        <label className="mb-2 font-semibold">URL de Imagen</label>
+        <ImageUploader onImageUpload={handleImageUpload} />
         <Controller
           name="url_Image"
           control={control}
           render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="border border-gray-300 p-2 rounded-md"
-              placeholder="Ingrese la URL de la imagen"
-              required
-            />
+            <input {...field} type="hidden" /> // Campo oculto para almacenar la URL de la imagen
           )}
         />
       </div>
