@@ -158,6 +158,12 @@ const Sidebar: React.FC = () => {
                       <FaCartArrowDown className="mr-2" />
                       Ordenes de pedido
                     </Link>
+
+                    <Link to="/dashboard/GraficoSalas" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                      <FaCartArrowDown className="mr-2" />
+                      Grafico de salas 
+                    </Link>
+
                   </div>
                 )}
               </div>
