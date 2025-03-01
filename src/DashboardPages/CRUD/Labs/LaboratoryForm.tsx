@@ -11,7 +11,7 @@ interface LaboratoryFormProps {
 
 const LaboratoryForm: React.FC<LaboratoryFormProps> = ({ laboratory, onSave, onCancel }) => {
   const { control, handleSubmit, reset, setValue } = useForm<Laboratory>({
-    defaultValues: laboratory || { id_Laboratory: 0, name: '', description: '', capacity: 0, url_Image: '' },
+    defaultValues: laboratory || { id_Laboratory: 0, name: '', description: '', capacity: 0, url_Image: '', isActive: false },
   });
 
   const onSubmit = (data: Laboratory) => {
@@ -90,6 +90,23 @@ const LaboratoryForm: React.FC<LaboratoryFormProps> = ({ laboratory, onSave, onC
             />
           )}
         />
+      </div>
+
+      <div className="flex items-center">
+        <Controller
+          name="isActive"
+          control={control}
+          render={({ field }) => (
+            <input
+              {...field}
+              type="checkbox"
+              className="mr-2"
+              checked={field.value}
+              onChange={(e) => field.onChange(e.target.checked)}
+            />
+          )}
+        />
+        <label className="font-semibold">Laboratorio Activo</label>
       </div>
 
       <div className="flex justify-end space-x-4 mt-4">

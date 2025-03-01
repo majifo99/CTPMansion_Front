@@ -1,4 +1,3 @@
-// src/Services/udpService.ts
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Importar js-cookie para manejar las cookies
 import { UDP } from '../types/Types';
@@ -16,11 +15,28 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Obtener todas las UDPs
+// Obtener todas las UDPs con información del usuario
 export const getUDPs = async (): Promise<UDP[]> => {
   try {
     const response = await api.get('/UDP');
-    return Array.isArray(response.data) ? response.data : [];
+    const udps = Array.isArray(response.data) ? response.data : [];
+
+    // Obtener información del usuario para cada UDP
+    const udpsWithUserInfo = await Promise.all(
+      udps.map(async (udp) => {
+        const userResponse = await api.get(`/User/${udp.userId}`);
+        return {
+          ...udp,
+          userName: userResponse.data.name,
+          userLastName: userResponse.data.lastName,
+          userLastName2: userResponse.data.lastName2,
+          userphoneNumber:userResponse.data.phoneNumber,
+          useremail:userResponse.data.email,
+        };
+      })
+    );
+
+    return udpsWithUserInfo;
   } catch (error) {
     console.error("Error al obtener UDPs:", error);
     return [];
@@ -31,7 +47,18 @@ export const getUDPs = async (): Promise<UDP[]> => {
 export const getUDPById = async (id: number): Promise<UDP | null> => {
   try {
     const response = await api.get(`/UDP/${id}`);
-    return response.data;
+    const udp = response.data;
+
+    // Obtener información del usuario asociado a la UDP
+    const userResponse = await api.get(`/User/${udp.userId}`);
+    return {
+      ...udp,
+      userName: userResponse.data.name,
+      userLastName: userResponse.data.lastName,
+      userLastName2: userResponse.data.lastName2,
+      userphoneNumber:userResponse.data.phoneNumber,
+      useremail:userResponse.data.email,
+    };
   } catch (error) {
     console.error(`Error al obtener UDP con ID ${id}:`, error);
     return null;

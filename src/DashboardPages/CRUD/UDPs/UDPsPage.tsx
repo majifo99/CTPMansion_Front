@@ -82,7 +82,7 @@ const UDPsPage: React.FC = () => {
                   <td className="border px-4 py-2">{udp.description}</td>
                   <td className="border px-4 py-2">{udp.area}</td>
                   <td className="border px-4 py-2">{udp.balance}</td>
-                  <td className="border px-4 py-2">{udp.userId}</td>
+                  <td className="border px-4 py-2">{`${udp.userName} ${udp.userLastName} ${udp.userLastName2}`}</td>
                   <td className="border px-4 py-2 flex justify-center">
                     <button
                       className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"

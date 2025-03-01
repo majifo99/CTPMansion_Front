@@ -165,7 +165,7 @@ const RoomRequestPage: React.FC = () => {
             <textarea
               id="needs"
               placeholder="Equipo de sonido, proyector, etc."
-              {...register('needs', { required: 'Las necesidades son obligatorias' })}
+              {...register('needs')}
               className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 h-24"
             ></textarea>
           </div>
@@ -196,46 +196,47 @@ const RoomRequestPage: React.FC = () => {
         {loading && <p>Cargando salas...</p>}
         {error && <p className="text-red-600">{error}</p>}
         {Array.isArray(rooms) &&
-          rooms.map((room) => (
-            <div
-              key={room.id_Room}
-              className="p-4 border border-gray-300 rounded-lg shadow-md flex flex-col bg-white hover:shadow-lg transition-shadow duration-200"
-            >
-              {/* Imagen de la sala */}
-              <img
-                src={room.url_Image}
-                alt={room.name}
-                className="w-full h-48 object-cover mb-4 rounded-lg"
-              />
-              <h3 className="font-semibold text-lg mb-2">{room.name}</h3>
-              <p className="flex-grow text-sm text-gray-700 mb-2">{room.description}</p>
-              <p className="mt-2 text-sm text-gray-600">
-                <strong>Capacidad:</strong> {room.capacity}
-              </p>
-              <div className="mt-4 flex flex-col space-y-2">
-                <button
-                  className="w-full text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => {
-                    setSelectedRoom(room);
-                    setActiveModal("calendar");
-                  }}
-                >
-                  Ver Disponibilidad
-                </button>
-                <button
-                  className="w-full text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-medium"
-                  onClick={() => {
-                    setSelectedRoom(room);
-                    setActiveModal("form");
-                  }}
-                >
-                  Solicitar Sala
-                </button>
+          rooms
+            .filter(room => room.isActive) // Filtra solo las salas activas
+            .map((room) => (
+              <div
+                key={room.id_Room}
+                className="p-4 border border-gray-300 rounded-lg shadow-md flex flex-col bg-white hover:shadow-lg transition-shadow duration-200"
+              >
+                {/* Imagen de la sala */}
+                <img
+                  src={room.url_Image}
+                  alt={room.name}
+                  className="w-full h-48 object-cover mb-4 rounded-lg"
+                />
+                <h3 className="font-semibold text-lg mb-2">{room.name}</h3>
+                <p className="flex-grow text-sm text-gray-700 mb-2">{room.description}</p>
+                <p className="mt-2 text-sm text-gray-600">
+                  <strong>Capacidad de asistentes:</strong> {room.capacity}
+                </p>
+                <div className="mt-4 flex flex-col space-y-2">
+                  <button
+                    className="w-full text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium"
+                    onClick={() => {
+                      setSelectedRoom(room);
+                      setActiveModal("calendar");
+                    }}
+                  >
+                    Ver Disponibilidad
+                  </button>
+                  <button
+                    className="w-full text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-medium"
+                    onClick={() => {
+                      setSelectedRoom(room);
+                      setActiveModal("form");
+                    }}
+                  >
+                    Reservar Sala
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
       </div>
-
 
       {activeModal === "calendar" && selectedRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

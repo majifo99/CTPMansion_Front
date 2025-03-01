@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { UDP } from '../types/Types';
+import { getUsers } from '../services/userService'; // Asume que tienes este servicio
+
+interface User {
+  id: number;
+  name: string;
+  lastName: string;
+  lastName2: string;
+}
 
 interface EditUDPModalProps {
   show: boolean;
@@ -15,6 +23,12 @@ const EditUDPModal: React.FC<EditUDPModalProps> = ({ show, udp, onClose, onSave 
   const [balance, setBalance] = useState(0);
   const [userId, setUserId] = useState(0);
 
+  // Estados para la búsqueda de usuarios
+  const [searchTerm, setSearchTerm] = useState('');
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   // Rellena los campos al editar o los limpia al crear una nueva UDP
   useEffect(() => {
     if (udp) {
@@ -23,14 +37,60 @@ const EditUDPModal: React.FC<EditUDPModalProps> = ({ show, udp, onClose, onSave 
       setArea(udp.area);
       setBalance(udp.balance);
       setUserId(udp.userId);
+
+      // Buscar el usuario seleccionado si estamos editando
+      if (udp.userId) {
+        const fetchSelectedUser = async () => {
+          const user = allUsers.find((u) => u.id === udp.userId);
+          if (user) {
+            setSelectedUser(user);
+            setSearchTerm(`${user.name} ${user.lastName} ${user.lastName2}`);
+          }
+        };
+        fetchSelectedUser();
+      }
     } else {
       setTitle('');
       setDescription('');
       setArea('');
       setBalance(0);
       setUserId(0);
+      setSelectedUser(null);
+      setSearchTerm('');
     }
-  }, [udp]);
+  }, [udp, allUsers]);
+
+  // Obtener todos los usuarios al cargar el componente
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await getUsers(); // Obtener todos los usuarios
+      setAllUsers(users);
+    };
+    fetchUsers();
+  }, []);
+
+  // Filtrar usuarios localmente cuando el término de búsqueda cambia
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = allUsers.filter(
+        (user) =>
+          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.lastName2.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    } else {
+      setFilteredUsers([]);
+    }
+  }, [searchTerm, allUsers]);
+
+  // Seleccionar un usuario de la lista filtrada
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user);
+    setUserId(user.id); // Actualizar el userId
+    setSearchTerm(`${user.name} ${user.lastName} ${user.lastName2}`); // Mostrar el nombre completo en el input
+    setFilteredUsers([]); // Limpiar la lista de resultados
+  };
 
   const handleSubmit = () => {
     const udpData: UDP = {
@@ -122,20 +182,34 @@ const EditUDPModal: React.FC<EditUDPModalProps> = ({ show, udp, onClose, onSave 
             />
           </div>
 
-          {/* Campo ID de Usuario */}
+          {/* Campo de búsqueda de usuario */}
           <div>
-            <label htmlFor="udp-userId" className="block font-semibold mb-1 text-gray-600">
-              ID de Usuario
+            <label htmlFor="udp-user" className="block font-semibold mb-1 text-gray-600">
+              Usuario
             </label>
-            <input
-              id="udp-userId"
-              type="number"
-              className="border border-gray-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200"
-              placeholder="Ingrese el ID del usuario"
-              value={userId}
-              onChange={(e) => setUserId(Number(e.target.value))}
-              required
-            />
+            <div className="relative">
+              <input
+                id="udp-user"
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border border-gray-300 rounded-md p-2 w-full focus:ring focus:ring-blue-200"
+                placeholder="Buscar usuario por nombre o apellidos"
+              />
+              {filteredUsers.length > 0 && (
+                <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-48 overflow-y-auto">
+                  {filteredUsers.map((user) => (
+                    <li
+                      key={user.id}
+                      onClick={() => handleUserSelect(user)}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      {`${user.name} ${user.lastName} ${user.lastName2}`}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           {/* Botones */}

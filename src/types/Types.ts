@@ -114,6 +114,7 @@ description: string;      // Description of the room
 capacity: number;         // Capacity of the room
 url_Image: string;        // URL for the room image
 isConferenceRoom: boolean; // Flag indicating if the room is a conference room
+isActive:boolean;
 roomRequests: any;  // Flag indicating if the room is a conference room
 }
 
@@ -133,4 +134,9 @@ export interface UDP {
   area: string;
   balance: number;
   userId: number;
+  userName?: string;
+  userLastName?: string;
+  userLastName2?: string;
+  useremail?: string;
+  userphoneNumber?: string;
 }

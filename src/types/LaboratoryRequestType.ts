@@ -28,5 +28,6 @@ export type Laboratory = {
   description: string;
   capacity: number;
   url_Image: string;
+  isActive:boolean;
 };
 
