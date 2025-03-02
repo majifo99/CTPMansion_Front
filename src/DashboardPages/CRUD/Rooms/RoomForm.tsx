@@ -11,7 +11,15 @@ interface RoomFormProps {
 
 const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
   const { control, handleSubmit, reset, setValue } = useForm<Room>({
-    defaultValues: room || { id_Room: 0, name: '', capacity: 0, description: '', url_Image: '', isConferenceRoom: false },
+    defaultValues: room || {
+      id_Room: 0,
+      name: '',
+      capacity: 0,
+      description: '',
+      url_Image: '',
+      isConferenceRoom: false,
+      isActive: true, // Valor por defecto para isActive
+    },
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,6 +110,25 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
         </label>
         <Controller
           name="isConferenceRoom"
+          control={control}
+          render={({ field }) => (
+            <input
+              type="checkbox"
+              checked={field.value}
+              onChange={(e) => field.onChange(e.target.checked)}
+              className="h-5 w-5"
+            />
+          )}
+        />
+      </div>
+
+      {/* Nuevo campo para activar/desactivar la sala */}
+      <div className="flex items-center space-x-4">
+        <label htmlFor="isActive" className="font-semibold">
+          Sala Activa
+        </label>
+        <Controller
+          name="isActive"
           control={control}
           render={({ field }) => (
             <input

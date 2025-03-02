@@ -77,7 +77,7 @@ const LabRequestPage: React.FC = () => {
       id_LaboratoryRequest: 0,
       laboratoryId: selectedLab.id_Laboratory,
       userId: user.id.toString(), // Obtiene el ID del usuario desde el contexto
-      status: 0,
+      status: RequestStatus.Pending,
       startDate: data.startDate,
       endDate: data.endDate,
       startTime: data.startTime,
@@ -169,7 +169,7 @@ const LabRequestPage: React.FC = () => {
             <textarea
               id="needs"
               placeholder="Equipo de sonido, proyector, etc."
-              {...register('needs', { required: 'Las necesidades son obligatorias' })}
+              {...register('needs')}
               className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 h-24"
             ></textarea>
           </div>
@@ -187,7 +187,7 @@ const LabRequestPage: React.FC = () => {
     </div>
   );
 
-  const events = labRequests.filter(request => request.laboratoryId === selectedLab?.id_Laboratory && request.status === 1).map(request => ({
+  const events = labRequests.filter(request => request.laboratoryId === selectedLab?.id_Laboratory && request.status === RequestStatus.Approved).map(request => ({
     title: `Reservado: ${request.managerName}`,
     start: moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate(),
     end: moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate(),
@@ -199,40 +199,42 @@ const LabRequestPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading && <p>Cargando laboratorios...</p>}
         {error && <p className="text-red-600">{error}</p>}
-        {Array.isArray(labs) && labs.map(lab => (
-          <div
-            key={lab.id_Laboratory}
-            className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
-          >
-            {/* Imagen del laboratorio */}
-            <img
-              src={lab.url_Image}
-              alt={lab.name}
-              className="w-full h-48 object-cover mb-4 rounded-lg"
-            />
-            <h3 className="font-semibold text-lg mb-2">{lab.name}</h3>
-            <p className="flex-grow">{lab.description}</p>
-            <p className="mt-2 text-sm">Capacidad: {lab.capacity}</p>
-            <button
-              className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
-              onClick={() => {
-                setSelectedLab(lab);
-                setActiveModal("calendar");
-              }}
+        {Array.isArray(labs) && labs
+          .filter(lab => lab.isActive) // Filtra solo los laboratorios activos
+          .map(lab => (
+            <div
+              key={lab.id_Laboratory}
+              className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
             >
-              Ver Disponibilidad
-            </button>
-            <button
-              className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800"
-              onClick={() => {
-                setSelectedLab(lab);
-                setActiveModal("form");
-              }}
-            >
-              Reservar Laboratorio
-            </button>
-          </div>
-        ))}
+              {/* Imagen del laboratorio */}
+              <img
+                src={lab.url_Image}
+                alt={lab.name}
+                className="w-full h-48 object-cover mb-4 rounded-lg"
+              />
+              <h3 className="font-semibold text-lg mb-2">{lab.name}</h3>
+              <p className="flex-grow text-sm text-gray-700 mb-2">{lab.description}</p>
+              <p className="mt-2 text-sm text-gray-600">Capacidad de asistentes: {lab.capacity}</p>
+              <button
+                className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
+                onClick={() => {
+                  setSelectedLab(lab);
+                  setActiveModal("calendar");
+                }}
+              >
+                Ver Disponibilidad
+              </button>
+              <button
+                className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800"
+                onClick={() => {
+                  setSelectedLab(lab);
+                  setActiveModal("form");
+                }}
+              >
+                Reservar Laboratorio
+              </button>
+            </div>
+          ))}
       </div>
 
       {activeModal === "calendar" && selectedLab && (

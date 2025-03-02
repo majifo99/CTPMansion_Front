@@ -1,9 +1,7 @@
 import { useForm } from 'react-hook-form';
-//import { useState } from 'react';
 import { useCertificateRequest } from '../hooks/useCertificateRequest';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-// import ReCAPTCHA from 'react-google-recaptcha'; // Comentado para desactivar CAPTCHA temporalmente
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -30,21 +28,11 @@ type CertificationName = {
 const CertificatesPage = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
     const { deliveryMethods, certificationNames, isSubmitting, submitRequest } = useCertificateRequest();
-    // const [captchaToken, setCaptchaToken] = useState<string | null>(null); // Comentado para desactivar CAPTCHA temporalmente
-
-    // const onCaptchaChange = (token: string | null) => { // Comentado para desactivar CAPTCHA temporalmente
-    //     setCaptchaToken(token);
-    // };
 
     const notifySuccess = () => toast.success('Solicitud realizada correctamente!');
     const notifyError = () => toast.error('Error al realizar la solicitud.');
 
     const onSubmit = (data: FormData) => {
-        // if (!captchaToken) { // Comentado para desactivar CAPTCHA temporalmente
-        //     alert('Por favor completa el CAPTCHA');
-        //     return;
-        // }
-
         const requestData = {
             studentName: data.studentName,
             studentLastName1: data.studentLastName1,
@@ -108,13 +96,14 @@ const CertificatesPage = () => {
                                 {renderInputField('studentLastName1', 'Primer Apellido del Estudiante', 'Pérez', { required: 'El primer apellido es requerido' })}
                                 {renderInputField('studentLastName2', 'Segundo Apellido del Estudiante', 'Rodríguez', { required: 'El segundo apellido es requerido' })}
                             </div>
-
+                            <p className="text-sm text-gray-500">*Si eres estudiante egresado, no es necesario rellenar los datos del encargado.*</p>
                             <div className="grid grid-cols-2 gap-6">
-                                {renderInputField('EncargadoId', 'Cédula del Encargado', '102340567', { required: 'La cédula del encargado es requerida' })}
-                                {renderInputField('guardianName', 'Nombre del Encargado', 'Luis', { required: 'El nombre del encargado es requerido' })}
-                                {renderInputField('guardianLastName1', 'Primer Apellido del Encargado', 'Pérez', { required: 'El primer apellido es requerido' })}
-                                {renderInputField('guardianLastName2', 'Segundo Apellido del Encargado', 'Rodríguez', { required: 'El segundo apellido es requerido' })}
+                                {renderInputField('EncargadoId', 'Cédula del Encargado', '102340567', {})}
+                                {renderInputField('guardianName', 'Nombre del Encargado', 'Luis', {})}
+                                {renderInputField('guardianLastName1', 'Primer Apellido del Encargado', 'Pérez', {})}
+                                {renderInputField('guardianLastName2', 'Segundo Apellido del Encargado', 'Rodríguez', {})}
                             </div>
+                           
 
                             {renderInputField('email', 'Email', 'name@gmail.com', { required: 'El e-mail es requerido' }, 'email')}
                             {renderInputField('phoneNumber', 'Teléfono', '123456789', { required: 'El teléfono es requerido' }, 'tel')}
@@ -140,7 +129,6 @@ const CertificatesPage = () => {
                                     </select>
                                 )}
                                 {errors.deliveryMethod && <p className="text-red-600 text-sm">{errors.deliveryMethod.message}</p>}
-                                *Los títulos solo se pueden solicitar físicos*
                             </div>
 
                             <div>
@@ -164,12 +152,8 @@ const CertificatesPage = () => {
                                     </select>
                                 )}
                                 {errors.certificationType && <p className="text-red-600 text-sm">{errors.certificationType.message as string}</p>}
+                                <p className="text-sm text-gray-500">*Los títulos solo pueden ser solicitados de manera física.*</p>
                             </div>
-
-                            {/* CAPTCHA comentado para desactivar */}
-                            {/* <div className="mt-6">
-                                <ReCAPTCHA sitekey="6Le8YzwqAAAAACwDjRqrSHOh6vNwre9LH78Lj_Lw" onChange={onCaptchaChange} />
-                            </div> */}
 
                             <div className="flex justify-end mt-6">
                                 <button

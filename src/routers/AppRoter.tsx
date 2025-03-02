@@ -7,6 +7,7 @@ import UserProfile from '../DashboardPages/Main/UserProfile';
 import DashboardHome from '../DashboardPages/Main/DashboardHome';
 import AcceptedRejectedChart from '../DashboardPages/AcceptedRejectedChart';
 import NotFound from '../pages/NotFound'; // Importar la página 404
+import UDPsPages from '../components/UDPsPages';
 
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -61,6 +62,8 @@ const AppRouter: React.FC = () => {
             <Route path="/request-password-reset" element={<RequestPasswordReset />} />
             <Route path="/reset-password" element={<ResetPasswordForm />} />
             <Route path="/login" element={<LoginForm />} />
+            {/* Nueva ruta para UDPs */}
+            <Route path="/udps" element={<UDPsPages />} />
 
             {/* Ruta de No Autorizado */}
             <Route path="/unauthorized" element={<Unauthorized />} />
