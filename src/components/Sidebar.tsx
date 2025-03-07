@@ -82,7 +82,7 @@ const Sidebar: React.FC = () => {
 
           <nav>
             {/* Link al Dashboard principal */}
-            <Link to="/dashboard" className="flex items-center mb-4 p-2 rounded hover:bg-gray-700">
+            <Link to="/dashboard" className="flex items-center mb-4  rounded hover:bg-gray-700">
               <FaHome size={24} className="mr-2" />
               {!isSidebarCollapsed && <span className="text-lg">Inicio</span>}
             </Link>
@@ -95,7 +95,7 @@ const Sidebar: React.FC = () => {
                   onClick={() => setIsSolicitudesOpen(!isSolicitudesOpen)}
                 >
                   <div className="flex items-center">
-                    <MdRoom size={24} />
+                    <MdRoom size={24} className="mr-2" />
                     {!isSidebarCollapsed && <span className="ml-2">Solicitudes</span>}
                   </div>
                   {!isSidebarCollapsed && (isSolicitudesOpen ? <FaChevronUp /> : <FaChevronDown />)}
@@ -127,7 +127,7 @@ const Sidebar: React.FC = () => {
                   onClick={() => setIsGestionesOpen(!isGestionesOpen)}
                 >
                   <div className="flex items-center">
-                    <FiUsers size={24} />
+                    <FiUsers size={24} className="mr-2" />
                     {!isSidebarCollapsed && <span className="ml-2">Gestiones</span>}
                   </div>
                   {!isSidebarCollapsed && (isGestionesOpen ? <FaChevronUp /> : <FaChevronDown />)}
@@ -177,7 +177,7 @@ const Sidebar: React.FC = () => {
                   onClick={() => setIsCreacionElaboracionOpen(!isCreacionElaboracionOpen)}
                 >
                   <div className="flex items-center">
-                    <IoIosConstruct size={24} />
+                    <IoIosConstruct size={24} className="mr-2" />
                     {!isSidebarCollapsed && <span className="ml-2">Creación y Elaboración</span>}
                   </div>
                   {!isSidebarCollapsed && (isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />)}
@@ -218,7 +218,7 @@ const Sidebar: React.FC = () => {
         {/* Parte inferior de la Sidebar - Menú de perfil */}
         <div className="relative mt-auto" ref={menuRef}>
           <button
-            className="flex items-center cursor-pointer focus:outline-none w-full text-left p-2 hover:bg-gray-700 rounded"
+            className="flex items-center cursor-pointer focus:outline-none w-full text-left  hover:bg-gray-700 rounded"
             onClick={() => setIsProfileMenuOpen((prev) => !prev)}
             aria-haspopup="true"
             aria-expanded={isProfileMenuOpen}

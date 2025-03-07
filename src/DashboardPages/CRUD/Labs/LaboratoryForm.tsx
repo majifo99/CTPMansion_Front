@@ -98,11 +98,10 @@ const LaboratoryForm: React.FC<LaboratoryFormProps> = ({ laboratory, onSave, onC
           control={control}
           render={({ field }) => (
             <input
-              {...field}
               type="checkbox"
-              className="mr-2"
               checked={field.value}
               onChange={(e) => field.onChange(e.target.checked)}
+              className="h-5 w-5"
             />
           )}
         />

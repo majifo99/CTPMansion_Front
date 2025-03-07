@@ -2,7 +2,7 @@ import { FaFacebookF } from 'react-icons/fa';
 import useLocation from '../hooks/useLocation'; // Ajusta la ruta según sea necesario
 
 const Footer = () => {
-  const { location, loading, error } = useLocation();
+  const { location } = useLocation();
 
   // Valores predeterminados en caso de que no haya datos
   const defaultLocation = {

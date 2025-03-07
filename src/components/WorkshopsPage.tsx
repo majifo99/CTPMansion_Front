@@ -45,10 +45,9 @@ const TalleresExploratoriosPage = () => {
         <div className="container mx-auto px-5">
           {/* Título llamativo y único */}
           <div className="relative text-center mb-12">
-            <h2 className="relative inline-block text-5xl font-extrabold text-gray-900">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-pulse">
-                Talleres Exploratorios
-              </span>
+          <h2 className="relative text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]">
+            Talleres Exploratorios
+            <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></span>
             </h2>
             <div className="absolute inset-0 flex justify-center">
               <div className="rounded-full w-32 h-32 bg-gradient-to-r from-blue-200 to-purple-200 opacity-30 blur-2xl -z-10"></div>
