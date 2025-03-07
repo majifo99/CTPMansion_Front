@@ -27,7 +27,7 @@ const EditUDPModal: React.FC<EditUDPModalProps> = ({ show, udp, onClose, onSave 
   const [searchTerm, setSearchTerm] = useState('');
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [, setSelectedUser] = useState<User | null>(null);
 
   // Rellena los campos al editar o los limpia al crear una nueva UDP
   useEffect(() => {

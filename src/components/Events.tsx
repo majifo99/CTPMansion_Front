@@ -31,9 +31,9 @@ const EventsPage = () => {
         <div className="container mx-auto px-5 py-24">
           {/* Título con estilo formal y color en degradado */}
           <div className="flex justify-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600 text-center relative inline-block">
+            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]">
               Próximos Eventos
-              <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-teal-500 to-blue-500 rounded-md"></span>
+              <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></span>
             </h2>
           </div>
 

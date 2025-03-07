@@ -24,7 +24,7 @@ const UDPForm: React.FC<UDPFormProps> = ({ udp, onSave, onCancel }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [allUsers, setAllUsers] = useState<User[]>([]); // Todos los usuarios
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // Usuarios filtrados
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [, setSelectedUser] = useState<User | null>(null);
 
   // Obtener todos los usuarios al cargar el componente
   useEffect(() => {

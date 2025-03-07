@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useLabRequest } from '../../hooks/useLabRequest';
 import { Laboratory } from '../../types/Types';
-import { LabRequest } from '../../types/LaboratoryRequestType';
+import { LabRequest, RequestStatus } from '../../types/LaboratoryRequestType';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';

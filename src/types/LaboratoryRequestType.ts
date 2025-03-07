@@ -20,6 +20,9 @@ export interface LabRequest {
   endTime: string;                   // Hora de fin
   userId: string;                    // ID del usuario que realiza la solicitud
   status?: RequestStatus;            // Estado de la solicitud (Pendiente, Aprobada, Rechazada)
+  labName?: string;                  // Nombre del laboratorio (propiedad opcional)
+  labIsActive?: boolean;             // Estado del laboratorio (propiedad opcional)
+  labCapacity?: number;              // Capacidad del laboratorio (propiedad opcional)
 }
 
 export type Laboratory = {
