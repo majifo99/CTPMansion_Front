@@ -10,6 +10,7 @@ import {
   FaCartArrowDown,
   FaUserCircle,
   FaCaretDown,
+  FaImage,
 } from 'react-icons/fa';
 import { MdRoom, MdScience } from 'react-icons/md';
 import { GiTeacher, GiTakeMyMoney } from 'react-icons/gi';
@@ -207,6 +208,11 @@ const Sidebar: React.FC = () => {
                     <Link to="/dashboard/elaborar-laboratorios" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
                       <FaPlus className="mr-2" />
                       Elaborar laboratorios
+                    </Link>
+                    {/* Nuevo enlace a la gestión de galería */}
+                    <Link to="/dashboard/galeria" className="flex items-center mb-2 hover:bg-gray-700 p-2 rounded">
+                      <FaImage className="mr-2" />
+                      Galería
                     </Link>
                   </div>
                 )}

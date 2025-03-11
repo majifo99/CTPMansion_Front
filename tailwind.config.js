@@ -1,3 +1,4 @@
+//\tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -32,18 +33,40 @@ module.exports = {
           '50%': { opacity: 1 },
           '100%': { opacity: 0.6 },
         },
+        scrollLeft: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(calc(-33.33%))' },
+        },
+        scrollRight: {
+          '0%': { transform: 'translateX(calc(-33.33%))' },
+          '100%': { transform: 'translateX(0)' },
+        },
       },
       animation: {
         fadeInUp: 'fadeInUp 0.8s ease-out forwards',
         spinSlow: 'spinSlow 3s linear infinite',
         pulseOpacity: 'pulseOpacity 2s ease-in-out infinite',
+        'scroll-left': 'scrollLeft 60s linear infinite',
+        'scroll-right': 'scrollRight 60s linear infinite',
+        'scroll-left-slow': 'scrollLeft 180s linear infinite',
+        'scroll-right-slow': 'scrollRight 180s linear infinite',
       },
       rotate: {
-        '3': '3deg',  // Rotación para efectos hover
+        '3': '3deg',
         '6': '6deg',
         '-3': '-3deg',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.animate-transition': {
+          'animation-timing-function': 'ease-in-out',
+          'animation-duration': '1s',
+        },
+      };
+      addUtilities(newUtilities);
+    },
+  ],
 };

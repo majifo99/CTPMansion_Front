@@ -140,3 +140,17 @@ export interface UDP {
   useremail?: string;
   userphoneNumber?: string;
 }
+
+export interface Gallery {
+  id_Gallery: number;
+  title: string;
+  url_Image: string;  // Definido como url_Image en la interfaz
+  categoryId: number;
+  category?: Category;
+}
+
+export interface Category {
+  id_Category: number;
+  name: string;
+  galleries?: Gallery[]; // Opcional para evitar referencias circulares al serializar
+}

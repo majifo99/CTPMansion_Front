@@ -3,7 +3,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import {jwtDecode} from 'jwt-decode';
 import Cookies from 'js-cookie';
-import { login as authLogin, logout as authLogout } from '../services/authService';
+import { login as authLogin, logout as authLogout } from '../Services/authService';
 
 interface UserType {
   id: number;

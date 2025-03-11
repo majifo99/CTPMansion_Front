@@ -37,6 +37,10 @@ const Unauthorized = React.lazy(() => import('../pages/UnauthorizedPage')); // P
 const OrderComponent = React.lazy(() => import('../DashboardPages/Requests/OrderComponent'));
 const UpdateUDPBalanceComponent = React.lazy(() => import('../DashboardPages/Managing/UpdateUDPBalanceComponent'));
 const OrdenesDePedido = React.lazy(() => import('../DashboardPages/Managing/ManageOrders'));
+// Galería pública
+const GalleryPage = React.lazy(() => import('../pages/GalleryPage'));
+// Gestión de galería admin
+const GalleryAdminPage = React.lazy(() => import('../DashboardPages/CRUD/GalleryCategory/GalleryPage'));
 
 const AppRouter: React.FC = () => {
   return (
@@ -64,6 +68,7 @@ const AppRouter: React.FC = () => {
             <Route path="/login" element={<LoginForm />} />
             {/* Nueva ruta para UDPs */}
             <Route path="/udps" element={<UDPsPages />} />
+            <Route path="/gallery" element={<GalleryPage />} />
 
             {/* Ruta de No Autorizado */}
             <Route path="/unauthorized" element={<Unauthorized />} />
@@ -187,6 +192,14 @@ const AppRouter: React.FC = () => {
                 element={
                   <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
                     <ElaborarLaboratoriosPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="galeria"
+                element={
+                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
+                    <GalleryAdminPage />
                   </ProtectedRoute>
                 }
               />

@@ -300,3 +300,128 @@ export const createRoomRequest = async (roomRequest: any) => {
     throw error;
   }
 };
+
+export const getCategories = () => handleResponse('/Category');
+
+export const addCategory = async (newCategory: any) => {
+  try {
+    const response = await apiClient.post('/Category', newCategory);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding category:', error);
+    throw error;
+  }
+};
+
+export const getCategoryById = async (id: number) => {
+  try {
+    const response = await apiClient.get(`/Category/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    throw error;
+  }
+};
+
+export const updateCategory = async (id: number, updatedCategory: any) => {
+  try {
+    const response = await apiClient.put(`/Category/${id}`, updatedCategory);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating category:', error);
+    throw error;
+  }
+};
+
+export const patchCategory = async (id: number, updatedCategory: any) => {
+  try {
+    const response = await apiClient.patch(`/Category/${id}`, updatedCategory);
+    return response.data;
+  } catch (error) {
+    console.error('Error patching category:', error);
+    throw error;
+  }
+};
+
+export const deleteCategory = async (id: number, deleteImages: boolean = false) => {
+  try {
+    await apiClient.delete(`/Category/${id}`, {
+      params: { deleteImages },
+    });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    throw error;
+  }
+};
+
+// === Servicios relacionados a galerías ===
+export const getGalleries = () => handleResponse('/Gallery');
+
+export const addGallery = async (newGallery: any) => {
+  try {
+    const response = await apiClient.post('/Gallery', newGallery);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding gallery:', error);
+    throw error;
+  }
+};
+
+export const getGalleryById = async (id: number) => {
+  try {
+    const response = await apiClient.get(`/Gallery/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching gallery:', error);
+    throw error;
+  }
+};
+
+export const updateGallery = async (id: number, updatedGallery: any) => {
+  try {
+    const response = await apiClient.put(`/Gallery/${id}`, updatedGallery);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating gallery:', error);
+    throw error;
+  }
+};
+
+export const patchGallery = async (id: number, updatedGallery: any) => {
+  try {
+    const response = await apiClient.patch(`/Gallery/${id}`, updatedGallery);
+    return response.data;
+  } catch (error) {
+    console.error('Error patching gallery:', error);
+    throw error;
+  }
+};
+
+export const deleteGallery = async (id: number) => {
+  try {
+    await apiClient.delete(`/Gallery/${id}`);
+  } catch (error) {
+    console.error('Error deleting gallery:', error);
+    throw error;
+  }
+};
+
+export const getGalleriesByCategory = async (categoryId: number) => {
+  try {
+    const response = await apiClient.get(`/Gallery/ByCategory/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching galleries by category:', error);
+    throw error;
+  }
+};
+
+export const getGalleriesWithoutCategory = async () => {
+  try {
+    const response = await apiClient.get('/Gallery/WithoutCategory');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching galleries without category:', error);
+    throw error;
+  }
+};
