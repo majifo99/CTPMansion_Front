@@ -101,9 +101,7 @@ const ManageOrders: React.FC = () => {
                 <p><strong>Fecha de Orden:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
                 <p><strong>Área Solicitante:</strong> {order.requesterArea || 'No especificada'}</p>
 
-                <p className={`font-bold mt-2 ${order.status === 1 ? 'text-green-600' : order.status === 2 ? 'text-red-600' : 'text-yellow-600'}`}>
-                  Estado: {order.status === 1 ? 'Aprobada' : order.status === 2 ? 'Rechazada' : 'Pendiente'}
-                </p>
+               
 
                 {/* Botón para ver detalles */}
                 <button

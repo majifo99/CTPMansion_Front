@@ -74,18 +74,20 @@ const RolesManagement: React.FC = () => {
   );
 
   return (
-    <div className="container mx-auto p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">Gestión de Roles de Usuarios</h1>
+    <div className="container mx-auto p-4 md:p-8 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6 text-center">
+        Gestión de Roles de Usuarios
+      </h1>
 
       <input
         type="text"
         placeholder="Buscar por nombre o apellido"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full p-3 mb-6 rounded-lg shadow-lg border border-gray-300 outline-none text-gray-700 placeholder-gray-500"
+        className="w-full p-2 md:p-3 mb-6 rounded-lg shadow-lg border border-gray-300 outline-none text-gray-700 placeholder-gray-500 text-sm md:text-base"
       />
 
-      <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {filteredUsers.map((user) => {
           const userRoles = roles[user.id] || [];
           const availableRoles = Object.keys(roleNames)
@@ -95,50 +97,56 @@ const RolesManagement: React.FC = () => {
           return (
             <li
               key={user.id}
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative"
+              className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800">{user.name} {user.lastName} {user.lastName2}</h2>
-                  <p className="text-gray-600">{user.email}</p>
-                  <p className="text-gray-600">{user.phoneNumber}</p>
+                  <h2 className="text-lg md:text-xl font-bold text-gray-800">
+                    {user.name} {user.lastName} {user.lastName2}
+                  </h2>
+                  <p className="text-sm md:text-base text-gray-600">{user.email}</p>
+                  <p className="text-sm md:text-base text-gray-600">{user.phoneNumber}</p>
                 </div>
               </div>
 
               {/* Roles Asignados */}
-              <div className="mt-6">
-                <h3 className="font-semibold text-lg text-gray-700 mb-2">Roles Asignados</h3>
+              <div className="mt-4 md:mt-6">
+                <h3 className="font-semibold text-base md:text-lg text-gray-700 mb-2">
+                  Roles Asignados
+                </h3>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {userRoles.length > 0 ? (
                     userRoles.map((role) => (
                       <button
                         key={role.id}
                         onClick={() => handleRoleChange(user.id, role.id, true)}
-                        className="px-3 py-1 bg-red-100 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-all"
+                        className="px-2 py-1 text-xs md:text-sm bg-red-100 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-all"
                       >
                         {roleNames[role.id]} ✖
                       </button>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">No hay roles asignados</p>
+                    <p className="text-xs md:text-sm text-gray-500">No hay roles asignados</p>
                   )}
                 </div>
 
                 {/* Roles Disponibles */}
-                <h3 className="font-semibold text-lg text-gray-700 mb-2">Roles Disponibles</h3>
+                <h3 className="font-semibold text-base md:text-lg text-gray-700 mb-2">
+                  Roles Disponibles
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {availableRoles.length > 0 ? (
                     availableRoles.map((roleId) => (
                       <button
                         key={roleId}
                         onClick={() => handleRoleChange(user.id, roleId, false)}
-                        className="px-3 py-1 bg-green-100 text-green-600 font-semibold rounded-full hover:bg-green-600 hover:text-white transition-all"
+                        className="px-2 py-1 text-xs md:text-sm bg-green-100 text-green-600 font-semibold rounded-full hover:bg-green-600 hover:text-white transition-all"
                       >
                         {roleNames[roleId]} +
                       </button>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">No hay roles disponibles</p>
+                    <p className="text-xs md:text-sm text-gray-500">No hay roles disponibles</p>
                   )}
                 </div>
               </div>

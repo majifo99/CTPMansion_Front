@@ -14,7 +14,7 @@ const UDPsPage: React.FC = () => {
 
   // Estados para el modal
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedUDP, setSelectedUDP] = useState<UDP | null>(null);
+  const [selectedUDP] = useState<UDP | null>(null);
 
   // Obtener las UDPs al cargar la página
   useEffect(() => {
@@ -68,10 +68,10 @@ const UDPsPage: React.FC = () => {
       <section className="text-gray-700 body-font bg-gray-50 py-24 pt-24">
         <div className="container mx-auto px-5">
           {/* Título */}
-          <h2 className="relative text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-teal-600 to-blue-500">
+          <h2 className="relative text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]">
             Nuestras UDPs
-            <span className="block h-1 w-20 mx-auto mt-2 bg-gradient-to-r from-blue-700 to-teal-500 rounded-full"></span>
-          </h2>
+            <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></span>
+            </h2>
 
           {udps.map((udp, index) => (
             <div

@@ -20,6 +20,7 @@ export interface RoomRequest {
   roomId: number;                  // ID de la sala solicitada
   userId: string;                  // ID del usuario que realiza la solicitud
   status?: RequestStatus;          // Estado de la solicitud (Pendiente, Aprobada, Rechazada)
+  roomName?: string;               // Nombre de la sala (propiedad opcional)
 }
 
 

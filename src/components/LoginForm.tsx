@@ -1,69 +1,65 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
-import { useTheme } from './ThemeContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 
 Modal.setAppElement('#root');
 
 const LoginForm: React.FC = () => {
-  const { login } = useAuthContext(); // Usamos el contexto de autenticación
+  const { login } = useAuthContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Estado de carga
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Manejar el submit del formulario
-  const onSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true); // Activar el estado de carga
+    
+    // Validación básica de campos
+    if (!email || !password) {
+      setErrorMessage('Por favor completa todos los campos');
+      setIsModalOpen(true);
+      return;
+    }
 
-    const loginSuccess = await login(email, password);
+    setIsLoading(true);
 
-    setTimeout(() => {
-      if (!loginSuccess) {
-        setIsLoading(false); // Desactivar el estado de carga en caso de error
-        setErrorMessage('Credenciales inválidas. Por favor, intenta de nuevo.');
-        setIsModalOpen(true);
-      } else {
-        setIsLoading(false); // Desactivar el estado de carga antes de redirigir
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
         navigate('/dashboard');
+      } else {
+        setErrorMessage('Credenciales incorrectas. Verifica tu email y contraseña');
+        setIsModalOpen(true);
       }
-    }, 2000); // Simulación de un retraso de 2 segundos
+    } catch (error) {
+      setErrorMessage('Error al conectar con el servidor. Intenta nuevamente más tarde');
+      setIsModalOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Cerrar el modal de error
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className={`${isDarkMode ? 'bg-[#13152A] text-gray-300' : 'bg-gray-100 text-gray-800'} flex justify-center items-center h-screen`}>
+    <div className="bg-gray-100 text-gray-800 flex justify-center items-center h-screen">
       <div className="hidden lg:block w-1/2 h-screen">
         <img
           src="https://i.ibb.co/dKVCLB2/ctp-m.jpg"
           alt="Imagen de fondo"
-          className={`object-cover w-full h-full ${isDarkMode ? 'opacity-60' : ''}`}
+          className="object-cover w-full h-full"
         />
       </div>
 
-      <div className={`lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2 h-full ${isDarkMode ? 'bg-[#13152A]' : 'bg-white'} shadow-lg rounded-lg`}>
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold">Iniciar Sesión</h1>
-          <div className="flex items-center">
-            <span className="text-sm mr-2">{isDarkMode ? 'Modo Noche' : 'Modo Día'}</span>
-            <label className="inline-flex relative items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" checked={isDarkMode} onChange={toggleDarkMode} />
-              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
-            </label>
-          </div>
-        </div>
+      <div className="lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2 h-full bg-white shadow-lg rounded-lg">
+        <h1 className="text-3xl font-semibold mb-6">Iniciar Sesión</h1>
 
-        <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label htmlFor="email" className="block mb-2">Correo Electrónico</label>
             <input
@@ -71,8 +67,7 @@ const LoginForm: React.FC = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+              className="w-full border rounded-md py-2 px-3 bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500 focus:outline-none"
               placeholder="nombre@empresa.com"
             />
           </div>
@@ -84,14 +79,13 @@ const LoginForm: React.FC = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
-              className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+              className="w-full border rounded-md py-2 px-3 bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500 focus:outline-none"
               placeholder="••••••••"
             />
             <button
               type="button"
               className="absolute top-3/4 right-3 transform -translate-y-1/2 focus:outline-none"
-              onClick={() => setShowPassword((prev) => !prev)}
+              onClick={() => setShowPassword(!showPassword)}
             >
               <svg className="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 {showPassword ? (
@@ -106,32 +100,60 @@ const LoginForm: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'} ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className="w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Verificando...
+              </span>
+            ) : (
+              'Iniciar Sesión'
+            )}
           </button>
-        </form>
-      </div>
 
-      {/* Modal de error */}
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Error"
-        className="absolute inset-0 flex items-center justify-center z-[9999]"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
-      >
-        <div className={`p-6 rounded-lg shadow-lg z-[9999] ${isDarkMode ? 'bg-[#13152A] text-gray-300' : 'bg-white text-gray-800'}`}>
-          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-teal-400' : 'text-blue-600'}`}>Error</h2>
-          <p className="mt-2">{errorMessage}</p>
-          <button
-            onClick={closeModal}
-            className={`mt-4 px-4 py-2 rounded-lg ${isDarkMode ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-          >
-            Cerrar
-          </button>
-        </div>
-      </Modal>
+          {/* Nuevos enlaces agregados */}
+          <div className="mt-4 text-center space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate('/register')}
+              className="text-blue-500 hover:underline hover:text-blue-600 text-sm"
+            >
+              ¿No tienes una cuenta? Regístrate aquí
+            </button>
+            <br />
+            <button
+              type="button"
+              onClick={() => navigate('/request-password-reset')}
+              className="text-blue-500 hover:underline hover:text-blue-600 text-sm"
+            >
+              ¿Olvidaste tu contraseña? Restablécelá aquí
+            </button>
+          </div>
+        </form>
+
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          contentLabel="Error"
+          className="absolute inset-0 flex items-center justify-center z-[9999]"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
+        >
+          <div className="p-6 rounded-lg shadow-lg bg-white text-gray-800 max-w-sm">
+            <h2 className="text-xl font-semibold text-red-600 mb-4">Error de autenticación</h2>
+            <p className="mb-4">{errorMessage}</p>
+            <button
+              onClick={closeModal}
+              className="w-full px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </Modal>
+      </div>
     </div>
   );
 };
