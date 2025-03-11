@@ -6,6 +6,7 @@ import { Workshop } from '../../../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const WorkshopsPage: React.FC = () => {
   const {
@@ -64,7 +65,7 @@ const WorkshopsPage: React.FC = () => {
     }
   };
 
-  if (loading) return <p>Cargando...</p>;
+  if (loading) return <div className="flex justify-center items-center h-screen"> <ClipLoader color="#3b82f6" size={100} /></div>
   if (error) return <p>{error}</p>;
 
   // Cálculo de talleres para la página actual

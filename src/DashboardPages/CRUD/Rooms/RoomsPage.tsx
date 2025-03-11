@@ -13,6 +13,8 @@ const RoomsPage: React.FC = () => {
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [deletingRoomId, setDeletingRoomId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5); // Número de salas por página
 
   // Abrir modal de edición
   const handleOpenEditModal = (room?: Room) => {
@@ -29,14 +31,14 @@ const RoomsPage: React.FC = () => {
   // Guardar sala (agregar o editar)
   const handleSaveRoom = async (room: Room): Promise<void> => {
     if (editingRoom) {
-        await handleEditRoom(editingRoom.id_Room, room); // Suponiendo que esta función devuelve una promesa
-        toast.success('Sala editada correctamente');
+      await handleEditRoom(editingRoom.id_Room, room); // Suponiendo que esta función devuelve una promesa
+      toast.success('Sala editada correctamente');
     } else {
-        await handleAddRoom(room); // Suponiendo que esta función devuelve una promesa
-        toast.success('Sala agregada correctamente');
+      await handleAddRoom(room); // Suponiendo que esta función devuelve una promesa
+      toast.success('Sala agregada correctamente');
     }
     handleCloseEditModal();
-};
+  };
 
   // Abrir modal de eliminación
   const handleOpenDeleteModal = (id: number) => {
@@ -58,6 +60,14 @@ const RoomsPage: React.FC = () => {
       handleCloseDeleteModal();
     }
   };
+
+  // Cálculo de salas para la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRooms = rooms.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(rooms.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -97,7 +107,7 @@ const RoomsPage: React.FC = () => {
                 <td colSpan={5} className="px-4 py-2 text-center">No hay salas disponibles.</td>
               </tr>
             ) : (
-              rooms.map((room) => (
+              currentRooms.map((room) => (
                 <tr key={room.id_Room} className="border-t">
                   <td className="border px-4 py-2">{room.name}</td>
                   <td className="border px-4 py-2">{room.description}</td>
@@ -128,6 +138,25 @@ const RoomsPage: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Paginación */}
+      <div className="flex justify-center mt-6">
+        <nav className="inline-flex">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* Modal de edición */}

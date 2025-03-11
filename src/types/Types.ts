@@ -121,11 +121,17 @@ roomRequests: any;  // Flag indicating if the room is a conference room
 
 export interface UserProfileType {
 id: number;
-name: string;
-lastName: string;
-lastName2: string;
-email: string;
-phoneNumber: string;
+name: string,
+lastName: string,
+lastName2: string,
+email: string,
+phoneNumber: string,
+password: string,
+profilePicture: string,
+emergencyPhoneNumber: string,
+address: string,
+institutionJoinDate: string | Date,
+workJoinDate: string | Date
 }
 
 export interface UDP {

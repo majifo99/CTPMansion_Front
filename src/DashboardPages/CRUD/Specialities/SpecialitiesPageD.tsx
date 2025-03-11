@@ -7,6 +7,7 @@ import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SpecialityForm from './SpecialityForm';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const SpecialitiesPage: React.FC = () => {
   const { specialities, loading, error, handleAddSpeciality, handleEditSpeciality, handleDeleteSpeciality } = useSpecialities();
@@ -14,6 +15,8 @@ const SpecialitiesPage: React.FC = () => {
   const [editingSpeciality, setEditingSpeciality] = useState<Speciality | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [deletingSpecialityId, setDeletingSpecialityId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5); // Número de especialidades por página
 
   // Abrir el modal de edición o creación
   const handleOpenEditModal = (speciality?: Speciality) => {
@@ -60,8 +63,16 @@ const SpecialitiesPage: React.FC = () => {
     }
   };
 
-  if (loading) return <p>Cargando...</p>;
+  if (loading) return <div className="flex justify-center items-center h-screen"> <ClipLoader color="#3b82f6" size={100} /></div>
   if (error) return <p>{error}</p>;
+
+  // Cálculo de especialidades para la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentSpecialities = specialities.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(specialities.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -87,7 +98,7 @@ const SpecialitiesPage: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {specialities.map((speciality) => (
+            {currentSpecialities.map((speciality) => (
               <tr key={speciality.id} className="border-t">
                 <td className="border px-4 py-2">{speciality.title}</td>
                 <td className="border px-4 py-2">{speciality.description}</td>
@@ -112,6 +123,25 @@ const SpecialitiesPage: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Paginación */}
+      <div className="flex justify-center mt-6">
+        <nav className="inline-flex">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* Modal para agregar/editar especialidad */}
