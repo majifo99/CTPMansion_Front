@@ -6,6 +6,7 @@ import { Event } from '../../../types/Types';
 import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const EventosPage: React.FC = () => {
   const { events, loading, error, handleAddEvent, handleEditEvent, handleDeleteEvent } = useEvents();
@@ -13,6 +14,8 @@ const EventosPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deletingEventId, setDeletingEventId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5); // Número de eventos por página
 
   const handleOpenEditModal = (event?: Event) => {
     setEditingEvent(event || null);
@@ -56,7 +59,7 @@ const EventosPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="loader">Cargando...</div>
+        <ClipLoader color="#3b82f6" size={100} />
       </div>
     );
   }
@@ -71,6 +74,17 @@ const EventosPage: React.FC = () => {
       </div>
     );
   }
+
+  // Ordenar eventos del más reciente al más antiguo
+  const sortedEvents = [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Cálculo de eventos para la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentEvents = sortedEvents.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedEvents.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -97,7 +111,7 @@ const EventosPage: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {events.map((event, index) => (
+            {currentEvents.map((event, index) => (
               <tr key={event.id} className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                 <td className="border px-4 py-2">{event.title}</td>
                 <td className="border px-4 py-2">{event.description}</td>
@@ -123,6 +137,25 @@ const EventosPage: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Paginación */}
+      <div className="flex justify-center mt-6">
+        <nav className="inline-flex">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* Modal para Agregar/Editar Evento */}
