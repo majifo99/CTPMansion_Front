@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { RequestStatus, RoomRequest } from '../../types/RoomRequestType';
 import { useRoomsAndRequests } from '../../hooks/useRooms';
 import RoomRequestDetailsModal from '../../modals/RoomRequestDetailsModal';
+import RoomHistoryModal from '../../modals/RoomHistoryModal';
 
 const ManageRoomRequests: React.FC = () => {
   const {
@@ -19,6 +20,7 @@ const ManageRoomRequests: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<RoomRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   const notifySuccess = (message: string) => toast.success(message);
   const notifyError = (message: string) => toast.error(message);
@@ -66,26 +68,26 @@ const ManageRoomRequests: React.FC = () => {
     setSelectedRequest(null);
   };
 
-  const filteredRequests = roomRequests.filter((request) =>
-    `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  // Filtrar solo pendientes en vista principal
+  const filteredRequests = roomRequests
+    .filter(request => request.status === RequestStatus.Pending)
+    .filter(request =>
+      `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
 
   const sortedRequests = filteredRequests.sort((a, b) => {
-    // Orden principal por estado
-    if (a.status === RequestStatus.Pending && b.status !== RequestStatus.Pending) return -1;
-    if (a.status === RequestStatus.Approved && b.status === RequestStatus.Rejected) return -1;
-
-    // Orden secundario por fecha (más reciente primero)
     const dateA = new Date(a.startDate).getTime();
     const dateB = new Date(b.startDate).getTime();
-    return dateB - dateA; // Más reciente primero
+    return dateB - dateA;
   });
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Gestión de Solicitudes de Sala</h2>
+
+      
 
       <div className="mb-4">
         <input
@@ -96,7 +98,14 @@ const ManageRoomRequests: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-
+      <div className="flex justify-end mb-4">
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          onClick={() => setIsHistoryModalOpen(true)}
+        >
+          Ver Historial de Solicitudes
+        </button>
+      </div>
       {loading && <p className="text-gray-600">Cargando solicitudes...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
@@ -136,6 +145,12 @@ const ManageRoomRequests: React.FC = () => {
           onReject={rejectRequest}
         />
       )}
+
+      <RoomHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        roomRequests={roomRequests}
+      />
 
       <ToastContainer position="bottom-right" autoClose={3000} />
     </div>

@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { RequestStatus, LabRequest } from '../../types/LaboratoryRequestType';
 import { useLabsAndRequests } from '../../hooks/useLabs';
 import LabRequestDetailsModal from '../../modals/LabRequestDetailsModal';
+import LabHistoryModal from '../../modals/LabHistoryModal';
 
 const ManageLabRequests: React.FC = () => {
   const {
@@ -19,6 +20,7 @@ const ManageLabRequests: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   const notifySuccess = (message: string) => toast.success(message);
   const notifyError = (message: string) => toast.error(message);
@@ -69,27 +71,30 @@ const ManageLabRequests: React.FC = () => {
     setSelectedRequest(null);
   };
 
-  const filteredRequests = labRequests.filter(request =>
-    `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  // Mostrar solo solicitudes pendientes
+  const filteredRequests = labRequests
+    .filter(request => request.status === RequestStatus.Pending)
+    .filter(request =>
+      `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
 
   const sortedRequests = filteredRequests.sort((a, b) => {
-    // Orden principal por estado
     if (a.status === RequestStatus.Pending && b.status !== RequestStatus.Pending) return -1;
     if (a.status === RequestStatus.Approved && b.status === RequestStatus.Rejected) return -1;
     
-    // Orden secundario por fecha (más reciente primero)
     const dateA = new Date(a.startDate).getTime();
     const dateB = new Date(b.startDate).getTime();
     
-    return dateB - dateA; // Más reciente primero
+    return dateB - dateA;
   });
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Gestión de Solicitudes de Laboratorio</h2>
+
+      
 
       <div className="mb-4">
         <input
@@ -100,7 +105,14 @@ const ManageLabRequests: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-
+      <div className="flex justify-end mb-4">
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          onClick={() => setIsHistoryModalOpen(true)}
+        >
+          Ver Historial de Solicitudes
+        </button>
+      </div>
       {loading && <p className="text-gray-600">Cargando solicitudes...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
@@ -140,6 +152,12 @@ const ManageLabRequests: React.FC = () => {
           onReject={rejectRequest}
         />
       )}
+
+      <LabHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        labRequests={labRequests}
+      />
 
       <ToastContainer position="bottom-right" autoClose={3000} />
     </div>
