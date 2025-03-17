@@ -39,7 +39,7 @@ const Navbar = () => {
               to="/"
               className="relative pb-1 transition-all duration-300 hover:text-teal-400 after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 after:bg-teal-400 hover:after:w-full after:transition-all after:duration-300"
             >
-              Home
+              Inicio
             </Link>
           </li>
 
@@ -95,11 +95,24 @@ const Navbar = () => {
           </li>
 
           <li className="relative group">
+            <a
+              className="relative pb-1 transition-all duration-300 hover:text-teal-400 after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 after:bg-teal-400 hover:after:w-full after:transition-all after:duration-300"
+              href="https://sicai.pcpuris.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="SICAI"
+            >
+              SICAI
+            </a>
+
+          </li>
+
+          <li className="relative group">
             <Link
               to="/udps"
               className="relative pb-1 transition-all duration-300 hover:text-teal-400 after:absolute after:left-0 after:bottom-0 after:w-0 after:h-0.5 after:bg-teal-400 hover:after:w-full after:transition-all after:duration-300"
             >
-              UDPs
+              UDP's
             </Link>
           </li>
         </ul>
@@ -140,7 +153,7 @@ const Navbar = () => {
                 onClick={handleNav}
                 className="p-3 rounded-lg hover:bg-teal-400 hover:text-white transition-all duration-300 shadow-md"
               >
-                <Link to="/">Home</Link>
+                <Link to="/">Inicio</Link>
               </motion.li>
               <motion.li
                 variants={itemVariants}
@@ -185,12 +198,21 @@ const Navbar = () => {
               >
                 <Link to="/certificates">Solicitud de Certificados</Link>
               </motion.li>
+
               <motion.li
                 variants={itemVariants}
                 onClick={handleNav}
                 className="p-3 rounded-lg hover:bg-teal-400 hover:text-white transition-all duration-300 shadow-md"
               >
-                <Link to="/udps">UDPs</Link>
+                <a href="https://sicai.pcpuris.com/">SICAI</a>
+              </motion.li>
+
+              <motion.li
+                variants={itemVariants}
+                onClick={handleNav}
+                className="p-3 rounded-lg hover:bg-teal-400 hover:text-white transition-all duration-300 shadow-md"
+              >
+                <Link to="/udps">UDP's</Link>
               </motion.li>
             </ul>
           </motion.div>
