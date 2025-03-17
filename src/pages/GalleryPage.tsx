@@ -188,8 +188,9 @@ const GalleryPage = () => {
       <Navbar />
       <div className="bg-gray-50 min-h-screen pt-24">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-5xl font-extrabold text-center mb-4 text-[#34436B]">
+          <h1 className="relative text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]">
             Galería Institucional
+            <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></span>
           </h1>
           <p className="text-center text-gray-600 mb-10 max-w-3xl mx-auto">
             Explora los momentos más destacados de nuestra institución educativa a través de imágenes que capturan nuestra esencia.
@@ -210,7 +211,7 @@ const GalleryPage = () => {
               <div className="flex justify-center mb-4">
                 <button
                   onClick={() => setIsCategoryModalOpen(true)}
-                  className="px-5 py-2.5 rounded-full font-medium transition-all duration-300 bg-[#4A6FA5] text-white shadow-md hover:bg-[#34436B] flex items-center justify-center"
+                  className="px-5 py-2.5 rounded-full font-medium transition-all duration-300 bg-[#13152A] text-white shadow-md hover:bg-[#34436B] flex items-center justify-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

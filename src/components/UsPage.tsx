@@ -1,18 +1,46 @@
 import { useEffect } from 'react';
-import { FaPeopleCarry, FaHandshake, FaHandsHelping } from 'react-icons/fa';
+import { FaHandshake, FaHandsHelping, FaLightbulb, FaHeart, FaBalanceScale } from 'react-icons/fa';
 import { RiEmpathizeFill } from 'react-icons/ri';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import useUsPage from '../hooks/useUsePage';
 
 const iconMapper: Record<string, JSX.Element> = {
-  Respeto: <FaHandshake className="text-burntOrange w-12 h-12" />,
-  Compromiso: <FaPeopleCarry className="text-burntOrange w-12 h-12" />,
-  Empatía: <RiEmpathizeFill className="text-burntOrange w-12 h-12" />,
-  Colaboración: <FaHandsHelping className="text-burntOrange w-12 h-12" />,
+  'Compromiso con la excelencia educativa': <FaLightbulb className="text-burntOrange w-12 h-12" />,
+  'Inclusión y respeto a la diversidad': <FaHeart className="text-burntOrange w-12 h-12" />,
+  'Responsabilidad y honestidad': <FaBalanceScale className="text-burntOrange w-12 h-12" />,
+  'Solidaridad y cooperación': <FaHandsHelping className="text-burntOrange w-12 h-12" />,
+  'Respeto y tolerancia': <FaHandshake className="text-burntOrange w-12 h-12" />,
+  'Innovación y creatividad': <RiEmpathizeFill className="text-burntOrange w-12 h-12" />
 };
 
-// Skeleton loader para mejorar la UX mientras los datos cargan
+const himno = {
+  title: '"HIMNO CTP LA MANSIÓN"',
+  lyrics: [
+    "La Mansión tiene historia grandiosa",
+    "pues hay manes patricios aquí",
+    "este humilde rincón de la pampa",
+    "vio a Crombeth, a Maceo y a Martí.",
+    "",
+    "El ideal redentor del caribe",
+    "se encubó en esta bella Mansión",
+    "y en la historia de América Libre",
+    "el apóstol Martí es un bastón.",
+    "",
+    "Compañeros honremos fervientes",
+    "a este centro con gran devoción",
+    "y el futuro verá en nuestro esfuerzo",
+    "a hombres dignos para la nación.",
+    "",
+    "Que la pampa tremole en sus hijos",
+    "a la par del heroico Nambí",
+    "y en el alma de cada estudiante",
+    "sea un ejemplo el apóstol Martí.",
+    "",
+    "Música y letra: José Ramírez Saizar",
+  ],
+};
+
 const SkeletonLoader = () => (
   <div className="animate-pulse space-y-8">
     <div className="bg-gray-300 h-6 w-1/3 mx-auto rounded"></div>
@@ -28,7 +56,6 @@ const UsPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Mostrar error si ocurre uno
   if (error) {
     return (
       <div>
@@ -46,7 +73,6 @@ const UsPage = () => {
       {/* Misión y Visión */}
       <div className="text-center p-8 mt-8">
         {loading && <SkeletonLoader />}
-
         {!loading && vision && (
           <div className="flex flex-wrap items-center mt-20 text-center">
             <div className="w-full md:w-3/5 lg:w-1/2 px-4">
@@ -90,42 +116,43 @@ const UsPage = () => {
         )}
       </div>
 
-      {/* Valores */}
-      <section className="bg-gray-100 py-8">
-        <div className="container mx-auto text-center px-4">
-          <h2 className="text-4xl font-bold text-gray-800 mb-8">Nuestros Valores</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {loading
-              ? Array(4)
-                  .fill(0)
-                  .map((_, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white p-8 shadow-md rounded-md hover:shadow-lg transition-shadow duration-300 animate-pulse"
-                    >
-                      <div className="bg-gray-300 h-12 w-12 mx-auto rounded-full mb-4"></div>
-                      <div className="bg-gray-300 h-6 w-2/3 mx-auto rounded"></div>
-                      <div className="bg-gray-300 h-4 w-full mt-4 rounded"></div>
-                      <div className="bg-gray-300 h-4 w-3/4 mt-2 rounded"></div>
-                    </div>
-                  ))
-              : values.map((value) => (
-                  <div
-                    key={value.id}
-                    className="bg-white p-8 shadow-md rounded-md hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <div className="flex justify-center mb-4">
-                      {iconMapper[value.title] || (
-                        <RiEmpathizeFill className="text-burntOrange w-12 h-12" aria-hidden="true" />
-                      )}
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{value.title}</h3>
-                    <p className="text-gray-600">{value.description}</p>
-                  </div>
-                ))}
-          </div>
+      {/* Sección de Valores */}
+      <section className="bg-gray-100 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {values.map((value) => (
+            <div
+              key={value.id}
+              className="bg-white p-8 shadow-lg rounded-xl flex flex-col justify-between h-64 text-center  items-center"
+            >
+              <div className="mb-4">{iconMapper[value.title] || <RiEmpathizeFill className="text-burntOrange w-14 h-14 " />}</div>
+              <h3 className="text-xl font-bold text-gray-800">{value.title}</h3>
+              <p className="text-gray-600 mt-2 overflow-hidden text-ellipsis">{value.description}</p>
+            </div>
+          ))}
         </div>
       </section>
+
+      {/* Croquis de la Institución */}
+      <div className="text-center p-8">
+        <h2 className="font-bold text-xl sm:text-4xl text-center">Croquis de la Institución</h2>
+        <div className="flex justify-center mt-6">
+          <img
+            src="https://i.ibb.co/VY6ZK77d/Imagen-de-Whats-App-2025-03-12-a-las-14-38-18-9dc9b155.jpg"
+            alt="Croquis de la Institución"
+            className="w-full max-w-4xl rounded shadow-lg"
+            loading="lazy"
+          />
+        </div>
+      </div>
+
+      {/* Himno */}
+      <div className="text-center p-8">
+        <h2 className="font-bold text-xl sm:text-4xl text-center">{himno.title}</h2>
+        <p className="sm:text-lg mt-6 text-gray-600 text-center whitespace-pre-line italic">
+          {himno.lyrics.join("\n")}
+        </p>
+      </div>
+
       <Footer />
     </div>
   );
