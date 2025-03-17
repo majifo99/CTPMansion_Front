@@ -1,6 +1,7 @@
 // src/modals/ProductDetailsModal.tsx
-import React from 'react';
-import { Order } from '../types/OrderTypes';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Order, OrderDetail, RequestStatus } from '../types/OrderTypes';
+import { useOrders } from '../hooks/useOrders';
 
 interface ProductDetailsModalProps {
   isOpen: boolean;
@@ -17,19 +18,112 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
   onApprove,
   onReject,
 }) => {
+  const { handleGetOrderById } = useOrders();
+  const [currentOrder, setCurrentOrder] = useState<Order>(order);
+  const [loading, setLoading] = useState<boolean>(false);
+  
+  // Use a ref to prevent multiple API calls
+  const hasFetchedRef = React.useRef(false);
+
+  // Fetch order details only once when modal opens
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      // Only fetch if modal is open, we have an order ID, and haven't fetched yet
+      if (isOpen && order?.orderId && !hasFetchedRef.current) {
+        setLoading(true);
+        hasFetchedRef.current = true; // Mark as fetched immediately
+        
+        try {
+          const fullOrder = await handleGetOrderById(order.orderId);
+          
+          // Deep copy the order to ensure we're not modifying the original
+          const processedOrder = {...fullOrder};
+          
+          // If order details are missing or empty, add mock data for testing
+          if (!processedOrder.orderDetails || processedOrder.orderDetails.length === 0) {
+            // Use the order details from the original order prop as fallback
+            if (order.orderDetails && order.orderDetails.length > 0) {
+              processedOrder.orderDetails = [...order.orderDetails];
+            }
+          }
+          
+          setCurrentOrder(processedOrder);
+        } catch (error) {
+          console.error("Error loading order details:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchOrderDetails();
+    
+    // Reset the fetch flag when the modal closes
+    return () => {
+      if (!isOpen) {
+        hasFetchedRef.current = false;
+      }
+    };
+  }, [isOpen, order?.orderId]); // Remove handleGetOrderById from deps to prevent re-fetching
+
   if (!isOpen) return null;
 
   // Función para aprobar y cerrar el modal
   const handleApprove = async () => {
-    await onApprove(order.orderId);  // Aprobar la orden
-    onClose();  // Cerrar el modal automáticamente
+    await onApprove(currentOrder.orderId);
+    onClose();
   };
 
   // Función para rechazar y cerrar el modal
   const handleReject = async () => {
-    await onReject(order.orderId);  // Rechazar la orden
-    onClose();  // Cerrar el modal automáticamente
+    await onReject(currentOrder.orderId);
+    onClose();
   };
+
+  // Helper function to get unit of measure name
+  const getUnitOfMeasureName = (detail: any): string => {
+    // First check if unitOfMeasure object exists with name property
+    if (detail.unitOfMeasure && detail.unitOfMeasure.name) {
+      return detail.unitOfMeasure.name;
+    }
+    
+    // If unitOfMeasure is a string directly
+    if (typeof detail.unitOfMeasure === 'string') {
+      return detail.unitOfMeasure;
+    }
+    
+    // Fallback to ID if available
+    if (detail.unitOfMeasureId) {
+      return `ID: ${detail.unitOfMeasureId}`;
+    }
+    
+    // Last resort
+    return 'N/A';
+  };
+
+  const getProductName = (detail: any): string => {
+    // Check if product object exists with name property
+    if (detail.product && detail.product.name) {
+      return detail.product.name;
+    }
+    
+    // If product name is directly available
+    if (detail.name) {
+      return detail.name;
+    }
+    
+    // Fallback
+    return 'Producto desconocido';
+  };
+
+  const isPending = currentOrder.status === RequestStatus.Pending;
+  
+  // Check if we have order details - make this more robust
+  const hasOrderDetails = Boolean(
+    currentOrder?.orderDetails && 
+    Array.isArray(currentOrder.orderDetails) && 
+    currentOrder.orderDetails.length > 0
+  );
 
   return (
     <div
@@ -38,96 +132,121 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
     >
       <div
         className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative"
-        onClick={(e) => e.stopPropagation()}  // Evitar que el modal se cierre al hacer click dentro
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header del Modal */}
         <div className="flex justify-between items-start mb-6">
-          <h2 className="text-3xl font-bold text-gray-700">Detalles de la Orden</h2>
+          <h2 className="text-3xl font-bold text-gray-700">Detalles de la Orden #{currentOrder.orderId}</h2>
           <button className="text-gray-500 hover:text-gray-700 text-xl" onClick={onClose}>
             &#x2715;
           </button>
         </div>
 
-        {/* Información General de la Orden */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left">
-          <div>
-            <p className="text-lg">
-              <strong className="text-gray-600">Receptor:</strong> {order.receiver}
-            </p>
-            <p className="text-lg mt-2">
-              <strong className="text-gray-600">Área Solicitante:</strong> {order.requesterArea || 'No especificada'}
-            </p>
-            <p className="text-lg mt-4">
-              <strong className="text-gray-600">Comentarios:</strong> {order.comments || 'Sin comentarios'}
-            </p>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
+        ) : (
+          <>
+            {/* Información General de la Orden */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left">
+              <div>
+                <p className="text-lg">
+                  <strong className="text-gray-600">Receptor:</strong> {currentOrder.receiver}
+                </p>
+                <p className="text-lg mt-2">
+                  <strong className="text-gray-600">Área Solicitante:</strong> {currentOrder.requesterArea || 'No especificada'}
+                </p>
+                <p className="text-lg mt-4">
+                  <strong className="text-gray-600">Comentarios:</strong> {currentOrder.comments || 'Sin comentarios'}
+                </p>
+              </div>
 
-          {/* Columna Derecha */}
-          <div className="sm:text-right">
-            <p className="text-lg">
-              <strong className="text-gray-600">Fecha de Orden:</strong> {new Date(order.orderDate).toLocaleDateString()}
-            </p>
-            <p className="text-lg mt-4">
-              <strong className="text-gray-600">Estado:</strong>{' '}
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-white text-sm ${
-                  order.status === 1
-                    ? 'bg-green-500'
-                    : order.status === 2
-                    ? 'bg-red-500'
-                    : 'bg-yellow-500'
-                }`}
-              >
-                {order.status === 1 ? 'Aprobada' : order.status === 2 ? 'Rechazada' : 'Pendiente'}
-              </span>
-            </p>
-          </div>
-        </div>
-
-        {/* Detalles de los Productos con Scroll */}
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">Detalles de los Productos:</h3>
-          {order.orderDetails && order.orderDetails.length > 0 ? (
-            <div className="overflow-y-auto max-h-48"> {/* Añadimos un scroll vertical */}
-              <table className="table-auto w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="px-4 py-3 text-gray-600 font-medium text-center">Producto</th>
-                    <th className="px-4 py-3 text-gray-600 font-medium text-center">Cantidad</th>
-                    <th className="px-4 py-3 text-gray-600 font-medium text-center">Unidad de Medida</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {order.orderDetails.map((detail, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 border-b text-center">{detail.product?.name || 'Producto desconocido'}</td>
-                      <td className="px-4 py-3 border-b text-center">{detail.quantity}</td>
-                      <td className="px-4 py-3 border-b text-center">{detail.unitOfMeasure}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {/* Columna Derecha */}
+              <div className="sm:text-right">
+                <p className="text-lg">
+                  <strong className="text-gray-600">Fecha de Orden:</strong> {new Date(currentOrder.orderDate).toLocaleDateString()}
+                </p>
+                <p className="text-lg mt-4">
+                  <strong className="text-gray-600">Estado:</strong>{' '}
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-white text-sm ${
+                      currentOrder.status === RequestStatus.Approved
+                        ? 'bg-green-500'
+                        : currentOrder.status === RequestStatus.Rejected
+                        ? 'bg-red-500'
+                        : 'bg-yellow-500'
+                    }`}
+                  >
+                    {currentOrder.status === RequestStatus.Approved 
+                      ? 'Aprobada' 
+                      : currentOrder.status === RequestStatus.Rejected 
+                      ? 'Rechazada' 
+                      : 'Pendiente'}
+                  </span>
+                </p>
+              </div>
             </div>
-          ) : (
-            <p className="text-center text-gray-600">No hay detalles para esta orden.</p>
-          )}
-        </div>
 
-        {/* Botones de acción */}
-        <div className="flex justify-center mt-8 space-x-4">
-          <button
-            className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            onClick={handleApprove}
-          >
-            Aprobar
-          </button>
-          <button
-            className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-            onClick={handleReject}
-          >
-            Rechazar
-          </button>
-        </div>
+            {/* Detalles de los Productos con Scroll */}
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">Detalles de los Productos:</h3>
+              
+              <div className="overflow-y-auto max-h-48">
+                <table className="table-auto w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="px-4 py-3 text-gray-600 font-medium text-center">Producto</th>
+                      <th className="px-4 py-3 text-gray-600 font-medium text-center">Cantidad</th>
+                      <th className="px-4 py-3 text-gray-600 font-medium text-center">Unidad de Medida</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hasOrderDetails ? (
+                      currentOrder.orderDetails.map((detail, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 border-b text-center">
+                            {getProductName(detail)}
+                          </td>
+                          <td className="px-4 py-3 border-b text-center">
+                            {detail.quantity}
+                          </td>
+                          <td className="px-4 py-3 border-b text-center">
+                            {getUnitOfMeasureName(detail)}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr className="hover:bg-gray-50">
+                        <td colSpan={3} className="px-4 py-3 border-b text-center text-gray-500">
+                          No se pudieron cargar los detalles de la orden.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Botones de acción - solo mostrar si la orden está pendiente */}
+            {isPending && (
+              <div className="flex justify-center mt-8 space-x-4">
+                <button
+                  className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  onClick={handleApprove}
+                >
+                  Aprobar
+                </button>
+                <button
+                  className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                  onClick={handleReject}
+                >
+                  Rechazar
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
