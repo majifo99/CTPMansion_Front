@@ -7,7 +7,7 @@ import useGallery from '../../../hooks/useGalleries';
 import useCategories from '../../../hooks/useCategories';
 import { Gallery, Category } from '../../../types/Types';
 
-// Importamos los modales desde su carpeta separada (eliminamos DiscardChangesModal)
+// Importamos los modales desde su carpeta separada
 import EditGalleryModal from '../../../modals/galleryModals/EditGalleryModal';
 import EditCategoryModal from '../../../modals/galleryModals/EditCategoryModal';
 import DeleteConfirmationModal from '../../../modals/galleryModals/DeleteConfirmationModal';
@@ -24,6 +24,8 @@ const GalleryPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ id: number, type: 'gallery' | 'category' } | null>(null);
   const [deleteAssociatedImages, setDeleteAssociatedImages] = useState(false);
+  // Estado para almacenar las galerías con sus categorías completas
+  const [enhancedGalleries, setEnhancedGalleries] = useState<Gallery[]>([]);
 
   // Estados para paginación de categorías
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,6 +49,33 @@ const GalleryPage: React.FC = () => {
     fetchCategories();
   }, []);
 
+  // Combinar datos de galerías y categorías para mostrar la información completa
+  useEffect(() => {
+    if (galleries.length > 0 && categories.length > 0) {
+      const galleryWithCategories = galleries.map(gallery => {
+        // Si ya tiene información completa de categoría, la mantenemos
+        if (gallery.category && typeof gallery.category === 'object') {
+          return gallery;
+        }
+        
+        // Si solo tiene el ID de categoría, buscamos la categoría completa
+        if (gallery.categoryId) {
+          const category = categories.find(cat => cat.id_Category === gallery.categoryId);
+          return {
+            ...gallery,
+            category: category || null
+          };
+        }
+        
+        return gallery;
+      });
+      
+      setEnhancedGalleries(galleryWithCategories);
+    } else {
+      setEnhancedGalleries(galleries);
+    }
+  }, [galleries, categories]);
+
   // Filtrado por categoría
   useEffect(() => {
     if (selectedCategoryFilter !== null) {
@@ -57,13 +86,18 @@ const GalleryPage: React.FC = () => {
   }, [selectedCategoryFilter]);
 
   // Filtrado por texto de búsqueda
-  const filteredGalleries = galleries.filter(gallery =>
+  const filteredGalleries = enhancedGalleries.filter(gallery =>
     gallery.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredCategories = categories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Calcular el número de imágenes por categoría
+  const getCategoryImageCount = (categoryId: number) => {
+    return galleries.filter(gallery => gallery.categoryId === categoryId).length;
+  };
 
   // Paginación de categorías
   const indexOfLastCategory = currentPage * itemsPerPage;
@@ -177,12 +211,26 @@ const GalleryPage: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
+  // Función para obtener el nombre de la categoría
+  const getCategoryName = (gallery: Gallery) => {
+    if (gallery.category && gallery.category.name) {
+      return gallery.category.name;
+    }
+    
+    if (gallery.categoryId) {
+      const category = categories.find(cat => cat.id_Category === gallery.categoryId);
+      return category ? category.name : 'Sin categoría';
+    }
+    
+    return 'Sin categoría';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Cabecera con título */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#34436B] mb-4 md:mb-0">
+          <h1 className=" text-3xl font-bold mb-6 ">
             Gestión de Galería
           </h1>
           
@@ -249,13 +297,12 @@ const GalleryPage: React.FC = () => {
                   </select>
                   
                   {/* Botón para agregar imagen */}
-                    <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center transition duration-300"
+                  <button
+                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
                     onClick={() => handleOpenGalleryModal()}
-                    >
-                    <AiTwotonePlusSquare className="mr-2" size={20} />
-                    Agregar Imagen
-                    </button>
+                  >
+                    <AiTwotonePlusSquare size={30} />
+                  </button>
                 </div>
               </div>
 
@@ -314,9 +361,9 @@ const GalleryPage: React.FC = () => {
                       </div>
                       <div className="p-4">
                         <h3 className="font-medium text-gray-800 truncate">{gallery.title}</h3>
-                        {/* Siempre mostrar la categoría independientemente del filtro */}
+                        {/* Usar la función getCategoryName para mostrar siempre la categoría */}
                         <p className="text-sm text-gray-500 mt-1">
-                          {gallery.category?.name || 'Sin categoría'}
+                          {getCategoryName(gallery)}
                         </p>
                       </div>
                     </div>
@@ -332,11 +379,10 @@ const GalleryPage: React.FC = () => {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-800">Categorías</h2>
                     <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center transition duration-300"
-                    onClick={() => handleOpenCategoryModal()}
+                      className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                      onClick={() => handleOpenCategoryModal()}
                     >
-                    <AiTwotonePlusSquare className="mr-2" size={20} />
-                    Agregar Categoría
+                      <AiTwotonePlusSquare size={30} />
                     </button>
               </div>
 
@@ -361,23 +407,22 @@ const GalleryPage: React.FC = () => {
                     <table className="min-w-full bg-white">
                       <thead className="bg-gray-50 text-gray-600 uppercase text-sm leading-normal">
                         <tr>
-                          <th className="py-3 px-6 text-left">ID</th>
+                         
                           <th className="py-3 px-6 text-left">Nombre</th>
-                          <th className="py-3 px-6 text-center">Imágenes</th>
+                          <th className="py-3 px-6 text-center">Cantidad de imágenes</th>
                           <th className="py-3 px-6 text-center">Acciones</th>
                         </tr>
                       </thead>
                       <tbody className="text-gray-600 text-sm">
                         {currentCategories.map((category) => (
                           <tr key={category.id_Category} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="py-3 px-6 text-left whitespace-nowrap">
-                              {category.id_Category}
-                            </td>
+  
                             <td className="py-3 px-6 text-left">
                               {category.name}
                             </td>
                             <td className="py-3 px-6 text-center">
-                              {category.galleries?.length || 0}
+                              {/* Usar la función getCategoryImageCount para mostrar el conteo correcto */}
+                              {getCategoryImageCount(category.id_Category)}
                             </td>
                             <td className="py-3 px-6 text-center">
                                 <div className="flex item-center justify-center gap-2">
