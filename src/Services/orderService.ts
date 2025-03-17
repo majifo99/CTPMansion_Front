@@ -25,28 +25,63 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Función para crear una orden
-export const createOrder = async (order: Order): Promise<Order> => {
+// GET /api/Order - Obtener todas las órdenes
+export const getAllOrders = async (): Promise<Order[]> => {
+  const response = await api.get('/');
+  return response.data;
+};
+
+// POST /api/Order - Crear una nueva orden
+export const createOrder = async (order: Omit<Order, 'orderId'>): Promise<Order> => {
   const response = await api.post('/', order);
   return response.data;
 };
 
-// Función para obtener órdenes por estado (ej. Pending, Approved, Rejected)
-export const getOrdersByStatus = async (status: RequestStatus | null): Promise<Order[]> => {
-  const url = status !== null 
-    ? `/orders-by-status?status=${status}` 
-    : '/orders'; // Endpoint para todas las órdenes
+// GET /api/Order/{id} - Obtener una orden específica por ID
+export const getOrderById = async (id: number): Promise<Order> => {
+  const response = await api.get(`/${id}`);
+  return response.data;
+};
+
+// DELETE /api/Order/{id} - Eliminar una orden específica
+export const deleteOrder = async (id: number): Promise<void> => {
+  await api.delete(`/${id}`);
+};
+
+// GET /api/Order/approved-orders - Obtener órdenes aprobadas
+export const getApprovedOrders = async (): Promise<Order[]> => {
+  const response = await api.get('/approved-orders');
+  return response.data;
+};
+
+// GET /api/Order/orders-by-status - Obtener órdenes por estado
+export const getOrdersByStatus = async (status?: RequestStatus): Promise<Order[]> => {
+  const url = status !== undefined
+    ? `/orders-by-status?status=${status}`
+    : '/orders-by-status';
 
   const response = await api.get(url);
   return response.data;
 };
 
-// Aprobar una orden
+// PATCH /api/Order/{id}/approve - Aprobar una orden
 export const approveOrder = async (id: number): Promise<void> => {
   await api.patch(`/${id}/approve`);
 };
 
-// Rechazar una orden
+// PATCH /api/Order/{id}/reject - Rechazar una orden
 export const rejectOrder = async (id: number): Promise<void> => {
   await api.patch(`/${id}/reject`);
+};
+
+// GET /api/Order/udp/{udpId} - Obtener órdenes asociadas a un UDP específico
+export const getOrdersByUdp = async (udpId: number): Promise<Order[]> => {
+  const response = await api.get(`/udp/${udpId}`);
+  return response.data;
+};
+
+// GET /api/Order/user/{userId} - Obtener órdenes realizadas por un usuario específico
+export const getOrdersByUser = async (userId: string): Promise<Order[]> => {
+  const response = await api.get(`/user/${userId}`);
+  return response.data;
 };

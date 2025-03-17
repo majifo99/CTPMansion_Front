@@ -12,7 +12,6 @@ export enum RequestStatus {
     name: string;
   
   }
-  
 
   export interface NewOrder {
     orderDate: string;
@@ -23,13 +22,12 @@ export enum RequestStatus {
     comments: string;
   }
   
-  export interface OrderDetail {
- 
-    product: Product;
-    quantity: number;
-    unitOfMeasure: string;
-    received: boolean | null;  // Optional field to mark if the product is received
-  }
+export interface OrderDetail {
+  product: Product;
+  quantity: number;
+  unitOfMeasureId: number; // Changed from unitOfMeasure: string
+  received: boolean;
+}
   
   export interface Order {
     orderId: number;
@@ -41,4 +39,9 @@ export enum RequestStatus {
     status: RequestStatus;
     orderDetails: OrderDetail[];
   }
+
+export interface UnitOfMeasure {
+  unitOfMeasureId: number;
+  name: string;
+}
   
