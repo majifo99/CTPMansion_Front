@@ -1,4 +1,3 @@
-// src/DashboardPages/UDPsPage.tsx
 import React, { useState } from 'react';
 import { useUDPs } from '../../../hooks/useUDP';
 import EditUDPModal from '../../../modals/EditUDPModal';
@@ -6,11 +5,14 @@ import { AiFillDelete, AiTwotoneEdit, AiTwotonePlusSquare } from 'react-icons/ai
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UDP } from '../../../types/Types';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const UDPsPage: React.FC = () => {
   const { udps, loading, error, handleAddUDP, handleEditUDP, handleDeleteUDP } = useUDPs();
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [editingUDP, setEditingUDP] = useState<UDP | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5); // Número de UDPs por página
 
   const handleOpenEditModal = (udp?: UDP) => {
     setEditingUDP(udp || null);
@@ -38,6 +40,17 @@ const UDPsPage: React.FC = () => {
     toast.error('UDP eliminado');
   };
 
+  if (loading) return <div className="flex justify-center items-center h-screen"> <ClipLoader color="#3b82f6" size={100} /></div>
+  if (error) return <p>{error}</p>;
+
+  // Cálculo de UDPs para la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUDPs = udps.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(udps.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <ToastContainer />
@@ -63,46 +76,52 @@ const UDPsPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="text-center">Cargando...</td>
+            {currentUDPs.map(udp => (
+              <tr key={udp.id_UDP}>
+                <td className="border px-4 py-2">{udp.title}</td>
+                <td className="border px-4 py-2">{udp.description}</td>
+                <td className="border px-4 py-2">{udp.area}</td>
+                <td className="border px-4 py-2">{udp.balance}</td>
+                <td className="border px-4 py-2">{`${udp.userName} ${udp.userLastName} ${udp.userLastName2}`}</td>
+                <td className="border px-4 py-2 flex justify-center">
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
+                    onClick={() => handleOpenEditModal(udp)}
+                  >
+                    <AiTwotoneEdit size={24} />
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                    onClick={() => handleConfirmDelete(udp.id_UDP)}
+                  >
+                    <AiFillDelete size={24} />
+                  </button>
+                </td>
               </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan={6} className="text-red-500 text-center">{error}</td>
-              </tr>
-            ) : udps.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center">No hay UDPs disponibles.</td>
-              </tr>
-            ) : (
-              udps.map(udp => (
-                <tr key={udp.id_UDP}>
-                  <td className="border px-4 py-2">{udp.title}</td>
-                  <td className="border px-4 py-2">{udp.description}</td>
-                  <td className="border px-4 py-2">{udp.area}</td>
-                  <td className="border px-4 py-2">{udp.balance}</td>
-                  <td className="border px-4 py-2">{`${udp.userName} ${udp.userLastName} ${udp.userLastName2}`}</td>
-                  <td className="border px-4 py-2 flex justify-center">
-                    <button
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
-                      onClick={() => handleOpenEditModal(udp)}
-                    >
-                      <AiTwotoneEdit size={24} />
-                    </button>
-                    <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                      onClick={() => handleConfirmDelete(udp.id_UDP)}
-                    >
-                      <AiFillDelete size={24} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
+
+      {/* Paginación */}
+      <div className="flex justify-center mt-6">
+        <nav className="inline-flex">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </nav>
+      </div>
+
       <EditUDPModal
         show={showEditModal}
         udp={editingUDP}
