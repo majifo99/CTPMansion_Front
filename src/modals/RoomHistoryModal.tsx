@@ -54,7 +54,7 @@ const RoomHistoryModal: React.FC<RoomHistoryModalProps> = ({ isOpen, onClose, ro
           >
             <option value={RequestStatus.Approved}>Aprobadas</option>
             <option value={RequestStatus.Rejected}>Rechazadas</option>
-            <option value="All">Todas (Aprobadas + Rechazadas)</option>
+            <option value="All">Todas </option>
           </select>
         </div>
 

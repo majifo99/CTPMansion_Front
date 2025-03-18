@@ -1,7 +1,6 @@
 import React from 'react';
 import { RequestStatus, RoomRequest } from '../types/RoomRequestType';
 
-
 interface RoomRequestDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -37,51 +36,56 @@ const RoomRequestDetailsModal: React.FC<RoomRequestDetailsModalProps> = ({
     });
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white p-6 rounded-xl shadow-xl max-w-3xl w-full mx-4 relative"
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50" onClick={onClose}>
+      <div 
+        className="bg-white p-6 rounded-xl shadow-xl max-w-3xl w-full mx-4 relative flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-start mb-6">
+        {/* Encabezado */}
+        <div className="flex justify-between items-start mb-4">
           <h2 className="text-2xl font-bold text-gray-800">Detalles de la Solicitud</h2>
-          <button
-            className="text-gray-500 hover:text-gray-700 transition-colors text-2xl"
-            onClick={onClose}
-          >
+          <button className="text-gray-500 hover:text-gray-700 transition-colors text-2xl" onClick={onClose}>
             &times;
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Contenido con Scroll */}
+        <div className="overflow-y-auto flex-grow px-2">
           <table className="w-full text-left text-sm text-gray-700">
             <tbody>
-              {/* Sección: Información de la Sala */}
+              {/* Información de la Sala */}
               <tr className="bg-gray-50">
                 <td colSpan={2} className="px-4 py-3 font-semibold text-gray-700 border-b-2 border-gray-200">
                   Información de la Sala
                 </td>
               </tr>
               <TableRow label="Nombre de la Sala" value={request.roomName} />
+              <TableRow label="Capacidad de asistentes" value={request.numberOfAttendees} />
 
               {/* Separador visual */}
               <tr><td className="h-4" colSpan={2}></td></tr>
 
-              {/* Sección: Detalles de la Solicitud */}
+              {/* Detalles de la Solicitud */}
               <tr className="bg-gray-50">
                 <td colSpan={2} className="px-4 py-3 font-semibold text-gray-700 border-b-2 border-gray-200">
                   Detalles de la Solicitud
                 </td>
               </tr>
               <TableRow label="ID Solicitud" value={request.id_RoomRequest} />
-              <TableRow label="Gestor" value={`${request.managerName} ${request.managerLastName} ${request.managerLastName2}`} />
+              <TableRow 
+                label="Gestor" 
+                value={`${request.managerName} ${request.managerLastName} ${request.managerLastName2}`} 
+              />
               <TableRow label="Curso" value={request.course} />
               <TableRow label="Descripción Actividad" value={request.activityDescription} />
-              <TableRow label="Asistentes" value={request.numberOfAttendees} />
-              <TableRow label="Fecha" value={`${formatDate(request.startDate)} - ${formatDate(request.endDate)}`} />
-              <TableRow label="Horario" value={`${request.startTime} - ${request.endTime}`} />
+              <TableRow 
+                label="Fecha" 
+                value={`${formatDate(request.startDate)} - ${formatDate(request.endDate)}`} 
+              />
+              <TableRow 
+                label="Horario" 
+                value={`${request.startTime} - ${request.endTime}`} 
+              />
               <TableRow label="Necesidades Específicas" value={request.needs} />
 
               {/* Estado de la Solicitud */}
@@ -110,16 +114,17 @@ const RoomRequestDetailsModal: React.FC<RoomRequestDetailsModalProps> = ({
           </table>
         </div>
 
+        {/* Botones Fijos */}
         {isPending && (
-          <div className="flex justify-center space-x-4 mt-6">
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-300 flex justify-end gap-3 p-3">
             <button
-              className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 transition-colors"
               onClick={() => onApprove(request.id_RoomRequest)}
             >
               Aprobar
             </button>
             <button
-              className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 transition-colors"
               onClick={() => onReject(request.id_RoomRequest)}
             >
               Rechazar

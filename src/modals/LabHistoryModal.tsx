@@ -55,7 +55,7 @@ const LabHistoryModal: React.FC<LabHistoryModalProps> = ({ isOpen, onClose, labR
           >
             <option value={RequestStatus.Approved}>Aprobadas</option>
             <option value={RequestStatus.Rejected}>Rechazadas</option>
-            <option value="All">Todas (Aprobadas + Rechazadas)</option>
+            <option value="All">Todas</option>
           </select>
         </div>
 
