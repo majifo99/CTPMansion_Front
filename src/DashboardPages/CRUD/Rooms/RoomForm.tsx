@@ -142,6 +142,14 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
       </div>
 
       <div className="flex justify-end space-x-4 mt-4">
+      
+        <button
+          type="submit"
+          className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Procesando...' : 'Guardar'}
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -151,13 +159,6 @@ const RoomForm: React.FC<RoomFormProps> = ({ room, onSave, onCancel }) => {
           className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
         >
           Cancelar
-        </button>
-        <button
-          type="submit"
-          className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Procesando...' : 'Guardar'}
         </button>
       </div>
     </form>

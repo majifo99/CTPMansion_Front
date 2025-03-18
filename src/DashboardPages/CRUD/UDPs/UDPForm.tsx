@@ -159,23 +159,23 @@ const UDPForm: React.FC<UDPFormProps> = ({ udp, onSave, onCancel }) => {
       </div>
 
       <div className="flex justify-end space-x-4 mt-4">
-        <button
-          type="button"
-          onClick={() => {
-            reset();
-            onCancel();
-          }}
-          className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-        >
-          Guardar
-        </button>
-      </div>
+  <button
+    type="submit"
+    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+  >
+    Guardar
+  </button>
+  <button
+    type="button"
+    onClick={() => {
+      reset();
+      onCancel();
+    }}
+    className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
+  >
+    Cancelar
+  </button>
+</div>
     </form>
   );
 };
