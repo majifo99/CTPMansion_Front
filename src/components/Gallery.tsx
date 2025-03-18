@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import useGallery from '../hooks/useGalleries';
 import { Gallery as GalleryType } from '../types/Types';
 
@@ -33,7 +32,6 @@ export function Gallery() {
 
   // Referencias para controlar las animaciones
   const galleryContainerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Duplicar las imágenes 5 veces para asegurar un efecto infinito más fluido

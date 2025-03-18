@@ -1,5 +1,4 @@
 import React from 'react';
-import { AiOutlineClose } from 'react-icons/ai';
 import { Gallery } from '../../types/Types';
 import GalleryForm from '../../DashboardPages/CRUD/GalleryCategory/GalleryForm';
 

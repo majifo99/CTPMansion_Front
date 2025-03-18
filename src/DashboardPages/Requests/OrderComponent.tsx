@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrders } from '../../hooks/useOrders';
 import { useProducts } from '../../hooks/useProducts';
-import { Order, OrderDetail, Product } from '../../types/Order';
+import { Order, OrderDetail, Product } from '../../types/OrderTypes';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -204,11 +204,11 @@ const OrderComponent: React.FC = () => {
     // Format order details to match API expectations
     const formattedOrderDetails = selectedProducts.map(detail => ({
       product: {
-        id_Product: detail.product.id_Product || null,
+        id_Product: detail.product.id_Product ?? undefined,
         name: detail.product.name
       },
       quantity: detail.quantity,
-      unitOfMeasureId: detail.unitOfMeasureId,
+      unitOfMeasureId: detail.unitOfMeasureId, // Corrected property name
       received: false
     }));
 

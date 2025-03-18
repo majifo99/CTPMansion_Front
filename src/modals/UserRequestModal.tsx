@@ -164,7 +164,7 @@ const UserRequestModal: React.FC<UserRequestModalProps> = ({ isOpen, onClose, us
                       <ul className="ml-4 list-disc space-y-1">
                         {order.orderDetails.map((detail: OrderDetail, index) => (
                           <li key={index}>
-                            <strong>Producto:</strong> {detail.product.name}, <strong>Cantidad:</strong> {detail.quantity}, <strong>Unidad:</strong> {detail.unitOfMeasure}, <strong>Recibido:</strong> {detail.received ? "Sí" : "No"}
+                            <strong>Producto:</strong> {detail.product.name}, <strong>Cantidad:</strong> {detail.quantity}, <strong>Unidad:</strong> {detail.unitOfMeasureId}, <strong>Recibido:</strong> {detail.received ? "Sí" : "No"}
                           </li>
                         ))}
                       </ul>
