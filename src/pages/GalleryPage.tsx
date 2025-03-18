@@ -10,7 +10,7 @@ import 'aos/dist/aos.css';
 
 const GalleryPage = () => {
   // Estados para la galería
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [, setSelectedCategory] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImageTitle, setSelectedImageTitle] = useState<string>('');
@@ -27,8 +27,8 @@ const GalleryPage = () => {
   const categoriesContainerRef = useRef<HTMLDivElement>(null);
 
   // Obtenemos datos de galería y categorías
-  const { galleries, loading: loadingGalleries, error: galleriesError, fetchGalleries, fetchGalleriesByCategory } = useGallery();
-  const { categories, loading: loadingCategories, error: categoriesError } = useCategories();
+  const { galleries, loading: loadingGalleries, fetchGalleries, fetchGalleriesByCategory } = useGallery();
+  const { categories, loading: loadingCategories,  } = useCategories();
   
   // Inicializar AOS para animaciones
   useEffect(() => {
