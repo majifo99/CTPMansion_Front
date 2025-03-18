@@ -1,6 +1,6 @@
 // src/modals/ProductDetailsModal.tsx
-import React, { useEffect, useState, useCallback } from 'react';
-import { Order, OrderDetail, RequestStatus } from '../types/OrderTypes';
+import React, { useEffect, useState } from 'react';
+import { Order, RequestStatus } from '../types/OrderTypes';
 import { useOrders } from '../hooks/useOrders';
 
 interface ProductDetailsModalProps {
@@ -36,12 +36,20 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         try {
           const fullOrder = await handleGetOrderById(order.orderId);
           
-          // Deep copy the order to ensure we're not modifying the original
-          const processedOrder = {...fullOrder};
+          // Create a properly typed Order object with default values for any missing properties
+          const processedOrder: Order = {
+            orderId: fullOrder?.orderId || 0,
+            status: fullOrder?.status || RequestStatus.Pending,
+            orderDate: fullOrder?.orderDate || new Date().toISOString(),
+            userId: fullOrder?.userId || 0,
+            requesterArea: fullOrder?.requesterArea || '',
+            receiver: fullOrder?.receiver || '',
+            comments: fullOrder?.comments || '',
+            orderDetails: fullOrder?.orderDetails || []
+          };
           
-          // If order details are missing or empty, add mock data for testing
+          // If order details are missing or empty, add the ones from the original order prop
           if (!processedOrder.orderDetails || processedOrder.orderDetails.length === 0) {
-            // Use the order details from the original order prop as fallback
             if (order.orderDetails && order.orderDetails.length > 0) {
               processedOrder.orderDetails = [...order.orderDetails];
             }
@@ -64,7 +72,7 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         hasFetchedRef.current = false;
       }
     };
-  }, [isOpen, order?.orderId]); // Remove handleGetOrderById from deps to prevent re-fetching
+  }, [isOpen, order?.orderId, handleGetOrderById]);
 
   if (!isOpen) return null;
 

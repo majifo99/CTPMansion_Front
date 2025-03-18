@@ -13,7 +13,7 @@ export interface Product {
 export interface OrderDetail {
   product: Product;
   quantity: number;
-  unitOfMeasure: string;
+  unitOfMeasure: number;
   received: boolean;
 }
 
