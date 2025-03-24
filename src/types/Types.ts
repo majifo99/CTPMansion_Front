@@ -161,3 +161,28 @@ export interface Category {
   name: string;
   galleries?: Gallery[]; // Opcional para evitar referencias circulares al serializar
 }
+
+// Para el formulario de cambio de contraseña
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+// Para representar las solicitudes del usuario
+export interface UserRequest {
+  id: number;
+  type: 'Laboratorio' | 'Sala';
+  resourceName: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  status: number;
+  activityDescription: string;
+  managerName: string;
+  managerLastName: string;
+  managerLastName2: string;
+  numberOfAttendees: number;
+  needs: string;
+}

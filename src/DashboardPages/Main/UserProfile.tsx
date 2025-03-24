@@ -1,162 +1,342 @@
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form"; // Importación esencial que faltaba
 import { useUserProfile } from "../../hooks/useUserProfile";
 import { useAuth } from "../../contexts/AuthContext";
+import { ChangePasswordDto } from "../../types/Types";
 import ClipLoader from "react-spinners/ClipLoader";
-import ImageUploader from "../../components/ImageUploader";
-
-interface UserProfileFormData {
-  name: string;
-  lastName: string;
-  lastName2: string;
-  email: string;
-  phoneNumber: string;
-  profilePicture: string;
-  emergencyPhoneNumber: string;
-  address: string;
-  institutionJoinDate: string;
-  workJoinDate: string;
-}
-
-// Función para formatear fecha a 'YYYY-MM-DD'
-const formatDate = (date: string | Date): string =>
-  date ? new Date(date).toISOString().split("T")[0] : "";
+import { FaLock, FaTimes, FaEye, FaEyeSlash, FaCheck } from "react-icons/fa"; // Iconos completos
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ViewProfile from "./ProfileComponents/ViewProfile";
+import EditProfile from "./ProfileComponents/EditProfile";
+import UserRequestsTable from "./ProfileComponents/UserRequestsTable";
 
 const UserProfile: React.FC = () => {
   const { user: authUser } = useAuth();
   const userId = authUser?.id;
-  const { user, loading, error, handleUpdateUser } = useUserProfile(userId);
+  const { 
+    user, 
+    loading, 
+    error, 
+    handleUpdateUser, 
+    handleChangePassword, 
+    passwordLoading,
+    passwordError,
+    passwordSuccess,
+    labRequests,
+    roomRequests,
+    requestsLoading,
+    requestsError,
+    fetchUserRequests
+  } = useUserProfile(userId);
 
   const [editMode, setEditMode] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [requestsLoaded, setRequestsLoaded] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    setValue,
-  } = useForm<UserProfileFormData>();
-
+  // Cargar solicitudes una sola vez
   useEffect(() => {
-    if (user) {
-      reset({
-        name: user.name,
-        lastName: user.lastName,
-        lastName2: user.lastName2,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        profilePicture: user.profilePicture,
-        emergencyPhoneNumber: user.emergencyPhoneNumber,
-        address: user.address,
-        institutionJoinDate: formatDate(user.institutionJoinDate),
-        workJoinDate: formatDate(user.workJoinDate),
-      });
+    if (userId && !requestsLoaded) {
+      fetchUserRequests();
+      setRequestsLoaded(true);
     }
-  }, [user, reset]);
+  }, [userId, requestsLoaded, fetchUserRequests]);
 
-  const onSubmit = async (data: UserProfileFormData) => {
-    await handleUpdateUser(data);
-    setEditMode(false);
+  const onSubmitProfile = async (data: any) => {
+    try {
+      await handleUpdateUser(data);
+      setEditMode(false);
+      toast.success("Perfil actualizado con éxito");
+    } catch (err) {
+      toast.error("Error al actualizar el perfil");
+      console.error(err);
+    }
+  };
+
+  const onSubmitPassword = async (data: ChangePasswordDto) => {
+    try {
+      await handleChangePassword(data);
+      if (!passwordError) {
+        setShowPasswordModal(false);
+        toast.success("Contraseña actualizada con éxito");
+      }
+    } catch (err) {
+      // Errores manejados por useUserProfile
+      console.error(err);
+    }
+  };
+
+  const handleRefreshRequests = () => {
+    fetchUserRequests();
   };
 
   if (loading) return <ClipLoader color="#3b82f6" size={100} />;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto my-8 p-6 bg-white rounded-lg shadow-xl">
-      {/* Imagen de perfil */}
-      <div className="flex justify-center">
-        <img
-          src={user?.profilePicture || "https://source.unsplash.com/MP0IUfwrn0A"}
-          alt="Profile"
-          className="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-lg border-4 border-white"
+    <div className="max-w-5xl mx-auto my-8 flex flex-col space-y-8">
+      <ToastContainer position="top-right" autoClose={3000} />
+      
+      {/* Perfil del usuario */}
+      {editMode ? (
+        <EditProfile 
+          user={user} 
+          onSubmit={onSubmitProfile} 
+          onCancel={() => setEditMode(false)} 
         />
-      </div>
-
-      {/* Información del usuario */}
-      <div className="mt-6 text-center">
-        <h1 className="text-2xl md:text-3xl font-bold">{user?.name} {user?.lastName}</h1>
-        <p className="text-gray-600 break-words text-sm sm:text-base text-center px-2 ">{user?.email}</p>
-
-        {/* Información en tarjetas */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[
-            { label: "📞 Teléfono", value: user?.phoneNumber },
-            { label: "🏛️ Ingreso a la Institución", value: formatDate(user?.institutionJoinDate) },
-            { label: "🚨 Contacto de Emergencia", value: user?.emergencyPhoneNumber },
-            { label: "💼 Ingreso al MEP", value: formatDate(user?.workJoinDate) },
-            { label: "📍 Dirección", value: user?.address },
-          ].map((item, index) => (
-            <div key={index} className="p-4 bg-gray-100 rounded-lg flex flex-col sm:flex-row items-start sm:items-center space-x-3">
-              <span className="text-blue-500 text-xl">{item.label.split(" ")[0]}</span>
-              <p className="text-gray-700">
-                <strong>{item.label.split(" ").slice(1).join(" ")}:</strong> {item.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Botón de editar */}
-      <div className="mt-6 flex justify-center">
-        <button
-          onClick={() => setEditMode(true)}
-          className="bg-green-700 hover:bg-green-900 text-white font-bold py-2 px-4 rounded-full"
-        >
-          Editar Perfil
-        </button>
-      </div>
-
-      {/* Formulario de edición */}
-      {editMode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
-            <h2 className="text-xl md:text-2xl font-bold mb-4">Editar Perfil</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { name: "name", label: "Nombre" },
-                  { name: "lastName", label: "Apellido" },
-                  { name: "lastName2", label: "Segundo Apellido" },
-                  { name: "email", label: "Correo Electrónico" },
-                  { name: "phoneNumber", label: "Teléfono" },
-                  { name: "emergencyPhoneNumber", label: "Emergencia" },
-                  { name: "address", label: "Dirección" },
-                ].map(({ name, label }) => (
-                  <div key={name}>
-                    <label className="block font-semibold mb-1">{label}:</label>
-                    <input
-                      type="text"
-                      {...register(name as keyof UserProfileFormData, { required: "Campo obligatorio" })}
-                      className={`w-full p-2 border rounded-lg ${errors[name as keyof UserProfileFormData] ? "border-red-500" : "border-gray-300"}`}
-                    />
-                    {errors[name as keyof UserProfileFormData] && (
-                      <span className="text-red-500 text-sm">{errors[name as keyof UserProfileFormData]?.message}</span>
-                    )}
-                  </div>
-                ))}
-
-                {/* Campos de fecha */}
-                {["institutionJoinDate", "workJoinDate"].map(dateField => (
-                  <div key={dateField}>
-                    <label className="block font-semibold mb-1">{dateField === "institutionJoinDate" ? "Ingreso Institución" : "Ingreso Trabajo"}:</label>
-                    <input type="date" {...register(dateField as keyof UserProfileFormData)} className="w-full p-2 border rounded-lg" />
-                  </div>
-                ))}
-              </div>
-
-              {/* Imagen */}
-              <ImageUploader onImageUpload={(url) => setValue("profilePicture", url)} />
-
-              {/* Botones */}
-              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Guardar Cambios</button>
-                <button type="button" onClick={() => setEditMode(false)} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancelar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+      ) : (
+        <ViewProfile 
+          user={user} 
+          onEdit={() => setEditMode(true)} 
+          onChangePassword={() => setShowPasswordModal(true)}
+        />
       )}
+      
+      {/* Tabla de solicitudes */}
+      <UserRequestsTable
+        labRequests={labRequests}
+        roomRequests={roomRequests}
+        loading={requestsLoading}
+        error={requestsError}
+        onRefresh={handleRefreshRequests}
+      />
+      
+      {/* Modal de Cambio de Contraseña */}
+      {showPasswordModal && (
+        <PasswordChangeModal 
+          onClose={() => setShowPasswordModal(false)}
+          onSubmit={onSubmitPassword}
+          loading={passwordLoading}
+          error={passwordError}
+          passwordSuccess={passwordSuccess}
+        />
+      )}
+    </div>
+  );
+};
+
+interface PasswordChangeModalProps {
+  onClose: () => void;
+  onSubmit: (data: ChangePasswordDto) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+  passwordSuccess: boolean;
+}
+
+const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ 
+  onClose, onSubmit, loading, error, passwordSuccess 
+}) => {
+  const { register, handleSubmit, watch, reset, formState: { errors } } = 
+    useForm<ChangePasswordDto>();
+  
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  
+  const password = watch("newPassword", "");
+  const currentPassword = watch("currentPassword", "");
+  
+  const passwordStrength = {
+    length: password?.length >= 8,
+    hasNumber: /\d/.test(password || ''),
+    hasUpper: /[A-Z]/.test(password || ''),
+    hasLower: /[a-z]/.test(password || ''),
+    hasSpecial: /[^A-Za-z0-9]/.test(password || ''),
+  };
+  const strengthScore = Object.values(passwordStrength).filter(Boolean).length;
+  
+  useEffect(() => {
+    if (passwordSuccess) {
+      reset();
+    }
+  }, [passwordSuccess, reset]);
+
+  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    setShowPassword(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const handleModalSubmit = async (data: ChangePasswordDto) => {
+    try {
+      await onSubmit(data);
+    } catch (err) {
+      console.error("Error submitting password change:", err);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Cambiar Contraseña</h2>
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+            type="button"
+          >
+            <FaTimes />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit(handleModalSubmit)} className="space-y-4">
+          {/* Contraseña actual */}
+          <div>
+            <label className="block font-medium mb-1">Contraseña Actual:</label>
+            <div className="relative">
+              <input
+                type={showPassword.current ? "text" : "password"}
+                {...register("currentPassword", {
+                  required: "La contraseña actual es requerida"
+                })}
+                className="w-full p-2 pr-10 border rounded-lg"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => togglePasswordVisibility('current')}
+              >
+                {showPassword.current ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {errors.currentPassword && (
+              <span className="text-red-500 text-sm">{errors.currentPassword.message}</span>
+            )}
+          </div>
+          
+          {/* Nueva contraseña */}
+          <div>
+            <label className="block font-medium mb-1">Nueva Contraseña:</label>
+            <div className="relative">
+              <input
+                type={showPassword.new ? "text" : "password"}
+                {...register("newPassword", {
+                  required: "La nueva contraseña es requerida",
+                  minLength: {
+                    value: 8,
+                    message: "La contraseña debe tener al menos 8 caracteres"
+                  },
+                  pattern: {
+                    value: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).*$/,
+                    message: "La contraseña debe contener al menos una mayúscula, un número y un carácter especial"
+                  },
+                  validate: value => value !== currentPassword || "La nueva contraseña debe ser diferente a la actual"
+                })}
+                className="w-full p-2 pr-10 border rounded-lg"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => togglePasswordVisibility('new')}
+              >
+                {showPassword.new ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {errors.newPassword && (
+              <span className="text-red-500 text-sm">{errors.newPassword.message}</span>
+            )}
+            
+            {/* Indicador de fortaleza */}
+            {password && (
+              <div className="mt-2">
+                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full ${
+                      strengthScore <= 2 ? 'bg-red-500' : 
+                      strengthScore <= 4 ? 'bg-yellow-500' : 
+                      'bg-green-500'
+                    } ${
+                      strengthScore === 1 ? 'w-1/5' :
+                      strengthScore === 2 ? 'w-2/5' :
+                      strengthScore === 3 ? 'w-3/5' :
+                      strengthScore === 4 ? 'w-4/5' :
+                      strengthScore === 5 ? 'w-full' : 'w-0'
+                    }`}
+                  ></div>
+                </div>
+                <ul className="mt-1 text-xs">
+                  <li className={`flex items-center ${passwordStrength.length ? 'text-green-600' : 'text-gray-500'}`}>
+                    {passwordStrength.length ? <FaCheck className="mr-1" /> : <FaTimes className="mr-1" />}
+                    Mínimo 8 caracteres
+                  </li>
+                  <li className={`flex items-center ${passwordStrength.hasUpper ? 'text-green-600' : 'text-gray-500'}`}>
+                    {passwordStrength.hasUpper ? <FaCheck className="mr-1" /> : <FaTimes className="mr-1" />}
+                    Al menos una mayúscula
+                  </li>
+                  <li className={`flex items-center ${passwordStrength.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
+                    {passwordStrength.hasNumber ? <FaCheck className="mr-1" /> : <FaTimes className="mr-1" />}
+                    Al menos un número
+                  </li>
+                  <li className={`flex items-center ${passwordStrength.hasSpecial ? 'text-green-600' : 'text-gray-500'}`}>
+                    {passwordStrength.hasSpecial ? <FaCheck className="mr-1" /> : <FaTimes className="mr-1" />}
+                    Al menos un carácter especial
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+          
+          {/* Confirmar nueva contraseña */}
+          <div>
+            <label className="block font-medium mb-1">Confirmar Nueva Contraseña:</label>
+            <div className="relative">
+              <input
+                type={showPassword.confirm ? "text" : "password"}
+                {...register("confirmNewPassword", {
+                  required: "Debe confirmar la contraseña",
+                  validate: value => value === watch("newPassword") || "Las contraseñas no coinciden"
+                })}
+                className="w-full p-2 pr-10 border rounded-lg"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => togglePasswordVisibility('confirm')}
+              >
+                {showPassword.confirm ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {errors.confirmNewPassword && (
+              <span className="text-red-500 text-sm">{errors.confirmNewPassword.message}</span>
+            )}
+          </div>
+          
+          {/* Error del backend */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+              {error}
+            </div>
+          )}
+          
+          {/* Botones */}
+          <div className="flex justify-end space-x-3 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-70"
+            >
+              {loading ? (
+                <span className="flex items-center">
+                  <ClipLoader color="#ffffff" size={16} className="mr-2" />
+                  Guardando...
+                </span>
+              ) : (
+                "Guardar Cambios"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
