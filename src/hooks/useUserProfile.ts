@@ -1,12 +1,31 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { getUserById, updateUser } from '../services/userService'; // Ajustar la ruta según sea necesario
+import { 
+  getUserById, 
+  updateUser, 
+  changePassword, 
+  getUserLabRequests, 
+  getUserRoomRequests 
+} from '../services/userService';
+import { ChangePasswordDto } from '../types/Types';
 
 export const useUserProfile = (userId: number | undefined) => {
+  // Estados del perfil de usuario
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  
+  // Estados para cambio de contraseña
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  
+  // Estados para solicitudes del usuario
+  const [labRequests, setLabRequests] = useState<any[]>([]);
+  const [roomRequests, setRoomRequests] = useState<any[]>([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestsError, setRequestsError] = useState<string | null>(null);
 
   // Obtener el token desde las cookies
   const token = Cookies.get('token');
@@ -46,12 +65,69 @@ export const useUserProfile = (userId: number | undefined) => {
       setLoading(false);
     }
   };
+  
+  // Cambiar contraseña
+  const handleChangePassword = async (data: ChangePasswordDto) => {
+    setPasswordLoading(true);
+    setPasswordError(null);
+    setPasswordSuccess(false);
+    
+    try {
+      await changePassword(data);
+      setPasswordSuccess(true);
+    } catch (err: any) {
+      setPasswordError(err.message);
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+  
+  // Cargar solicitudes del usuario
+  const fetchUserRequests = async () => {
+    setRequestsLoading(true);
+    setRequestsError(null);
+    
+    try {
+      const [labData, roomData] = await Promise.all([
+        getUserLabRequests(),
+        getUserRoomRequests()
+      ]);
+      
+      setLabRequests(labData);
+      setRoomRequests(roomData);
+    } catch (err) {
+      setRequestsError('Error al cargar las solicitudes. Verifique la conexión.');
+    } finally {
+      setRequestsLoading(false);
+    }
+  };
+  
+  // Cargar solicitudes al inicializar el hook
+  useEffect(() => {
+    if (token) {
+      fetchUserRequests();
+    }
+  }, [token]);
 
   return {
+    // Datos y funciones del perfil
     user,
     loading,
     error,
     updateSuccess,
     handleUpdateUser,
+    
+    // Datos y funciones para cambio de contraseña
+    passwordLoading,
+    passwordError,
+    passwordSuccess,
+    handleChangePassword,
+    
+    // Datos y funciones para solicitudes
+    labRequests,
+    roomRequests,
+    requestsLoading,
+    requestsError,
+    fetchUserRequests, // Para permitir recargar solicitudes manualmente
   };
 };

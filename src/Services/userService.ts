@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Importar js-cookie para manejar cookies
+import { ChangePasswordDto } from '../types/Types';
 
 // URL base para tu API
 const BASE_URL = 'https://ctplamansion.onrender.com/api';
@@ -91,6 +92,40 @@ export const updateUser = async (userId: number, updatedData: any): Promise<any>
     return response.data;
   } catch (error) {
     console.error(`Error al actualizar los datos del usuario ${userId}:`, error);
+    throw error;
+  }
+};
+
+// Cambio de contraseña
+export const changePassword = async (changePasswordDto: ChangePasswordDto): Promise<string> => {
+  try {
+    const response = await apiClient.post('/User/change-password', changePasswordDto);
+    return response.data;
+  } catch (error: any) {
+    // Capturar mensaje de error específico del backend
+    const errorMessage = error.response?.data || 'Error al cambiar la contraseña';
+    throw new Error(errorMessage);
+  }
+};
+
+// Obtener solicitudes de laboratorio del usuario
+export const getUserLabRequests = async (): Promise<any[]> => {
+  try {
+    const response = await apiClient.get('/LaboratoryRequest/my-requests');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener solicitudes de laboratorio:', error);
+    throw error;
+  }
+};
+
+// Obtener solicitudes de sala del usuario
+export const getUserRoomRequests = async (): Promise<any[]> => {
+  try {
+    const response = await apiClient.get('/RoomRequest/my-requests');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener solicitudes de sala:', error);
     throw error;
   }
 };
