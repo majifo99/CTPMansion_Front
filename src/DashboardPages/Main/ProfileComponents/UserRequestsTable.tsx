@@ -7,7 +7,6 @@ import {
   FaUserClock, 
   FaChevronLeft, 
   FaChevronRight,
-  FaSortDown
 } from 'react-icons/fa';
 
 interface UserRequestsTableProps {

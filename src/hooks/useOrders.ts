@@ -13,10 +13,13 @@ import {
 } from '../services/orderService';
 import { Order, RequestStatus } from '../types/OrderTypes';
 
-export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.Pending) => {
+export const useOrders = (
+  initialStatus: RequestStatus | 'All' = RequestStatus.Pending,
+  loadInitialData: boolean = true // Nuevo parámetro para controlar carga inicial
+) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(loadInitialData);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch orders based on the given status
@@ -104,22 +107,22 @@ export const useOrders = (initialStatus: RequestStatus | 'All' = RequestStatus.P
   };
 
   // Get a specific order by ID
-const handleGetOrderById = async (id: number) => {
-  setLoading(true);
-  try {
-    const data = await getOrderById(id);
-    setSelectedOrder(data);
-    setError(null);
-    return data; // Add this return statement
-  } catch (err) {
-    console.error('Error al obtener la orden:', err);
-    setError('Error al obtener la orden');
-    setSelectedOrder(null);
-    return null; // Add this return statement
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleGetOrderById = async (id: number) => {
+    setLoading(true);
+    try {
+      const data = await getOrderById(id);
+      setSelectedOrder(data);
+      setError(null);
+      return data; // Add this return statement
+    } catch (err) {
+      console.error('Error al obtener la orden:', err);
+      setError('Error al obtener la orden');
+      setSelectedOrder(null);
+      return null; // Add this return statement
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Delete an order
   const handleDeleteOrder = async (id: number) => {
@@ -137,14 +140,22 @@ const handleGetOrderById = async (id: number) => {
     }
   };
   
+  // Solo cargar datos iniciales si loadInitialData es true
   useEffect(() => {
-    fetchOrdersData(initialStatus);  // Fetch orders based on initial status (default: Pending)
-  }, [initialStatus]);
+    if (loadInitialData) {
+      fetchOrdersData(initialStatus);
+    } else {
+      // Si no cargamos datos, asegúrate de que loading esté en false
+      setLoading(false);
+    }
+  }, [initialStatus, loadInitialData]);
 
   const handleApproveOrder = async (id: number) => {
     try {
       await approveOrder(id);
-      fetchOrdersData(initialStatus);  // Refresh orders after approval
+      if (loadInitialData) {
+        fetchOrdersData(initialStatus);  // Refresh orders after approval only if we're loading data
+      }
     } catch (err) {
       console.error('Error al aprobar la orden:', err);
       setError('Error al aprobar la orden');
@@ -154,7 +165,9 @@ const handleGetOrderById = async (id: number) => {
   const handleRejectOrder = async (id: number) => {
     try {
       await rejectOrder(id);
-      fetchOrdersData(initialStatus);  // Refresh orders after rejection
+      if (loadInitialData) {
+        fetchOrdersData(initialStatus);  // Refresh orders after rejection only if we're loading data
+      }
     } catch (err) {
       console.error('Error al rechazar la orden:', err);
       setError('Error al rechazar la orden');
@@ -165,11 +178,15 @@ const handleGetOrderById = async (id: number) => {
     setLoading(true);
     try {
       const newOrder = await createOrder(order);
-      setOrders((prevOrders) => [...prevOrders, newOrder]);  // Añadir la nueva orden a la lista
+      if (loadInitialData) {
+        setOrders((prevOrders) => [...prevOrders, newOrder]);  // Añadir la nueva orden a la lista
+      }
       setError(null);
+      return newOrder; // Retornar la orden creada
     } catch (err) {
       console.error('Error al crear la orden:', err);
       setError('Error al crear la orden');
+      throw err; // Propagar el error para manejo en el componente
     } finally {
       setLoading(false);
     }
