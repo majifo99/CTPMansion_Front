@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUser, FaEnvelope, FaPencilAlt, FaLock } from 'react-icons/fa';
+import { FaEnvelope, FaPencilAlt, FaLock } from 'react-icons/fa';
 
 interface ViewProfileProps {
   user: any;

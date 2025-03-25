@@ -42,6 +42,21 @@ const GalleryPage = React.lazy(() => import('../pages/GalleryPage'));
 // Gestión de galería admin
 const GalleryAdminPage = React.lazy(() => import('../DashboardPages/CRUD/GalleryCategory/GalleryPage'));
 
+// Define los nombres de políticas para usarlos en las rutas
+const policies = {
+  admin: ['Admin'],
+  adminOrUDPManager: ['Admin', 'UDPManager'],
+  adminOrContentEditor: ['Admin', 'ContentEditor'],
+  roomManagement: ['Admin', 'RoomManager'],
+  labManagement: ['Admin', 'LabManager'],
+  certificationManagement: ['Admin', 'CertificationManager'],
+  conferenceRoomManagement: ['Admin', 'ConferenceRoomManager'],
+  roomAndLabRequestManagement: ['Admin', 'UDPManager', 'RoomManager', 'LabManager'],
+  requester: ['RoomandLabRequester'], 
+  allManagers: ['Admin', 'UDPManager', 'CertificationManager', 'LabManager', 
+               'RoomManager', 'ContentEditor', 'ConferenceRoomManager']
+};
+
 const AppRouter: React.FC = () => {
   return (
     <AuthProvider>
@@ -66,7 +81,6 @@ const AppRouter: React.FC = () => {
             <Route path="/request-password-reset" element={<RequestPasswordReset />} />
             <Route path="/reset-password" element={<ResetPasswordForm />} />
             <Route path="/login" element={<LoginForm />} />
-            {/* Nueva ruta para UDPs */}
             <Route path="/udps" element={<UDPsPages />} />
             <Route path="/gallery" element={<GalleryPage />} />
 
@@ -82,148 +96,192 @@ const AppRouter: React.FC = () => {
                 </ProtectedRoute>
               }
             >
+              {/* Dashboard Home - accesible para todos los usuarios autenticados */}
               <Route index element={<DashboardHome />} />
-              <Route
-                path="perfil"
-                element={
-                  <ProtectedRoute>
-                    <UserProfile />
-                  </ProtectedRoute>
-                }
-              />
+              
+              {/* Perfil de usuario - accesible para todos los usuarios autenticados */}
+              <Route path="perfil" element={<UserProfile />} />
+              
+              {/* === RUTAS ADMINISTRATIVAS === */}
+              
+              {/* Órdenes de pedido - Admin only */}
               <Route
                 path="ordenesdepedido"
                 element={
-                  <ProtectedRoute requiredRoles={['Admin']}>
+                  <ProtectedRoute requiredRoles={policies.admin}>
                     <OrdenesDePedido />
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="udps"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
-                    <UDPsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="certificaciones"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'CertificationManager']}>
-                    <CertificacionesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="salas"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'RoomManager', 'ConferenceRoomManager']}>
-                    <SalasPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="laboratorios"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'LabManager']}>
-                    <LabRequestPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="admin-udp-balance"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'UDPManager']}>
-                    <UpdateUDPBalanceComponent />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="orden-de-pedido"
-                element={
-                  <ProtectedRoute requiredRoles={['RoomandLabRequester']}>
-                    <OrderComponent />
-                  </ProtectedRoute>
-                }
-              />
+              
+              {/* Roles - Admin only */}
               <Route
                 path="roles"
                 element={
-                  <ProtectedRoute requiredRoles={['Admin']}>
+                  <ProtectedRoute requiredRoles={policies.admin}>
                     <RolesManagement />
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="eventos"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                    <EventosPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="especialidades"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                    <SpecialitiesPageD />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="talleres"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                    <TalleresPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="elaborar-salas"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                    <RoomsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="elaborar-laboratorios"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                    <ElaborarLaboratoriosPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="galeria"
-                element={
-                  <ProtectedRoute requiredRoles={['Admin', 'ContentEditor']}>
-                    <GalleryAdminPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="solicitar-sala"
-                element={
-                  <ProtectedRoute requiredRoles={['RoomandLabRequester']}>
-                    <SolicitarSala />
-                  </ProtectedRoute>
-                }
-              />
+              
+              {/* Gráficos de estadísticas - Admin only */}
               <Route
                 path="GraficoSalas"
                 element={
-                  <ProtectedRoute requiredRoles={['Admin']}>
+                  <ProtectedRoute requiredRoles={policies.admin}>
                     <AcceptedRejectedChart />
                   </ProtectedRoute>
                 }
               />
+              
+              {/* === GESTIÓN DE UDPS === */}
+              
+              {/* UDPs - AdminOrUDPManagerPolicy */}
+              <Route
+                path="udps"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrUDPManager}>
+                    <UDPsPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Actualización de balance UDP - AdminOrUDPManagerPolicy */}
+              <Route
+                path="admin-udp-balance"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrUDPManager}>
+                    <UpdateUDPBalanceComponent />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* === GESTIÓN DE CONTENIDO === */}
+              
+              {/* Eventos - AdminOrContentEditorPolicy */}
+              <Route
+                path="eventos"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrContentEditor}>
+                    <EventosPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Especialidades - AdminOrContentEditorPolicy */}
+              <Route
+                path="especialidades"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrContentEditor}>
+                    <SpecialitiesPageD />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Talleres - AdminOrContentEditorPolicy */}
+              <Route
+                path="talleres"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrContentEditor}>
+                    <TalleresPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Galería - AdminOrContentEditorPolicy */}
+              <Route
+                path="galeria"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrContentEditor}>
+                    <GalleryAdminPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* === GESTIÓN DE SALAS === */}
+              
+              {/* CRUD de Salas - RoomManagementPolicy */}
+              <Route
+                path="elaborar-salas"
+                element={
+                  <ProtectedRoute requiredRoles={policies.roomManagement}>
+                    <RoomsPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Solicitudes de Salas - RoomManagementPolicy */}
+              <Route
+                path="salas"
+                element={
+                  <ProtectedRoute requiredRoles={policies.roomManagement}>
+                    <SalasPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* === GESTIÓN DE LABORATORIOS === */}
+              
+              {/* CRUD de Laboratorios - LabManagementPolicy */}
+              <Route
+                path="elaborar-laboratorios"
+                element={
+                  <ProtectedRoute requiredRoles={policies.labManagement}>
+                    <ElaborarLaboratoriosPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Solicitudes de Laboratorios - LabManagementPolicy */}
+              <Route
+                path="laboratorios"
+                element={
+                  <ProtectedRoute requiredRoles={policies.labManagement}>
+                    <LabRequestPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* === GESTIÓN DE CERTIFICACIONES === */}
+              
+              {/* Certificaciones - CertificationManagementPolicy */}
+              <Route
+                path="certificaciones"
+                element={
+                  <ProtectedRoute requiredRoles={policies.certificationManagement}>
+                    <CertificacionesPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* === SOLICITUDES DE USUARIO === */}
+              
+              {/* Solicitudes de Sala - Para RoomandLabRequester */}
+              <Route
+                path="solicitar-sala"
+                element={
+                  <ProtectedRoute requiredRoles={policies.requester}>
+                    <SolicitarSala />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Solicitudes de Laboratorio - Para RoomandLabRequester */}
               <Route
                 path="solicitar-laboratorio"
                 element={
-                  <ProtectedRoute requiredRoles={['RoomandLabRequester']}>
+                  <ProtectedRoute requiredRoles={policies.requester}>
                     <SolicitarLaboratorio />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Orden de pedido - Para RoomandLabRequester */}
+              <Route
+                path="orden-de-pedido"
+                element={
+                  <ProtectedRoute requiredRoles={policies.requester}>
+                    <OrderComponent />
                   </ProtectedRoute>
                 }
               />

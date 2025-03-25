@@ -4,7 +4,7 @@ import { useUserProfile } from "../../hooks/useUserProfile";
 import { useAuth } from "../../contexts/AuthContext";
 import { ChangePasswordDto } from "../../types/Types";
 import ClipLoader from "react-spinners/ClipLoader";
-import { FaLock, FaTimes, FaEye, FaEyeSlash, FaCheck } from "react-icons/fa"; // Iconos completos
+import { FaTimes, FaEye, FaEyeSlash, FaCheck } from "react-icons/fa"; // Iconos completos
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ViewProfile from "./ProfileComponents/ViewProfile";

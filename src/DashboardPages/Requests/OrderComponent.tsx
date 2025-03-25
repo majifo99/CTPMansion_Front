@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrders } from '../../hooks/useOrders';
 import { useProducts } from '../../hooks/useProducts';
-import { Order, OrderDetail, Product } from '../../types/OrderTypes';
+import { Order, OrderDetail, Product, RequestStatus } from '../../types/OrderTypes';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useUnitOfMeasure from '../../hooks/useUnitOfMeasure';
 
 const OrderComponent: React.FC = () => {
-  const { handleCreateOrder } = useOrders();
+  // Modificación clave: pasar false como segundo parámetro para evitar cargar datos iniciales
+  const { handleCreateOrder } = useOrders(RequestStatus.Pending, false);
   const { handleSearchProducts, searchResults, searchLoading } = useProducts();
   const { user } = useAuth();
   const { unitOfMeasures, loading: loadingUnitOfMeasures } = useUnitOfMeasure();
