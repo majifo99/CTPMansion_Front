@@ -70,7 +70,13 @@ const UserProfile: React.FC = () => {
     fetchUserRequests();
   };
 
-  if (loading) return <ClipLoader color="#3b82f6" size={100} />;
+  // CAMBIO - Loader centrado con mensaje
+  if (loading) return (
+    <div className="flex flex-col justify-center items-center h-screen">
+      <ClipLoader color="#3b82f6" size={100} />
+    </div>
+  );
+  
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
