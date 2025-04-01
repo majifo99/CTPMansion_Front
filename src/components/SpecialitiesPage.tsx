@@ -6,6 +6,13 @@ import { useEffect, useState } from 'react';
 import AOS from 'aos';
 
 // Interfaz del tipo Speciality
+interface Speciality {
+  id: number; // Match the type from the imported Speciality type
+  title: string;
+  description: string;
+  url_Image?: string;
+  url_Details?: string;
+}
 
 const SpecialitySections = () => {
   const { specialities, loading, error } = useSpecialities();
@@ -58,24 +65,26 @@ const SpecialitySections = () => {
             <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></span>
           </h2>
 
-          {specialities.map((speciality, index) => (
+          {specialities.map((speciality: Speciality, index: number) => (
             <div
               key={speciality.id}
               data-aos="fade-up"
               className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
                 } items-center justify-between mb-16 p-8 bg-white rounded-lg`}
             >
-              {/* Imagen de la especialidad */}
-              <div className="md:w-1/2 w-full h-80">
-                <img
-                  className="w-full h-full object-cover rounded-lg"
-                  src={speciality.url_Image}
-                  alt={speciality.title}
-                />
-              </div>
+              {/* Imagen de la especialidad - solo si existe */}
+              {speciality.url_Image && (
+                <div className="md:w-1/2 w-full h-80">
+                  <img
+                    className="w-full h-full object-cover rounded-lg"
+                    src={speciality.url_Image}
+                    alt={speciality.title}
+                  />
+                </div>
+              )}
 
-              {/* Contenido textual */}
-              <div className="md:w-1/2 w-full p-8">
+              {/* Contenido textual - ancho dinámico según si hay imagen */}
+              <div className={`${speciality.url_Image ? 'md:w-1/2' : 'md:w-full'} w-full p-8`}>
                 <h3 className="text-3xl font-bold text-gray-800 mb-4">
                   {speciality.title}
                 </h3>
@@ -84,7 +93,7 @@ const SpecialitySections = () => {
                 </p>
                 {speciality.url_Details && (
                   <button
-                    onClick={() => handleOpenModal(speciality.url_Details)}
+                    onClick={() => handleOpenModal(speciality.url_Details as string)}
                     className="inline-block bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
                   >
                     Ver más detalles
