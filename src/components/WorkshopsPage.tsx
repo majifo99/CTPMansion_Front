@@ -79,12 +79,6 @@ const TalleresExploratoriosPage = () => {
                 <p className="text-lg text-gray-600 leading-relaxed mb-6  text-justify">
                   {workshop.description}
                 </p>
-                <a
-                  href={`/talleres/${workshop.id}`} // Enlace a más detalles del taller
-                  className="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-                >
-                  Ver más detalles
-                </a>
               </div>
             </div>
           ))}

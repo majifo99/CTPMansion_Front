@@ -5,7 +5,7 @@ const NotFound: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200 text-darkBlue px-4">
       {/* Logo */}
       <img
-        src="https://i.ibb.co/7YKJXpB/La-Mansion.webp"
+        src="https://i.ibb.co/DDgrWtG7/CTPmnsn.webp"
         alt="Logo Institucional"
         className="w-40 h-40 md:w-60 md:h-60 mb-8"
       />
