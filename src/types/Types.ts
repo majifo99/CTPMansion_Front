@@ -65,6 +65,7 @@ export interface Speciality {
   title: string;
   description: string;
   url_Image: string;
+  Url_Details:string;
 }
 
 

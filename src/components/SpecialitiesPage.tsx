@@ -1,25 +1,18 @@
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { useSpecialities } from '../hooks/useSpecialities';
-import 'aos/dist/aos.css'; // Librería de animaciones AOS
+import 'aos/dist/aos.css';
 import { useEffect, useState } from 'react';
-import AOS from 'aos'; // Inicialización de AOS
+import AOS from 'aos';
+
+// Interfaz del tipo Speciality
 
 const SpecialitySections = () => {
   const { specialities, loading, error } = useSpecialities();
 
-  // Array de imágenes para el modal en el orden correspondiente
-  const verMasImages = [
-    'https://i.ibb.co/vj3NG8C/CYCI.jpg',
-    'https://i.ibb.co/60GNKtM/CNA.webp',
-    'https://i.ibb.co/3cMW6MD/SC.webp',
-    'https://i.ibb.co/2sDb81C/IMSI.jpg',
-    'https://i.ibb.co/SxbBJpL/DW.webp',
-  ];
-
-  // Estados para el modal
+  // Estado para manejar el modal
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [modalContent, setModalContent] = useState<string | null>(null);
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
@@ -28,7 +21,7 @@ const SpecialitySections = () => {
   if (loading) {
     return (
       <div className="container mx-auto px-5 py-24">
-        {/* Skeletons para el estado de carga */}
+        {/* Skeleton para carga */}
         {[1, 2, 3].map((skeletonIndex) => (
           <div
             key={skeletonIndex}
@@ -48,24 +41,27 @@ const SpecialitySections = () => {
     );
   }
 
-  if (error) return <p>{error}</p>;
+  if (error) return <p className="text-red-500 text-center">{error}</p>;
+
+  const handleOpenModal = (content: string) => {
+    setModalContent(content);
+    setModalOpen(true);
+  };
 
   return (
     <>
       <Navbar />
-      {/* Agregamos un padding-top para evitar que el contenido quede detrás del navbar */}
       <section className="text-gray-700 body-font bg-gray-50 py-24 pt-24">
         <div className="container mx-auto px-5">
-          {/* Título */}
-          <h2 className="relative text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]">
+          <h2 className="relative text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-[#34436B] to-[#B0C7E4]">
             Nuestras Especialidades
             <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-[#13152A] via-[#4A6FA5] to-[#B0C7E4] mx-auto mt-1 rounded-full"></span>
-            </h2>
+          </h2>
 
           {specialities.map((speciality, index) => (
             <div
               key={speciality.id}
-              data-aos="fade-up" // Animación AOS
+              data-aos="fade-up"
               className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
                 } items-center justify-between mb-16 p-8 bg-white rounded-lg`}
             >
@@ -86,39 +82,34 @@ const SpecialitySections = () => {
                 <p className="text-lg text-gray-600 leading-relaxed mb-6 text-justify">
                   {speciality.description}
                 </p>
-                <button
-                  onClick={() => {
-                    // Obtenemos la imagen correspondiente según el índice
-                    const imageUrl = verMasImages[index];
-                    if (imageUrl) {
-                      setSelectedImage(imageUrl);
-                      setModalOpen(true);
-                    }
-                  }}
-                  className="inline-block bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
-                >
-                  Ver más detalles
-                </button>
+                {speciality.url_Details && (
+                  <button
+                    onClick={() => handleOpenModal(speciality.url_Details)}
+                    className="inline-block bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
+                  >
+                    Ver más detalles
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Modal para mostrar la imagen */}
-      {modalOpen && (
+      {/* Modal para mostrar el contenido */}
+      {modalOpen && modalContent && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 cursor-pointer"
           onClick={() => setModalOpen(false)}
         >
           <div
-            className="relative bg-white rounded-lg max-w-2xl w-full mx-4 cursor-auto"
+            className="relative bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto cursor-auto p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Botón de cerrar con una "X" */}
             <button
-              title="Close"
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+              title="Cerrar"
+              aria-label="Cerrar modal"
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 z-10"
               onClick={() => setModalOpen(false)}
             >
               <svg
@@ -136,12 +127,22 @@ const SpecialitySections = () => {
                 />
               </svg>
             </button>
-            {/* Imagen ajustada */}
-            <img
-              src={selectedImage}
-              alt="Detalle de la especialidad"
-              className="w-full h-auto rounded-lg"
-            />
+
+            {/* Contenido dinámico basado en el tipo de URL */}
+            {modalContent.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
+              <img
+                src={modalContent}
+                alt="Detalle de la especialidad"
+                className="w-full h-auto rounded-lg"
+              />
+            ) : (
+              <iframe 
+                src={modalContent} 
+                className="w-full h-[70vh] border-0"
+                title="Detalles de la especialidad"
+                allowFullScreen
+              />
+            )}
           </div>
         </div>
       )}
