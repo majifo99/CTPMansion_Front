@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 type ImageUploaderProps = {
   onImageUpload: (url: string) => void;
+  initialImage?: string; // Nueva prop para imágenes existentes
 };
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, initialImage }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+
+  // Utilizar la imagen inicial como vista previa si está disponible
+  useEffect(() => {
+    if (initialImage) {
+      setPreview(initialImage);
+    }
+  }, [initialImage]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
