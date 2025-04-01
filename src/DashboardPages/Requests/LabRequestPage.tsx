@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Importa el contexto de autenticación
+import { useAuth } from '../../contexts/AuthContext';
 import { useLabsAndRequests } from '../../hooks/useLabs';
 import { useForm, RegisterOptions } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
@@ -10,18 +10,44 @@ import { LabRequest, RequestStatus } from '../../types/LaboratoryRequestType';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'moment/locale/es';
+
+// Configurar moment en español
+moment.locale('es');
 
 const localizer = momentLocalizer(moment);
+
+// Traducciones para el calendario
+const messages = {
+  allDay: 'Todo el día',
+  previous: 'Anterior',
+  next: 'Siguiente',
+  today: 'Hoy',
+  month: 'Mes',
+  week: 'Semana',
+  day: 'Día',
+  agenda: 'Agenda',
+  date: 'Fecha',
+  time: 'Hora',
+  event: 'Evento',
+  noEventsInRange: 'No hay eventos en este rango',
+  showMore: (total: number) => `+ Ver más (${total})`
+};
 
 type LabRequestFormField = Omit<LabRequest, 'id_LaboratoryRequest' | 'status' | 'userId'>;
 
 const LabRequestPage: React.FC = () => {
   const { labs, labRequests, loading, error, fetchLabRequestsData } = useLabsAndRequests();
-  const { user } = useAuth(); // Obtiene el usuario actual desde el contexto de autenticación
+  const { user } = useAuth();
   const [selectedLab, setSelectedLab] = useState<Laboratory | null>(null);
-  const [activeModal, setActiveModal] = useState<"form" | "calendar" | null>(null);
+  const [activeModal, setActiveModal] = useState<"form" | "calendar" | "reservationDetails" | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<LabRequest | null>(null);
   const { register, handleSubmit, reset } = useForm<LabRequestFormField>();
   const { isSubmitting, submitLabRequest } = useLabRequest();
+
+  const today = moment().format("YYYY-MM-DD");
+  const minTime = moment().set({ hour: 6, minute: 0, second: 0 }).format("HH:mm");
+  const maxTime = moment().set({ hour: 16, minute: 20, second: 0 }).format("HH:mm");
 
   const notifySuccess = () => toast.success('Solicitud de laboratorio enviada exitosamente!');
   const notifyError = (message: string) => toast.error(message);
@@ -76,7 +102,7 @@ const LabRequestPage: React.FC = () => {
       ...data,
       id_LaboratoryRequest: 0,
       laboratoryId: selectedLab.id_Laboratory,
-      userId: user.id.toString(), // Obtiene el ID del usuario desde el contexto
+      userId: user.id.toString(),
       status: RequestStatus.Pending,
       startDate: data.startDate,
       endDate: data.endDate,
@@ -89,7 +115,7 @@ const LabRequestPage: React.FC = () => {
       reset();
       notifySuccess();
       setSelectedLab(null);
-      setActiveModal(null); // Cierra el formulario después de enviar
+      setActiveModal(null);
       fetchLabRequestsData();
     } catch {
       notifyError('Error al enviar la solicitud.');
@@ -101,7 +127,9 @@ const LabRequestPage: React.FC = () => {
     label: string,
     placeholder: string,
     validation: RegisterOptions<LabRequestFormField>,
-    type = 'text'
+    type = 'text',
+    min?: string,
+    max?: string
   ) => (
     <div className="flex flex-col mb-4 w-full md:w-1/2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
@@ -109,6 +137,8 @@ const LabRequestPage: React.FC = () => {
         type={type}
         id={id}
         placeholder={placeholder}
+        min={min}
+        max={max}
         {...register(id, validation)}
         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
       />
@@ -134,9 +164,10 @@ const LabRequestPage: React.FC = () => {
     </div>
   );
 
-  const Modal = ({ onClose }: { onClose: () => void }) => (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl relative">
+  const RequestFormModal = ({ onClose }: { onClose: () => void }) => (
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 relative z-10 overflow-y-auto max-h-screen">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 text-2xl font-bold">&times;</button>
         <h3 className="text-lg font-semibold mb-4 text-center">Solicitud para {selectedLab?.name}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap mt-4">
@@ -157,12 +188,12 @@ const LabRequestPage: React.FC = () => {
             )}
           </div>
           <div className="w-full flex flex-wrap">
-            {renderInputField('startDate', 'Fecha de Inicio', '', { required: 'La fecha de inicio es obligatoria' }, 'date')}
-            {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time')}
+            {renderInputField('startDate', 'Fecha de Inicio', '', { required: 'La fecha de inicio es obligatoria' }, 'date', today)}
+            {renderInputField('startTime', 'Hora de Inicio', '', { required: 'La hora de inicio es obligatoria' }, 'time', minTime, maxTime)}
           </div>
           <div className="w-full flex flex-wrap">
-            {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date')}
-            {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time')}
+            {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date', today)}
+            {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time', minTime, maxTime)}
           </div>
           <div className="w-full px-2 mb-4">
             <label htmlFor="needs" className="block text-sm font-medium text-gray-900">Necesidades</label>
@@ -176,7 +207,7 @@ const LabRequestPage: React.FC = () => {
           <div className="w-full px-2 flex justify-end">
             <button
               type="submit"
-              className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2"
+              className="w-full md:w-auto text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
@@ -187,11 +218,72 @@ const LabRequestPage: React.FC = () => {
     </div>
   );
 
-  const events = labRequests.filter(request => request.laboratoryId === selectedLab?.id_Laboratory && request.status === RequestStatus.Approved).map(request => ({
-    title: `Reservado: ${request.managerName}`,
-    start: moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate(),
-    end: moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate(),
-  }));
+  const ReservationDetailsModal = ({ reservation, onClose }: { reservation: LabRequest, onClose: () => void }) => (
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
+      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 relative z-10">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 text-2xl font-bold">&times;</button>
+        <h3 className="text-lg font-semibold mb-4 text-center">Detalles de la Reserva</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-medium text-gray-900">Encargado:</h4>
+            <p className="text-gray-700">{reservation.managerName} {reservation.managerLastName} {reservation.managerLastName2}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900">Curso:</h4>
+            <p className="text-gray-700">{reservation.course}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900">Actividad:</h4>
+            <p className="text-gray-700">{reservation.activityDescription}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900">Número de Asistentes:</h4>
+            <p className="text-gray-700">{reservation.numberOfAttendees}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900">Fecha:</h4>
+            <p className="text-gray-700">{moment(reservation.startDate).format('dddd, LL')}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900">Horario:</h4>
+            <p className="text-gray-700">
+              {moment(reservation.startTime, 'HH:mm').format('LT')} - {moment(reservation.endTime, 'HH:mm').format('LT')}
+            </p>
+          </div>
+          
+          {reservation.needs && (
+            <div>
+              <h4 className="font-medium text-gray-900">Necesidades Especiales:</h4>
+              <p className="text-gray-700">{reservation.needs}</p>
+            </div>
+          )}
+        </div>
+        
+        <button
+          className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full"
+          onClick={onClose}
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  );
+
+  const events = labRequests
+    .filter(request => request.laboratoryId === selectedLab?.id_Laboratory && request.status === RequestStatus.Approved)
+    .map(request => ({
+      title: `Reservado: ${request.course} - ${request.managerName}`,
+      start: moment(`${request.startDate} ${request.startTime}`, "YYYY-MM-DD HH:mm").toDate(),
+      end: moment(`${request.endDate} ${request.endTime}`, "YYYY-MM-DD HH:mm").toDate(),
+      resource: request
+    }));
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
@@ -200,13 +292,12 @@ const LabRequestPage: React.FC = () => {
         {loading && <p>Cargando laboratorios...</p>}
         {error && <p className="text-red-600">{error}</p>}
         {Array.isArray(labs) && labs
-          .filter(lab => lab.isActive) // Filtra solo los laboratorios activos
+          .filter(lab => lab.isActive)
           .map(lab => (
             <div
               key={lab.id_Laboratory}
-              className="p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 flex flex-col"
+              className="p-4 border border-gray-300 rounded-lg shadow-md flex flex-col bg-white hover:shadow-lg transition-shadow duration-200"
             >
-              {/* Imagen del laboratorio */}
               <img
                 src={lab.url_Image}
                 alt={lab.name}
@@ -214,54 +305,133 @@ const LabRequestPage: React.FC = () => {
               />
               <h3 className="font-semibold text-lg mb-2">{lab.name}</h3>
               <p className="flex-grow text-sm text-gray-700 mb-2">{lab.description}</p>
-              <p className="mt-2 text-sm text-gray-600">Capacidad de asistentes: {lab.capacity}</p>
-              <button
-                className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
-                onClick={() => {
-                  setSelectedLab(lab);
-                  setActiveModal("calendar");
-                }}
-              >
-                Ver Disponibilidad
-              </button>
-              <button
-                className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800"
-                onClick={() => {
-                  setSelectedLab(lab);
-                  setActiveModal("form");
-                }}
-              >
-                Reservar Laboratorio
-              </button>
+              <p className="mt-2 text-sm text-gray-600">
+                <strong>Capacidad:</strong> {lab.capacity} personas
+              </p>
+              <div className="mt-4 flex flex-col space-y-2">
+                <button
+                  className="w-full text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => {
+                    setSelectedLab(lab);
+                    setActiveModal("calendar");
+                  }}
+                >
+                  Ver Disponibilidad
+                </button>
+                <button
+                  className="w-full text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-medium"
+                  onClick={() => {
+                    setSelectedLab(lab);
+                    setActiveModal("form");
+                  }}
+                >
+                  Reservar Laboratorio
+                </button>
+              </div>
             </div>
           ))}
       </div>
 
       {activeModal === "calendar" && selectedLab && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-4xl w-full">
-            <h2 className="text-2xl font-bold mb-4 text-center">Disponibilidad del Laboratorio</h2>
-            <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
-              className="border-2 border-gray-300 rounded-lg shadow-lg"
-            />
-            <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 w-full"
-              onClick={() => setActiveModal(null)}
-            >
-              Cerrar
-            </button>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-6xl mx-4 h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Disponibilidad: {selectedLab.name}</h2>
+              <button 
+                onClick={() => setActiveModal(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-4 bg-blue-50 p-3 rounded-lg">
+              <p className="text-blue-800">
+                <span className="font-semibold">Horario disponible:</span> Lunes a Viernes de 6:00 am a 4:20 pm
+              </p>
+            </div>
+
+            <div className="flex-grow min-h-0 relative">
+              <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                defaultView="month"
+                views={['month', 'week', 'day']}
+                style={{ height: '100%' }}
+                className="border border-gray-200 rounded-lg"
+                messages={messages}
+                min={new Date(0, 0, 0, 6, 0, 0)}
+                max={new Date(0, 0, 0, 16, 20, 0)}
+                onSelectEvent={(event) => {
+                  setSelectedReservation(event.resource);
+                  setActiveModal("reservationDetails");
+                }}
+                eventPropGetter={() => ({
+                  style: {
+                    backgroundColor: '#2563eb',
+                    color: 'white',
+                    borderRadius: '4px',
+                    border: 'none',
+                    fontSize: '0.875rem',
+                    padding: '2px 4px'
+                  }
+                })}
+                dayPropGetter={() => ({
+                  style: {
+                    borderRight: '1px solid #e5e7eb',
+                    borderBottom: '1px solid #e5e7eb'
+                  }
+                })}
+              />
+            </div>
+
+            <div className="mt-4 flex justify-between border-t pt-4">
+              <button
+                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                onClick={() => setActiveModal("form")}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Nueva Reserva
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                onClick={() => setActiveModal(null)}
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {activeModal === "form" && selectedLab && <Modal onClose={() => setActiveModal(null)} />}
+      {activeModal === "form" && selectedLab && (
+        <RequestFormModal onClose={() => setActiveModal(null)} />
+      )}
 
-      <ToastContainer />
+      {activeModal === "reservationDetails" && selectedReservation && (
+        <ReservationDetailsModal 
+          reservation={selectedReservation} 
+          onClose={() => setActiveModal("calendar")} 
+        />
+      )}
+
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };
