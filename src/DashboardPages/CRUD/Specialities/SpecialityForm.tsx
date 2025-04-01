@@ -80,16 +80,6 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
               control={control}
               render={({ field }) => <input {...field} type="hidden" />}
             />
-            {speciality?.url_Image && (
-              <div className="mt-2">
-                <p className="text-sm text-gray-600">Imagen actual:</p>
-                <img 
-                  src={speciality.url_Image} 
-                  alt="Vista previa" 
-                  className="w-full max-h-40 object-contain rounded"
-                />
-              </div>
-            )}
           </div>
 
           {/* Uploader para imagen de detalles */}
@@ -99,21 +89,12 @@ const SpecialityForm: React.FC<SpecialityFormProps> = ({ speciality, onSave, onC
               onImageUpload={handleDetailsImageUpload} 
               initialImage={speciality?.Url_Details}
             />
+            {/* Corregido: Url_Details en lugar de url_Details */}
             <Controller
-              name="url_Details"
+              name="Url_Details"
               control={control}
               render={({ field }) => <input {...field} type="hidden" />}
             />
-            {speciality?.Url_Details && (
-              <div className="mt-2">
-                <p className="text-sm text-gray-600">Imagen actual:</p>
-                <img 
-                  src={speciality.Url_Details} 
-                  alt="Vista previa detalles" 
-                  className="w-full max-h-40 object-contain rounded"
-                />
-              </div>
-            )}
           </div>
 
           {/* Botones responsivos */}
