@@ -13,7 +13,8 @@ import {
   FaImage,
   FaTimes,
   FaChartBar,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaRuler
 } from 'react-icons/fa';
 import { MdRoom, MdScience } from 'react-icons/md';
 import { GiTeacher, GiTakeMyMoney } from 'react-icons/gi';
@@ -328,39 +329,44 @@ const Sidebar: React.FC = () => {
 
         {/* Creación y Elaboración - Contenido */}
         {hasRole(policies.adminOrContentEditor) && (
-          <div className="mb-4">
-            <h3
-              className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer p-2 hover:bg-gray-700 rounded"
-              onClick={() => setIsCreacionElaboracionOpen(!isCreacionElaboracionOpen)}
-            >
-              <div className="flex items-center">
-                <IoIosConstruct size={24} className="mr-2" />
-                {(!isSidebarCollapsed || isMobile) && <span>Contenido Académico</span>}
-              </div>
-              {(!isSidebarCollapsed || isMobile) && (isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />)}
-            </h3>
-            {isCreacionElaboracionOpen && (!isSidebarCollapsed || isMobile) && (
-              <div className="pl-4">
-                <Link to="/dashboard/eventos" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/eventos' ? 'bg-gray-700' : ''}`}>
-                  <IoIosConstruct className="mr-2" />
-                  Eventos
-                </Link>
-                <Link to="/dashboard/especialidades" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/especialidades' ? 'bg-gray-700' : ''}`}>
-                  <BsJournal className="mr-2" />
-                  Especialidades
-                </Link>
-                <Link to="/dashboard/talleres" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/talleres' ? 'bg-gray-700' : ''}`}>
-                  <FaCog className="mr-2" />
-                  Talleres
-                </Link>
-                <Link to="/dashboard/galeria" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/galeria' ? 'bg-gray-700' : ''}`}>
-                  <FaImage className="mr-2" />
-                  Galería
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
+  <div className="mb-4">
+    <h3
+      className="text-lg font-semibold mb-2 flex justify-between items-center cursor-pointer p-2 hover:bg-gray-700 rounded"
+      onClick={() => setIsCreacionElaboracionOpen(!isCreacionElaboracionOpen)}
+    >
+      <div className="flex items-center">
+        <IoIosConstruct size={24} className="mr-2" />
+        {(!isSidebarCollapsed || isMobile) && <span>Contenido Académico</span>}
+      </div>
+      {(!isSidebarCollapsed || isMobile) && (isCreacionElaboracionOpen ? <FaChevronUp /> : <FaChevronDown />)}
+    </h3>
+    {isCreacionElaboracionOpen && (!isSidebarCollapsed || isMobile) && (
+      <div className="pl-4">
+        <Link to="/dashboard/eventos" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/eventos' ? 'bg-gray-700' : ''}`}>
+          <IoIosConstruct className="mr-2" />
+          Eventos
+        </Link>
+        <Link to="/dashboard/especialidades" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/especialidades' ? 'bg-gray-700' : ''}`}>
+          <BsJournal className="mr-2" />
+          Especialidades
+        </Link>
+        <Link to="/dashboard/talleres" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/talleres' ? 'bg-gray-700' : ''}`}>
+          <FaCog className="mr-2" />
+          Talleres
+        </Link>
+        <Link to="/dashboard/galeria" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/galeria' ? 'bg-gray-700' : ''}`}>
+          <FaImage className="mr-2" />
+          Galería
+        </Link>
+        {/* Nuevo enlace para Unidades de Medida */}
+        <Link to="/dashboard/unidades-medida" className={`flex items-center mb-2 hover:bg-gray-700 p-2 rounded ${location.pathname === '/dashboard/unidades-medida' ? 'bg-gray-700' : ''}`}>
+          <FaRuler className="mr-2" />
+          Unidades de Medida
+        </Link>
+      </div>
+    )}
+  </div>
+)}
       </>
     );
   };

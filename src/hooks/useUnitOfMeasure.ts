@@ -9,6 +9,11 @@ import {
 } from '../services/UnitOfMeasureService';
 import { UnitOfMeasure } from '../types/OrderTypes';
 
+// Type for the simplified form data
+type UnitOfMeasureFormData = {
+  name: string;
+};
+
 const useUnitOfMeasure = () => {
   const [unitOfMeasures, setUnitOfMeasures] = useState<UnitOfMeasure[]>([]);
   const [selectedUnitOfMeasure, setSelectedUnitOfMeasure] = useState<UnitOfMeasure | null>(null);
@@ -46,24 +51,34 @@ const useUnitOfMeasure = () => {
   };
 
   // Add a new unit of measure
-  const handleAddUnitOfMeasure = async (unitOfMeasure: Omit<UnitOfMeasure, 'unitOfMeasureId'>) => {
+  const handleAddUnitOfMeasure = async (unitOfMeasureData: UnitOfMeasureFormData) => {
     try {
-      await createUnitOfMeasure(unitOfMeasure);
+      const newUnitOfMeasure = {
+        unitOfMeasureId: 0,
+        name: unitOfMeasureData.name
+      };
+      await createUnitOfMeasure(newUnitOfMeasure);
       fetchUnitOfMeasures();
     } catch (err) {
       console.error('Error adding unit of measure:', err);
       setError('Error al agregar la unidad de medida');
+      throw err; // Rethrow to let the form handle the error
     }
   };
 
   // Update an existing unit of measure
-  const handleUpdateUnitOfMeasure = async (id: number, unitOfMeasure: Omit<UnitOfMeasure, 'unitOfMeasureId'>) => {
+  const handleUpdateUnitOfMeasure = async (id: number, unitOfMeasureData: UnitOfMeasureFormData) => {
     try {
-      await updateUnitOfMeasure(id, unitOfMeasure);
+      const updatedUnitOfMeasure = {
+        unitOfMeasureId: id,
+        name: unitOfMeasureData.name
+      };
+      await updateUnitOfMeasure(id, updatedUnitOfMeasure);
       fetchUnitOfMeasures();
     } catch (err) {
       console.error('Error updating unit of measure:', err);
       setError('Error al actualizar la unidad de medida');
+      throw err; // Rethrow to let the form handle the error
     }
   };
 
@@ -75,6 +90,7 @@ const useUnitOfMeasure = () => {
     } catch (err) {
       console.error('Error patching unit of measure:', err);
       setError('Error al actualizar parcialmente la unidad de medida');
+      throw err;
     }
   };
 
@@ -86,6 +102,7 @@ const useUnitOfMeasure = () => {
     } catch (err) {
       console.error('Error deleting unit of measure:', err);
       setError('Error al eliminar la unidad de medida');
+      throw err;
     }
   };
 

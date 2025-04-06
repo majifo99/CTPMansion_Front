@@ -24,22 +24,17 @@ const OrderComponent: React.FC = () => {
   const [selectedProducts, setSelectedProducts] = useState<OrderDetail[]>([]); 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [quantity, setQuantity] = useState<string>('');
-  const [unitOfMeasure, setUnitOfMeasure] = useState<string>('');
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
-  const [unitSearchTerm, setUnitSearchTerm] = useState<string>('');
-  const [filteredUnits, setFilteredUnits] = useState<any[]>([]);
   const [requesterArea, setRequesterArea] = useState<string>('');
   const [receiver, setReceiver] = useState<string>('');
   const [comments, setComments] = useState<string>('');
   
   // UI control
   const [showProductDropdown, setShowProductDropdown] = useState<boolean>(false);
-  const [showUnitDropdown, setShowUnitDropdown] = useState<boolean>(false);
   const [localSearchLoading, setLocalSearchLoading] = useState<boolean>(false);
   
   // Refs for handling outside clicks
   const productDropdownRef = useRef<HTMLDivElement>(null);
-  const unitDropdownRef = useRef<HTMLDivElement>(null);
   
   // Actualizar resultados locales cuando cambien los del hook
   useEffect(() => {
@@ -73,50 +68,23 @@ const OrderComponent: React.FC = () => {
     }
   };
 
-  // Handle unit of measure search - Modified to not set unitOfMeasure immediately
-  const handleUnitSearchTermChange = (value: string) => {
-    setUnitSearchTerm(value);
-    // Don't set unitOfMeasure here, only when an item is selected
+  // Handle unit selection from dropdown
+  const handleUnitSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const unitId = parseInt(e.target.value);
+    const unit = unitOfMeasures.find(u => u.unitOfMeasureId === unitId);
     
-    if (value === '') {
-      setFilteredUnits(unitOfMeasures);
+    if (unit) {
+      console.log(`Selected unit: ${unit.name} with ID: ${unit.unitOfMeasureId}`);
+      setSelectedUnitId(unitId);
     } else {
-      const filtered = unitOfMeasures.filter(unit => 
-        unit.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredUnits(filtered);
+      setSelectedUnitId(null);
     }
-    
-    setShowUnitDropdown(true);
   };
-
-  // Handle unit selection from dropdown - Modified to accept the full unit object
-  const handleUnitSelect = (unit: any) => {
-    console.log(`Selected unit: ${unit.name} with ID: ${unit.unitOfMeasureId}`);
-    
-    // Set both the display name and store the ID
-    setUnitSearchTerm(unit.name);
-    setUnitOfMeasure(unit.name);
-    setSelectedUnitId(unit.unitOfMeasureId);
-    
-    // Close the dropdown
-    setShowUnitDropdown(false);
-  };
-
-  // Update filtered units when unitOfMeasures changes
-  useEffect(() => {
-    setFilteredUnits(unitOfMeasures);
-  }, [unitOfMeasures]);
-
   // Handle outside clicks to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (productDropdownRef.current && !productDropdownRef.current.contains(event.target as Node)) {
         setShowProductDropdown(false);
-      }
-      
-      if (unitDropdownRef.current && !unitDropdownRef.current.contains(event.target as Node)) {
-        setShowUnitDropdown(false);
       }
     };
     
@@ -135,20 +103,19 @@ const OrderComponent: React.FC = () => {
 
   // Add product to order
   const addProduct = () => {
-    if (!searchTerm || !quantity || !unitOfMeasure) {
-      toast.error('Por favor, completa todos los campos para agregar un producto.');
+    if (!searchTerm) {
+      toast.error('Por favor, ingrese un nombre de producto.');
       return;
     }
-
-    // Use either the selected unit ID or find it from the name
-    let unitId = selectedUnitId;
-    if (!unitId) {
-      const unitOfMeasureObj = unitOfMeasures.find(unit => unit.name === unitOfMeasure);
-      if (!unitOfMeasureObj) {
-        toast.error('Unidad de medida no válida.');
-        return;
-      }
-      unitId = unitOfMeasureObj.unitOfMeasureId;
+    
+    if (!quantity) {
+      toast.error('Por favor, ingrese una cantidad.');
+      return;
+    }
+    
+    if (!selectedUnitId) {
+      toast.error('Por favor, seleccione una unidad de medida.');
+      return;
     }
 
     // Use the selected product if available, or create a new one
@@ -157,7 +124,7 @@ const OrderComponent: React.FC = () => {
     const newOrderDetail: OrderDetail = {
       product: productToAdd,
       quantity: parseInt(quantity),
-      unitOfMeasureId: unitId,
+      unitOfMeasureId: selectedUnitId,
       received: false,
     };
 
@@ -166,12 +133,8 @@ const OrderComponent: React.FC = () => {
     setSelectedProducts([...selectedProducts, newOrderDetail]);
     setSearchTerm('');
     setQuantity('');
-    setUnitOfMeasure('');
-    setUnitSearchTerm('');
     setSelectedProduct(null);
     setSelectedUnitId(null);
-    setLocalSearchResults([]);
-    toast.success('Producto añadido exitosamente');
   };
 
   // Handle product field changes in table
@@ -209,7 +172,7 @@ const OrderComponent: React.FC = () => {
         name: detail.product.name
       },
       quantity: detail.quantity,
-      unitOfMeasureId: detail.unitOfMeasureId, // Corrected property name
+      unitOfMeasureId: detail.unitOfMeasureId,
       received: false
     }));
 
@@ -291,37 +254,26 @@ const OrderComponent: React.FC = () => {
           min="1"
         />
         
-        {/* Unit of measure dropdown with search - MODIFIED */}
-        <div className="relative" ref={unitDropdownRef}>
-          <input
-            type="text"
-            placeholder="Unidad de Medida"
-            value={unitSearchTerm}
-            onChange={(e) => handleUnitSearchTermChange(e.target.value)}
-            onClick={() => setShowUnitDropdown(true)}
-            className="p-2 border rounded w-full cursor-pointer"
-          />
-          {showUnitDropdown && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-              {loadingUnitOfMeasures ? (
-                <div className="p-2 text-center">Cargando unidades...</div>
-              ) : filteredUnits.length > 0 ? (
-                filteredUnits.map((unit) => (
-                  <div 
-                    key={unit.unitOfMeasureId}
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleUnitSelect(unit)} // Pass the whole unit object
-                  >
-                    {unit.name}
-                  </div>
-                ))
-              ) : (
-                <div className="p-2 text-center text-gray-500">
-                  {unitSearchTerm ? 'No hay unidades que coincidan' : 'No hay unidades disponibles'}
-                </div>
-              )}
-            </div>
-          )}
+        {/* Unit of measure DROPDOWN REPLACEMENT */}
+        <div>
+          <select
+            value={selectedUnitId || ""}
+            onChange={handleUnitSelect}
+            className="p-2 border rounded w-full"
+            aria-label="Unidad de medida"
+            title="Unidad de medida"
+          >
+            <option value="" disabled>Seleccionar unidad</option>
+            {loadingUnitOfMeasures ? (
+              <option value="" disabled>Cargando unidades...</option>
+            ) : (
+              unitOfMeasures.map((unit) => (
+                <option key={unit.unitOfMeasureId} value={unit.unitOfMeasureId}>
+                  {unit.name}
+                </option>
+              ))
+            )}
+          </select>
         </div>
         
         {/* Add product button */}

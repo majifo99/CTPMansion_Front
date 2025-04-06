@@ -8,6 +8,7 @@ import DashboardHome from '../DashboardPages/Main/DashboardHome';
 import AcceptedRejectedChart from '../DashboardPages/AcceptedRejectedChart';
 import NotFound from '../pages/NotFound'; // Importar la página 404
 import UDPsPages from '../components/UDPsPages';
+import UnitOfMeasurePage from '../DashboardPages/CRUD/UnitOfMeasure/UnitOfMeasurePage';
 
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const SpecialitiesPage = React.lazy(() => import('../components/SpecialitiesPage'));
@@ -184,6 +185,16 @@ const AppRouter: React.FC = () => {
                 element={
                   <ProtectedRoute requiredRoles={policies.adminOrContentEditor}>
                     <TalleresPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Unidades de Medida - AdminOrContentEditorPolicy */}
+              <Route
+                path="unidades-medida"
+                element={
+                  <ProtectedRoute requiredRoles={policies.adminOrContentEditor}>
+                    <UnitOfMeasurePage />
                   </ProtectedRoute>
                 }
               />
