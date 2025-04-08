@@ -17,6 +17,35 @@ const ResetPasswordForm: React.FC = () => {
     const navigate = useNavigate();
     const { isDarkMode, } = useTheme(); // Access theme state and toggle
 
+    // Validar la contraseña según los requisitos
+    const validatePassword = (password: string): {isValid: boolean, errorMessage: string} => {
+        // Requisitos de contraseña
+        const minLength = 8;
+        const maxLength = 128;
+        
+        // Validar longitud
+        if (!password || password.length < minLength)
+            return { isValid: false, errorMessage: `La contraseña debe tener al menos ${minLength} caracteres.` };
+            
+        if (password.length > maxLength)
+            return { isValid: false, errorMessage: `La contraseña no puede exceder ${maxLength} caracteres.` };
+
+        // Validar complejidad
+        if (!/\d/.test(password))
+            return { isValid: false, errorMessage: "La contraseña debe contener al menos un número." };
+            
+        if (!/[a-z]/.test(password))
+            return { isValid: false, errorMessage: "La contraseña debe contener al menos una letra minúscula." };
+            
+        if (!/[A-Z]/.test(password))
+            return { isValid: false, errorMessage: "La contraseña debe contener al menos una letra mayúscula." };
+            
+        if (!/[^a-zA-Z0-9]/.test(password))
+            return { isValid: false, errorMessage: "La contraseña debe contener al menos un carácter especial." };
+
+        return { isValid: true, errorMessage: "" };
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -30,9 +59,10 @@ const ResetPasswordForm: React.FC = () => {
             return;
         }
 
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-        if (!passwordRegex.test(newPassword)) {
-            setErrorMessage('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.');
+        // Validar la contraseña con los nuevos requisitos
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+            setErrorMessage(passwordValidation.errorMessage);
             return;
         }
 
@@ -123,6 +153,13 @@ const ResetPasswordForm: React.FC = () => {
                             placeholder="Nueva contraseña"
                             required
                         />
+                        <ul className="text-xs text-gray-500 mt-1 list-disc pl-5">
+                            <li>Al menos 8 caracteres (máximo 128)</li>
+                            <li>Al menos una letra mayúscula</li>
+                            <li>Al menos una letra minúscula</li>
+                            <li>Al menos un número</li>
+                            <li>Al menos un carácter especial (!@#$%...)</li>
+                        </ul>
                     </div>
 
                     <div>

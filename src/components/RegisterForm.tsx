@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
+import ImageUploader from './ImageUploader'; // Importar el componente ImageUploader
 
 Modal.setAppElement('#root');
 
@@ -14,43 +15,30 @@ interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword: string;
-  profilePicture: FileList;
+  profilePicture: string; // URL de la imagen
   address: string;
   institutionJoinDate: string;
   workJoinDate: string;
 }
 
 const RegisterForm: React.FC = () => {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormData>();
+  const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm<RegisterFormData>();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const password = watch("password");
 
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
+  // Función para manejar la subida de imagen
+  const handleImageUpload = (url: string) => {
+    setValue("profilePicture", url);
   };
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsSubmitting(true);
     try {
-      let base64Image = '';
-      const profilePictureFile = data.profilePicture?.[0];
-      if (profilePictureFile) {
-        base64Image = await convertToBase64(profilePictureFile);
-      }
-
-      const { confirmPassword, profilePicture, ...rest } = data;
-      const dataToSend = {
-        ...rest,
-        profilePicture: base64Image
-      };
+      // Remove confirmPassword as it's not needed in the API request
+      const { confirmPassword, ...dataToSend } = data;
 
       const response = await fetch('https://ctplamansion.onrender.com/api/User/register', {
         method: 'POST',
@@ -95,7 +83,7 @@ const RegisterForm: React.FC = () => {
         />
       </div>
 
-      <div className="lg:p-8 md:p-8 sm:p-6 p-4 w-full lg:w-1/2 h-full bg-white shadow-lg rounded-lg">
+      <div className="lg:p-8 md:p-8 sm:p-6 p-4 w-full lg:w-1/2 h-full bg-white shadow-lg rounded-lg overflow-y-auto">
         <h1 className="text-2xl font-semibold mb-4">Regístrate</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -105,36 +93,54 @@ const RegisterForm: React.FC = () => {
               <label htmlFor="name" className="block mb-1 text-sm">Nombre</label>
               <input
                 type="text"
-                {...register("name", { required: "El nombre es requerido" })}
+                {...register("name", { 
+                  required: "El nombre es requerido",
+                  minLength: {
+                    value: 2,
+                    message: "El nombre debe tener al menos 2 caracteres"
+                  }
+                })}
                 id="name"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="Juan"
               />
-              {errors.name && <span className="text-red-500 text-xs">{errors.name.message}</span>}
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
 
             <div>
               <label htmlFor="lastName" className="block mb-1 text-sm">Primer Apellido</label>
               <input
                 type="text"
-                {...register("lastName", { required: "El primer apellido es requerido" })}
+                {...register("lastName", { 
+                  required: "El primer apellido es requerido",
+                  minLength: {
+                    value: 2,
+                    message: "El apellido debe tener al menos 2 caracteres"
+                  }
+                })}
                 id="lastName"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="Pérez"
               />
-              {errors.lastName && <span className="text-red-500 text-xs">{errors.lastName.message}</span>}
+              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
             </div>
 
             <div>
               <label htmlFor="lastName2" className="block mb-1 text-sm">Segundo Apellido</label>
               <input
                 type="text"
-                {...register("lastName2", { required: "El segundo apellido es requerido" })}
+                {...register("lastName2", { 
+                  required: "El segundo apellido es requerido",
+                  minLength: {
+                    value: 2,
+                    message: "El apellido debe tener al menos 2 caracteres"
+                  }
+                })}
                 id="lastName2"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="Gómez"
               />
-              {errors.lastName2 && <span className="text-red-500 text-xs">{errors.lastName2.message}</span>}
+              {errors.lastName2 && <p className="text-red-500 text-xs mt-1">{errors.lastName2.message}</p>}
             </div>
           </div>
 
@@ -147,15 +153,15 @@ const RegisterForm: React.FC = () => {
                 {...register("phoneNumber", { 
                   required: "El número de teléfono es requerido",
                   pattern: {
-                    value: /^\d{4}-\d{4}$/,
-                    message: "Formato inválido (ejemplo: 8888-8888)"
+                    value: /^[0-9\-]{8,15}$/,
+                    message: "Formato inválido. Ejemplo: 8888-8888"
                   }
                 })}
                 id="phoneNumber"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="8888-8888"
               />
-              {errors.phoneNumber && <span className="text-red-500 text-xs">{errors.phoneNumber.message}</span>}
+              {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
             </div>
 
             <div>
@@ -163,17 +169,17 @@ const RegisterForm: React.FC = () => {
               <input
                 type="text"
                 {...register("emergencyPhoneNumber", { 
-                  required: "Este campo es requerido",
+                  required: "El teléfono de emergencia es requerido",
                   pattern: {
-                    value: /^\d{4}-\d{4}$/,
-                    message: "Formato inválido (ejemplo: 8888-8888)"
+                    value: /^[0-9\-]{8,15}$/,
+                    message: "Formato inválido. Ejemplo: 8888-8888"
                   }
                 })}
                 id="emergencyPhoneNumber"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="8888-8888"
               />
-              {errors.emergencyPhoneNumber && <span className="text-red-500 text-xs">{errors.emergencyPhoneNumber.message}</span>}
+              {errors.emergencyPhoneNumber && <p className="text-red-500 text-xs mt-1">{errors.emergencyPhoneNumber.message}</p>}
             </div>
           </div>
 
@@ -182,18 +188,18 @@ const RegisterForm: React.FC = () => {
             <label htmlFor="email" className="block mb-1 text-sm">Correo Electrónico</label>
             <input
               type="email"
-              {...register("email", {
+              {...register("email", { 
                 required: "El correo electrónico es requerido",
                 pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: "Correo electrónico inválido",
-                },
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Dirección de correo inválida"
+                }
               })}
               id="email"
               className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
               placeholder="nombre@empresa.com"
             />
-            {errors.email && <span className="text-red-500 text-xs">{errors.email.message}</span>}
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
 
           {/* Contraseñas */}
@@ -202,38 +208,43 @@ const RegisterForm: React.FC = () => {
               <label htmlFor="password" className="block mb-1 text-sm">Contraseña</label>
               <input
                 type="password"
-                {...register("password", {
+                {...register("password", { 
                   required: "La contraseña es requerida",
                   minLength: {
                     value: 8,
-                    message: "La contraseña debe tener al menos 8 caracteres",
+                    message: "La contraseña debe tener al menos 8 caracteres"
                   },
-                  pattern: {
-                    value: /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/,
-                    message: "Debe tener al menos 8 caracteres, una mayúscula y un número",
+                  maxLength: {
+                    value: 128,
+                    message: "La contraseña no puede exceder 128 caracteres"
+                  },
+                  validate: {
+                    hasNumber: value => /\d/.test(value) || "La contraseña debe contener al menos un número",
+                    hasLower: value => /[a-z]/.test(value) || "La contraseña debe contener al menos una letra minúscula",
+                    hasUpper: value => /[A-Z]/.test(value) || "La contraseña debe contener al menos una letra mayúscula",
+                    hasSpecial: value => /[^a-zA-Z0-9]/.test(value) || "La contraseña debe contener al menos un carácter especial"
                   }
                 })}
                 id="password"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="••••••••"
               />
-              {errors.password && <span className="text-red-500 text-xs">{errors.password.message}</span>}
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
 
             <div>
               <label htmlFor="confirmPassword" className="block mb-1 text-sm">Confirmar Contraseña</label>
               <input
                 type="password"
-                {...register("confirmPassword", {
-                  required: "Confirma tu contraseña",
-                  validate: value =>
-                    value === password || "Las contraseñas no coinciden"
+                {...register("confirmPassword", { 
+                  required: "Debe confirmar la contraseña",
+                  validate: value => value === password || "Las contraseñas no coinciden"
                 })}
                 id="confirmPassword"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="••••••••"
               />
-              {errors.confirmPassword && <span className="text-red-500 text-xs">{errors.confirmPassword.message}</span>}
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
             </div>
           </div>
 
@@ -242,12 +253,18 @@ const RegisterForm: React.FC = () => {
             <label htmlFor="address" className="block mb-1 text-sm">Dirección</label>
             <input
               type="text"
-              {...register("address", { required: "La dirección es requerida" })}
+              {...register("address", { 
+                required: "La dirección es requerida",
+                minLength: {
+                  value: 5,
+                  message: "La dirección debe tener al menos 5 caracteres"
+                }
+              })}
               id="address"
               className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
               placeholder="Dirección completa"
             />
-            {errors.address && <span className="text-red-500 text-xs">{errors.address.message}</span>}
+            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
           </div>
 
           {/* Fechas */}
@@ -256,39 +273,38 @@ const RegisterForm: React.FC = () => {
               <label htmlFor="institutionJoinDate" className="block mb-1 text-sm">Ingreso a Institución</label>
               <input
                 type="date"
-                {...register("institutionJoinDate", { required: "Esta fecha es requerida" })}
+                {...register("institutionJoinDate", { 
+                  required: "La fecha de ingreso a la institución es requerida"
+                })}
                 id="institutionJoinDate"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
               />
-              {errors.institutionJoinDate && <span className="text-red-500 text-xs">{errors.institutionJoinDate.message}</span>}
+              {errors.institutionJoinDate && <p className="text-red-500 text-xs mt-1">{errors.institutionJoinDate.message}</p>}
             </div>
 
             <div>
               <label htmlFor="workJoinDate" className="block mb-1 text-sm">Ingreso al Trabajo</label>
               <input
                 type="date"
-                {...register("workJoinDate", { required: "Esta fecha es requerida" })}
+                {...register("workJoinDate", { 
+                  required: "La fecha de ingreso al trabajo es requerida"
+                })}
                 id="workJoinDate"
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
               />
-              {errors.workJoinDate && <span className="text-red-500 text-xs">{errors.workJoinDate.message}</span>}
+              {errors.workJoinDate && <p className="text-red-500 text-xs mt-1">{errors.workJoinDate.message}</p>}
             </div>
           </div>
 
-          {/* Foto de Perfil */}
-          <div>
-            <label htmlFor="profilePicture" className="block mb-1 text-sm">Foto de Perfil</label>
+          {/* Foto de Perfil (usando ImageUploader) - Opcional */}
+          <div className="flex flex-col">
+            <label className="block mb-1 text-sm">Foto de Perfil (opcional)</label>
+            <ImageUploader onImageUpload={handleImageUpload} />
             <input
-              type="file"
-              accept="image/*"
-              {...register("profilePicture", { 
-                required: "La foto de perfil es requerida",
-                validate: value => value?.length > 0 || "Debe seleccionar una imagen"
-              })}
+              type="hidden"
+              {...register("profilePicture")}
               id="profilePicture"
-              className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
             />
-            {errors.profilePicture && <span className="text-red-500 text-xs">{errors.profilePicture.message}</span>}
           </div>
 
           {/* Botón de Registro */}
