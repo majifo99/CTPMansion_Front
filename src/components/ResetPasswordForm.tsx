@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from './ThemeContext';
+import { resetPassword } from '../services/authService';
 
 Modal.setAppElement('#root');
 
@@ -67,22 +67,10 @@ const ResetPasswordForm: React.FC = () => {
         }
 
         try {
-            const response = await axios.post('https://ctplamansion.onrender.com/api/User/reset-password', {
-                email,
-                token,
-                newPassword
-            }, {
-                headers: { 'Content-Type': 'application/json-patch+json' }
-            });
-
-            if (response.status === 200) {
-                setSuccessMessage('Su contraseña ha sido restablecida exitosamente.');
-                setErrorMessage(null);
-                setIsModalOpen(true);
-            } else {
-                setSuccessMessage(null);
-                setErrorMessage('No se pudo restablecer la contraseña.');
-            }
+            await resetPassword(email, token, newPassword);
+            setSuccessMessage('Su contraseña ha sido restablecida exitosamente.');
+            setErrorMessage(null);
+            setIsModalOpen(true);
         } catch (error) {
             setSuccessMessage(null);
             setErrorMessage('Ocurrió un error. Por favor, inténtelo de nuevo.');

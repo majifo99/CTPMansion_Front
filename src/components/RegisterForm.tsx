@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import ImageUploader from './ImageUploader'; // Importar el componente ImageUploader
+import { register as registerUser } from "../services/authService"; // Importar la función de registro desde authService
 
 Modal.setAppElement('#root');
 
@@ -40,15 +41,8 @@ const RegisterForm: React.FC = () => {
       // Remove confirmPassword as it's not needed in the API request
       const { confirmPassword, ...dataToSend } = data;
 
-      const response = await fetch('https://ctplamansion.onrender.com/api/User/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend),
-      });
-
-      if (!response.ok) throw new Error('Error en la solicitud');
-
-      const result = await response.json();
+      // Usar la función de registro desde authService
+      const result = await registerUser(dataToSend);
       const userId = result.id_User;
 
       if (userId) {

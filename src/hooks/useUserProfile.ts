@@ -3,10 +3,10 @@ import Cookies from 'js-cookie';
 import { 
   getUserById, 
   updateUser, 
-  changePassword, 
   getUserLabRequests, 
   getUserRoomRequests 
 } from '../services/userService';
+import { changePassword } from '../services/authService';
 import { ChangePasswordDto } from '../types/Types';
 
 export const useUserProfile = (userId: number | undefined) => {
