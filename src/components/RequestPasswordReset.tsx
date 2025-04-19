@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
+import { sendPasswordResetToken } from '../services/authService';
 
 Modal.setAppElement('#root');
 
@@ -17,20 +17,10 @@ const RequestPasswordReset: React.FC = () => {
         e.preventDefault();
         setIsProcessing(true);
         try {
-            const response = await axios.post(
-                'https://ctplamansion.onrender.com/api/User/send-password-reset-token',
-                `"${email}"`,
-                { headers: { 'Content-Type': 'application/json-patch+json' } }
-            );
-
-            if (response.status === 200) {
-                setMessage('Se ha enviado un código de seguridad a su correo electrónico.');
-                setError(null);
-                setIsModalOpen(true);
-            } else {
-                setMessage(null);
-                setError('No se pudo enviar el código. Verifique su correo e inténtelo de nuevo.');
-            }
+            await sendPasswordResetToken(email);
+            setMessage('Se ha enviado un código de seguridad a su correo electrónico.');
+            setError(null);
+            setIsModalOpen(true);
         } catch (error) {
             setMessage(null);
             setError('Ocurrió un error al enviar el código. Por favor, inténtelo de nuevo.');
@@ -43,9 +33,10 @@ const RequestPasswordReset: React.FC = () => {
         setIsModalOpen(false);
         navigate('/reset-password');
     };
+    
     const handleGoBack = () => {
       navigate('/login');
-  };
+    };
 
     return (
         <div className="bg-white text-gray-800 flex justify-center items-center h-full">

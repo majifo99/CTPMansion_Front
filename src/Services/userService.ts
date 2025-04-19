@@ -1,6 +1,5 @@
 import axios from 'axios';
-import Cookies from 'js-cookie'; // Importar js-cookie para manejar cookies
-import { ChangePasswordDto } from '../types/Types';
+import Cookies from 'js-cookie';
 
 // URL base para tu API
 const BASE_URL = 'https://ctplamansion.onrender.com/api';
@@ -93,18 +92,6 @@ export const updateUser = async (userId: number, updatedData: any): Promise<any>
   } catch (error) {
     console.error(`Error al actualizar los datos del usuario ${userId}:`, error);
     throw error;
-  }
-};
-
-// Cambio de contraseña
-export const changePassword = async (changePasswordDto: ChangePasswordDto): Promise<string> => {
-  try {
-    const response = await apiClient.post('/User/change-password', changePasswordDto);
-    return response.data;
-  } catch (error: any) {
-    // Capturar mensaje de error específico del backend
-    const errorMessage = error.response?.data || 'Error al cambiar la contraseña';
-    throw new Error(errorMessage);
   }
 };
 

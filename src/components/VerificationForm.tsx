@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { verifyEmail, resendVerificationCode } from '../services/authService';
 
 const VerificationForm = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -18,16 +18,10 @@ const VerificationForm = () => {
     }
 
     try {
-      const response = await axios.post(`https://ctplamansion.onrender.com/api/User/verify-email?userId=${userId}&verificationCode=${verificationCode}`);
-
-      if (response.status === 200) {
-        setSuccess(true);
-        setError(null);
-        sessionStorage.removeItem('userId');
-      } else {
-        setError('La verificación falló. Por favor, inténtalo de nuevo.');
-        setSuccess(false);
-      }
+      await verifyEmail(userId, verificationCode);
+      setSuccess(true);
+      setError(null);
+      sessionStorage.removeItem('userId');
     } catch (error) {
       setError('Error al verificar el código. Por favor, inténtalo de nuevo.');
       setSuccess(false);
@@ -41,15 +35,9 @@ const VerificationForm = () => {
     }
 
     try {
-      const response = await axios.post(`https://localhost:7055/api/User/resend-verification-code?userId=${userId}`);
-
-      if (response.status === 200) {
-        setResendMessage('El código de verificación ha sido reenviado a tu correo electrónico.');
-        setError(null);
-      } else {
-        setResendMessage(null);
-        setError('No se pudo reenviar el código. Por favor, inténtalo de nuevo.');
-      }
+      await resendVerificationCode(userId);
+      setResendMessage('El código de verificación ha sido reenviado a tu correo electrónico.');
+      setError(null);
     } catch (error) {
       setResendMessage(null);
       setError('Error al reenviar el código. Por favor, inténtalo de nuevo.');
