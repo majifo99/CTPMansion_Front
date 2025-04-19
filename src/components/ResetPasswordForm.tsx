@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from './ThemeContext';
 import { resetPassword } from '../services/authService';
 
 Modal.setAppElement('#root');
@@ -14,36 +13,22 @@ const ResetPasswordForm: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
     const navigate = useNavigate();
-    const { isDarkMode, } = useTheme(); // Access theme state and toggle
 
-    // Validar la contraseña según los requisitos
-    const validatePassword = (password: string): {isValid: boolean, errorMessage: string} => {
-        // Requisitos de contraseña
+    const validatePassword = (password: string): string[] => {
+        const errors: string[] = [];
         const minLength = 8;
         const maxLength = 128;
         
-        // Validar longitud
-        if (!password || password.length < minLength)
-            return { isValid: false, errorMessage: `La contraseña debe tener al menos ${minLength} caracteres.` };
-            
-        if (password.length > maxLength)
-            return { isValid: false, errorMessage: `La contraseña no puede exceder ${maxLength} caracteres.` };
+        if (password.length < minLength) errors.push(`La contraseña debe tener al menos ${minLength} caracteres.`);
+        if (password.length > maxLength) errors.push(`La contraseña no puede exceder ${maxLength} caracteres.`);
+        if (!/\d/.test(password)) errors.push("La contraseña debe contener al menos un número.");
+        if (!/[a-z]/.test(password)) errors.push("La contraseña debe contener al menos una letra minúscula.");
+        if (!/[A-Z]/.test(password)) errors.push("La contraseña debe contener al menos una letra mayúscula.");
+        if (!/[^a-zA-Z0-9]/.test(password)) errors.push("La contraseña debe contener al menos un carácter especial.");
 
-        // Validar complejidad
-        if (!/\d/.test(password))
-            return { isValid: false, errorMessage: "La contraseña debe contener al menos un número." };
-            
-        if (!/[a-z]/.test(password))
-            return { isValid: false, errorMessage: "La contraseña debe contener al menos una letra minúscula." };
-            
-        if (!/[A-Z]/.test(password))
-            return { isValid: false, errorMessage: "La contraseña debe contener al menos una letra mayúscula." };
-            
-        if (!/[^a-zA-Z0-9]/.test(password))
-            return { isValid: false, errorMessage: "La contraseña debe contener al menos un carácter especial." };
-
-        return { isValid: true, errorMessage: "" };
+        return errors;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -59,10 +44,9 @@ const ResetPasswordForm: React.FC = () => {
             return;
         }
 
-        // Validar la contraseña con los nuevos requisitos
-        const passwordValidation = validatePassword(newPassword);
-        if (!passwordValidation.isValid) {
-            setErrorMessage(passwordValidation.errorMessage);
+        const validationErrors = validatePassword(newPassword);
+        if (validationErrors.length > 0) {
+            setPasswordErrors(validationErrors);
             return;
         }
 
@@ -83,25 +67,17 @@ const ResetPasswordForm: React.FC = () => {
     };
 
     return (
-        <div className={`${isDarkMode ? 'bg-[#13152A] text-gray-300' : 'bg-gray-100 text-gray-800'} flex justify-center items-center h-screen`}>
+        <div className="bg-gray-100 text-gray-800 flex justify-center items-center h-screen">
             <div className="hidden lg:block w-1/2 h-screen">
                 <img
                     src="https://i.ibb.co/dKVCLB2/ctp-m.jpg"
                     alt="Imagen de fondo"
-                    className={`object-cover w-full h-full ${isDarkMode ? 'opacity-60' : ''}`}
+                    className="object-cover w-full h-full"
                 />
             </div>
 
-            <div className={`lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2 h-full ${isDarkMode ? 'bg-[#13152A]' : 'bg-white'} shadow-lg rounded-lg`}>
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-semibold">Restablecer Contraseña</h1>
-                    <div className="flex items-center">
-                        <span className="text-sm mr-2">{isDarkMode ? 'Modo Noche' : 'Modo Día'}</span>
-                        <label className="inline-flex relative items-center cursor-pointer">
-                            <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
-                        </label>
-                    </div>
-                </div>
+            <div className="lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2 h-full bg-white shadow-lg rounded-lg">
+                <h1 className="text-3xl font-semibold mb-6">Restablecer Contraseña</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -111,7 +87,7 @@ const ResetPasswordForm: React.FC = () => {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+                            className="w-full border rounded-md py-2 px-3 bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500 focus:outline-none"
                             placeholder="Correo electrónico"
                             required
                         />
@@ -124,7 +100,7 @@ const ResetPasswordForm: React.FC = () => {
                             id="token"
                             value={token}
                             onChange={(e) => setToken(e.target.value)}
-                            className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+                            className="w-full border rounded-md py-2 px-3 bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500 focus:outline-none"
                             placeholder="Código de verificación"
                             required
                         />
@@ -136,18 +112,21 @@ const ResetPasswordForm: React.FC = () => {
                             type="password"
                             id="newPassword"
                             value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+                            onChange={(e) => {
+                                setNewPassword(e.target.value);
+                                setPasswordErrors(validatePassword(e.target.value));
+                            }}
+                            className="w-full border rounded-md py-2 px-3 bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500 focus:outline-none"
                             placeholder="Nueva contraseña"
                             required
                         />
-                        <ul className="text-xs text-gray-500 mt-1 list-disc pl-5">
-                            <li>Al menos 8 caracteres (máximo 128)</li>
-                            <li>Al menos una letra mayúscula</li>
-                            <li>Al menos una letra minúscula</li>
-                            <li>Al menos un número</li>
-                            <li>Al menos un carácter especial (!@#$%...)</li>
-                        </ul>
+                        {passwordErrors.length > 0 && (
+                            <div className="text-xs text-red-500 mt-1">
+                                {passwordErrors.map((error, index) => (
+                                    <p key={index}>{error}</p>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div>
@@ -157,7 +136,7 @@ const ResetPasswordForm: React.FC = () => {
                             id="confirmPassword"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className={`w-full border rounded-md py-2 px-3 ${isDarkMode ? 'bg-[#13152A] text-gray-300 border-gray-600 focus:border-teal-500' : 'bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500'} focus:outline-none`}
+                            className="w-full border rounded-md py-2 px-3 bg-gray-100 border-gray-300 text-gray-800 focus:border-blue-500 focus:outline-none"
                             placeholder="Confirmar contraseña"
                             required
                         />
@@ -165,7 +144,7 @@ const ResetPasswordForm: React.FC = () => {
 
                     <button
                         type="submit"
-                        className={`w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 ${isDarkMode ? 'bg-teal-500 hover:bg-teal-600 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+                        className="w-full py-2 px-4 rounded-md font-semibold transition-colors duration-300 bg-blue-500 hover:bg-blue-600 text-white"
                     >
                         Restablecer Contraseña
                     </button>
@@ -182,12 +161,12 @@ const ResetPasswordForm: React.FC = () => {
                 className="absolute inset-0 flex items-center justify-center z-[9999]"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
             >
-                <div className={`p-6 rounded-lg shadow-lg z-[9999] ${isDarkMode ? 'bg-[#13152A] text-gray-300' : 'bg-white text-gray-800'}`}>
-                    <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-teal-400' : 'text-blue-600'}`}>¡Contraseña restablecida!</h2>
+                <div className="p-6 rounded-lg shadow-lg bg-white text-gray-800">
+                    <h2 className="text-xl font-semibold text-blue-600">¡Contraseña restablecida!</h2>
                     <p className="mt-4">Su contraseña ha sido restablecida correctamente.</p>
                     <button
                         onClick={handleRedirectToLogin}
-                        className={`mt-4 px-4 py-2 rounded-lg ${isDarkMode ? 'bg-teal-500 text-white hover:bg-teal-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                        className="mt-4 px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
                     >
                         Iniciar sesión
                     </button>

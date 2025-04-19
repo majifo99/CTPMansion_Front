@@ -130,7 +130,7 @@ const LoginForm: React.FC = () => {
               onClick={() => navigate('/request-password-reset')}
               className="text-blue-500 hover:underline hover:text-blue-600 text-sm"
             >
-              ¿Olvidaste tu contraseña? Restablécelá aquí
+              ¿Olvidaste tu contraseña? Restablécela aquí
             </button>
           </div>
         </form>
