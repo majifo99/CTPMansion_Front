@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { Laboratory } from "../types/Types";
 import { LabRequest } from "../types/LaboratoryRequestType";
 
-const API_URL = 'https://ctplamansion.onrender.com/api';
+const API_URL = 'https://ctplamansion-production.up.railway.app/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,

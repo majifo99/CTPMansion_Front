@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Product } from '../types/OrderTypes';
 
-const apiUrl = 'https://ctplamansion.onrender.com/api/Product';
+const apiUrl = 'https://ctplamansion-production.up.railway.app/api/Product';
 
 // Helper function para obtener el JWT token desde cookies
 const getToken = () => Cookies.get('token');

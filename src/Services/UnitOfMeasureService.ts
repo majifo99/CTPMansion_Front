@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie'; // Importar js-cookie para manejar las cookies
 import { UnitOfMeasure } from '../types/OrderTypes';
 
-const apiUrl = 'https://ctplamansion.onrender.com/api/UnitOfMeasure';
+const apiUrl = 'https://ctplamansion-production.up.railway.app/api/UnitOfMeasure';
 
 // Helper function para obtener el JWT token desde cookies
 const getToken = () => Cookies.get('token');

@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { ChangePasswordDto } from '../types/Types';
 
 // URL base para tu API
-const BASE_URL = 'https://ctplamansion.onrender.com/api';
+const BASE_URL = 'https://ctplamansion-production.up.railway.app/api';
 
 // Define la estructura esperada del JWT decodificado
 interface DecodedUser {
