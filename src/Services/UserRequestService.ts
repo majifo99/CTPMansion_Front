@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-const API_URL = 'https://ctplamansion.onrender.com/api';
+const API_URL = 'https://ctplamansion-production.up.railway.app/api';
 
 export const fetchUserLabRequests = async (userId: string) => {
   const token = Cookies.get('token');
