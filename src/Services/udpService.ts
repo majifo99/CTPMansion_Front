@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'; // Importar js-cookie para manejar las cookies
 import { UDP } from '../types/Types';
 
 const api = axios.create({
-  baseURL: 'https://ctplamansion.onrender.com/api',
+  baseURL: 'https://ctplamansion-production.up.railway.app/api',
 });
 
 // Interceptor para agregar el token JWT a cada solicitud

@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 // URL base para tu API
-const BASE_URL = 'https://ctplamansion.onrender.com/api';
+const BASE_URL = 'https://ctplamansion-production.up.railway.app/api';
 
 // Crear una instancia de Axios con el token de autorización incluido
 const apiClient = axios.create({

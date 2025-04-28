@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie'; // Importamos js-cookie
 
 // URL base de la API
-const API_URL = 'https://ctplamansion.onrender.com/api';
+const API_URL = 'https://ctplamansion-production.up.railway.app/api';
 
 // Crear una instancia de axios con la URL base y encabezados predeterminados
 const apiClient = axios.create({

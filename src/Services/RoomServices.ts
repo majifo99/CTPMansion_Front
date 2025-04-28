@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'; // Importamos js-cookie para manejar las cookie
 import { Room } from '../types/Types';
 import { RoomRequest } from '../types/RoomRequestType';
 
-const API_URL = 'https://ctplamansion.onrender.com/api';
+const API_URL = 'https://ctplamansion-production.up.railway.app/api';
 
 // Crear una instancia de Axios con configuración predeterminada
 const apiClient = axios.create({
