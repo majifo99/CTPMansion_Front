@@ -85,7 +85,7 @@ const CertificatesPage = () => {
         </div>
     );
 
-    const isDigitalDelivery = selectedDeliveryMethod === 1;
+    const isDigitalDelivery = selectedDeliveryMethod === 0; // Digital is 0
     const isTitleCertification = selectedCertificationType.toLowerCase().includes('título');
     const showWarning = isDigitalDelivery && isTitleCertification;
 
@@ -164,7 +164,7 @@ const CertificatesPage = () => {
                                         )}
                                         {errors.certificationType && <p className="mt-1 text-xs text-red-500">{errors.certificationType.message as string}</p>}
                                         {showWarning && (
-                                            <p className="mt-1 text-s text-yellow-600 bg-yellow-100 p-2 rounded">
+                                            <p className="mt-1 text-sm text-yellow-600 bg-yellow-100 p-2 rounded">
                                                 Advertencia: Los títulos solo pueden ser solicitados de manera física.
                                             </p>
                                         )}
@@ -185,7 +185,7 @@ const CertificatesPage = () => {
                                             >
                                                 <option value="">Selecciona el Método de Entrega</option>
                                                 {deliveryMethods.map((method, index) => (
-                                                    <option key={index} value={method.id}>
+                                                    <option key={index} value={index}>
                                                         {method.name}
                                                     </option>
                                                 ))}
@@ -200,12 +200,13 @@ const CertificatesPage = () => {
                                 <button
                                     type="submit"
                                     className="w-full sm:w-auto px-8 py-3 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-200 font-semibold rounded-lg text-sm shadow-md transition-all duration-200 disabled:bg-green-400 disabled:cursor-not-allowed"
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || showWarning}
                                 >
                                     {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
                                 </button>
                             </div>
                         </form>
+                        
                     </div>
                 </section>
             </main>
