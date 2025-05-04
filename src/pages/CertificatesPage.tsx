@@ -85,15 +85,14 @@ const CertificatesPage = () => {
         </div>
     );
 
-    // Check if the selected certification is a "Título" and delivery method is digital
-    const isDigitalDelivery = selectedDeliveryMethod === 2; // Assuming id: 2 is "Digital"
+    const isDigitalDelivery = selectedDeliveryMethod === 1;
     const isTitleCertification = selectedCertificationType.toLowerCase().includes('título');
     const showWarning = isDigitalDelivery && isTitleCertification;
 
     return (
         <>
             <Navbar />
-            <main className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+            <main className="flex flex-col min-h-screen mt-12 bg-gradient-to-b from-gray-50 to-gray-100">
                 <section className="flex-grow flex items-center justify-center px-4 py-20">
                     <div className="w-full max-w-4xl p-8 bg-white rounded-2xl shadow-xl border border-gray-200">
                         <h3 className="text-3xl font-bold text-center text-gray-900 mb-8">
@@ -143,30 +142,6 @@ const CertificatesPage = () => {
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <label htmlFor="deliveryMethod" className="block mb-1 text-sm font-semibold text-gray-700">
-                                            Método de Entrega
-                                        </label>
-                                        {deliveryMethods.length === 0 ? (
-                                            <p className="text-sm text-gray-500">Cargando métodos de entrega...</p>
-                                        ) : (
-                                            <select
-                                                id="deliveryMethod"
-                                                {...register('deliveryMethod', { required: 'Método de entrega es requerido' })}
-                                                onChange={(e) => setSelectedDeliveryMethod(Number(e.target.value))}
-                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-600 focus:border-green-600 text-gray-900 text-sm transition-all duration-200"
-                                            >
-                                                <option value="">Selecciona el Método de Entrega</option>
-                                                {deliveryMethods.map((method, index) => (
-                                                    <option key={index} value={method.id}>
-                                                        {method.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        )}
-                                        {errors.deliveryMethod && <p className="mt-1 text-xs text-red-500">{errors.deliveryMethod.message}</p>}
-                                    </div>
-
-                                    <div>
                                         <label htmlFor="certificationType" className="block mb-1 text-sm font-semibold text-gray-700">
                                             Tipo de Certificación
                                         </label>
@@ -189,11 +164,34 @@ const CertificatesPage = () => {
                                         )}
                                         {errors.certificationType && <p className="mt-1 text-xs text-red-500">{errors.certificationType.message as string}</p>}
                                         {showWarning && (
-                                            <p className="mt-1 text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
+                                            <p className="mt-1 text-s text-yellow-600 bg-yellow-100 p-2 rounded">
                                                 Advertencia: Los títulos solo pueden ser solicitados de manera física.
                                             </p>
                                         )}
-                                        <p className="mt-1 text-m text-gray-500">*Los títulos solo pueden ser solicitados de manera física.</p>
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="deliveryMethod" className="block mb-1 text-sm font-semibold text-gray-700">
+                                            Método de Entrega
+                                        </label>
+                                        {deliveryMethods.length === 0 ? (
+                                            <p className="text-sm text-gray-500">Cargando métodos de entrega...</p>
+                                        ) : (
+                                            <select
+                                                id="deliveryMethod"
+                                                {...register('deliveryMethod', { required: 'Método de entrega es requerido' })}
+                                                onChange={(e) => setSelectedDeliveryMethod(Number(e.target.value))}
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-600 focus:border-green-600 text-gray-900 text-sm transition-all duration-200"
+                                            >
+                                                <option value="">Selecciona el Método de Entrega</option>
+                                                {deliveryMethods.map((method, index) => (
+                                                    <option key={index} value={method.id}>
+                                                        {method.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                        {errors.deliveryMethod && <p className="mt-1 text-xs text-red-500">{errors.deliveryMethod.message}</p>}
                                     </div>
                                 </div>
                             </div>
