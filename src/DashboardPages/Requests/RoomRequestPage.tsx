@@ -9,6 +9,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'moment/locale/es';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 // Configurar moment en español
 moment.locale('es');
@@ -215,40 +216,40 @@ const RoomRequestPage: React.FC = () => {
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 relative z-10">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 text-2xl font-bold">&times;</button>
         <h3 className="text-lg font-semibold mb-4 text-center">Detalles de la Reserva</h3>
-        
+
         <div className="space-y-4">
           <div>
             <h4 className="font-medium text-gray-900">Encargado:</h4>
             <p className="text-gray-700">{reservation.managerName} {reservation.managerLastName} {reservation.managerLastName2}</p>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-900">Curso:</h4>
             <p className="text-gray-700">{reservation.course}</p>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-900">Actividad:</h4>
             <p className="text-gray-700">{reservation.activityDescription}</p>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-900">Número de Asistentes:</h4>
             <p className="text-gray-700">{reservation.numberOfAttendees}</p>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-900">Fecha:</h4>
             <p className="text-gray-700">{moment(reservation.startDate).format('dddd, LL')}</p>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-900">Horario:</h4>
             <p className="text-gray-700">
               {moment(reservation.startTime, 'HH:mm').format('LT')} - {moment(reservation.endTime, 'HH:mm').format('LT')}
             </p>
           </div>
-          
+
           {reservation.needs && (
             <div>
               <h4 className="font-medium text-gray-900">Necesidades Especiales:</h4>
@@ -256,7 +257,7 @@ const RoomRequestPage: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         <button
           className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full"
           onClick={onClose}
@@ -280,7 +281,9 @@ const RoomRequestPage: React.FC = () => {
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-center text-2xl font-semibold mb-4">Solicitar Sala</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {loading && <p>Cargando salas...</p>}
+        {loading && <div className="flex justify-center items-center h-screen">
+          <ClipLoader color="#3b82f6" size={100} />
+        </div>}
         {error && <p className="text-red-600">{error}</p>}
         {Array.isArray(rooms) &&
           rooms
@@ -329,7 +332,7 @@ const RoomRequestPage: React.FC = () => {
           <div className="bg-white p-6 rounded-lg w-11/12 max-w-6xl h-[90vh] flex flex-col">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Disponibilidad: {selectedRoom.name}</h2>
-              <button 
+              <button
                 onClick={() => setActiveModal(null)}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -338,7 +341,7 @@ const RoomRequestPage: React.FC = () => {
                 </svg>
               </button>
             </div>
-            
+
             <div className="flex-grow min-h-0 relative">
               <Calendar
                 localizer={localizer}
@@ -399,13 +402,13 @@ const RoomRequestPage: React.FC = () => {
       )}
 
       {activeModal === "reservationDetails" && selectedReservation && (
-        <ReservationDetailsModal 
-          reservation={selectedReservation} 
-          onClose={() => setActiveModal("calendar")} 
+        <ReservationDetailsModal
+          reservation={selectedReservation}
+          onClose={() => setActiveModal("calendar")}
         />
       )}
 
-      <ToastContainer 
+      <ToastContainer
         position="bottom-right"
         autoClose={5000}
         hideProgressBar={false}
