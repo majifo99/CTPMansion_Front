@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
-import { CertificationRequest } from '../../types/Types'; // Define la estructura de las solicitudes
-import useCertificationRequests from '../../hooks/useCertificationRequests'; // Hook personalizado
-import Modal from '../../modals/ModalRequest'; // Modal personalizado
+import { CertificationRequest } from '../../types/Types';
+import useCertificationRequests from '../../hooks/useCertificationRequests';
+import Modal from '../../modals/ModalRequest';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Estilos de Toastify
+import 'react-toastify/dist/ReactToastify.css';
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { CgCloseO, CgMoreO } from "react-icons/cg";
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const CertificationRequestsTable: React.FC = () => {
-  const { requests, loading, error, handleRejectRequest, handleApproveRequest, setDeliveryDeadline, getCertificationName } = useCertificationRequests();
+  const {
+    requests,
+    loading,
+    error,
+    handleRejectRequest,
+    handleApproveRequest,
+    setDeliveryDeadline,
+    getCertificationName
+  } = useCertificationRequests();
+
   const [selectedRequest, setSelectedRequest] = useState<CertificationRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [deliveryDays, setDeliveryDays] = useState<number>(0);
   const [isDeliveryDaysSaved, setIsDeliveryDaysSaved] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
 
   const openDeliveryModal = (request: CertificationRequest) => {
     setSelectedRequest(request);
@@ -39,7 +52,7 @@ const CertificationRequestsTable: React.FC = () => {
         await setDeliveryDeadline(selectedRequest.id, deliveryDays);
         setIsDeliveryDaysSaved(true);
         toast.success('Días límite guardados correctamente.');
-      } catch (error) {
+      } catch {
         toast.error('Error al guardar los días límite.');
       }
     } else {
@@ -53,7 +66,7 @@ const CertificationRequestsTable: React.FC = () => {
         await handleApproveRequest(selectedRequest.id);
         closeModal();
         toast.success('Solicitud aprobada.');
-      } catch (error) {
+      } catch {
         toast.error('Error al aprobar la solicitud.');
       }
     } else {
@@ -65,13 +78,17 @@ const CertificationRequestsTable: React.FC = () => {
     try {
       await handleRejectRequest(request.id);
       toast.success('Solicitud rechazada.');
-    } catch (error) {
+    } catch {
       toast.error('Error al rechazar la solicitud.');
     }
   };
 
   if (loading) {
-    return <p className="text-center mt-4">Cargando solicitudes...</p>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader color="#3b82f6" size={100} />
+      </div>
+    );
   }
 
   if (error) {
@@ -104,63 +121,136 @@ const CertificationRequestsTable: React.FC = () => {
     }
   };
 
+  // Filter requests based on selected status
+  const filteredRequests = filterStatus === 'all'
+    ? requests
+    : requests.filter(request => 
+        (filterStatus === '0' && request.status === 0) ||
+        (filterStatus === '1' && request.status === 1) ||
+        (filterStatus === '2' && request.status === 2)
+      );
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRequests = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <ToastContainer />
-      
       <h1 className="text-3xl font-bold mb-8 text-center">Solicitudes de Certificación</h1>
-      
-      <table className="min-w-full bg-white border border-gray-200 shadow-md">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">Nombre del Estudiante</th>
-            <th className="py-2 px-4 border-b">Estado</th>
-            <th className="py-2 px-4 border-b">Tipo de Certificación</th>
-            <th className="py-2 px-4 border-b">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {requests.map((request) => (
-            <tr key={request.id} className="text-center">
-              <td className="py-2 px-4 border-b">{request.studentName}</td>
-              <td className={`py-2 px-4 border-b ${getStatusColor(request.status)}`}>
-                {getStatusText(request.status)}
-              </td>
-              <td className="py-2 px-4 border-b">{getCertificationName(request.certificationNameId)}</td>
-              <td className="py-2 px-4 border-b">
-                {/* Flex container with gap for actions */}
-                <div className="flex justify-center gap-2">
-                  <button
-                    className="bg-green-500 text-white px-3 py-1 rounded-full hover:bg-green-600 flex items-center justify-center"
-                    onClick={() => openDeliveryModal(request)}
-                  >
-                    <IoMdCheckmarkCircleOutline size={20} />
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 flex items-center justify-center"
-                    onClick={() => handleReject(request)}
-                  >
-                    <CgCloseO size={20} />
-                  </button>
-                  <button
-                    className="bg-gray-500 text-white px-3 py-1 rounded-full hover:bg-gray-600 flex items-center justify-center"
-                    onClick={() => openDetailModal(request)}
-                  >
-                    <CgMoreO size={20} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
+      {/* Filter Dropdown */}
+      <div className="mb-6 flex justify-end">
+        <div className="w-48">
+          <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">
+            Filtrar por estado:
+          </label>
+          <select
+            id="statusFilter"
+            value={filterStatus}
+            onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="all">Todas</option>
+            <option value="0">Pendiente</option>
+            <option value="1">Aprobado</option>
+            <option value="2">Rechazado</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Table Wrapper with Fixed Height and Scroll */}
+      <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
+        <table className="min-w-full bg-white border border-gray-200 shadow-md table-fixed">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b w-1/3">Nombre del Estudiante</th>
+              <th className="py-2 px-4 border-b w-1/6">Estado</th>
+              <th className="py-2 px-4 border-b w-1/3">Tipo de Certificación</th>
+              <th className="py-2 px-4 border-b w-1/6">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentRequests.map((request) => (
+              <tr key={request.id} className="text-center">
+                <td className="py-2 px-4 border-b truncate">{request.studentName}</td>
+                <td className={`py-2 px-4 border-b ${getStatusColor(request.status)}`}>
+                  {getStatusText(request.status)}
+                </td>
+                <td className="py-2 px-4 border-b truncate">
+                  {getCertificationName(request.certificationNameId)}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      className="bg-green-500 text-white px-3 py-1 rounded-full hover:bg-green-600"
+                      onClick={() => openDeliveryModal(request)}
+                    >
+                      <IoMdCheckmarkCircleOutline size={20} />
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600"
+                      onClick={() => handleReject(request)}
+                    >
+                      <CgCloseO size={20} />
+                    </button>
+                    <button
+                      className="bg-gray-500 text-white px-3 py-1 rounded-full hover:bg-gray-600"
+                      onClick={() => openDetailModal(request)}
+                    >
+                      <CgMoreO size={20} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {/* Fill remaining rows to maintain table height */}
+            {currentRequests.length < itemsPerPage &&
+              Array.from({ length: itemsPerPage - currentRequests.length }).map((_, index) => (
+                <tr key={`empty-${index}`} className="text-center">
+                  <td className="py-2 px-4 border-b">&nbsp;</td>
+                  <td className="py-2 px-4 border-b">&nbsp;</td>
+                  <td className="py-2 px-4 border-b">&nbsp;</td>
+                  <td className="py-2 px-4 border-b">&nbsp;</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center mt-6">
+        <nav className="inline-flex">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
+              className={`px-4 py-2 mx-1 rounded-md ${
+                currentPage === index + 1
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Delivery Modal */}
       {isModalOpen && selectedRequest && (
         <Modal onClose={closeModal}>
           <h2 className="text-xl font-bold mb-4">Gestionar Solicitud</h2>
           <p><strong>Nombre del Estudiante:</strong> {selectedRequest.studentName}</p>
           <p><strong>ID del Estudiante:</strong> {selectedRequest.studentIdentification}</p>
-          
+
           <div className="mt-4">
             <label className="block font-semibold mb-2">Días de entrega:</label>
             <input
@@ -195,16 +285,58 @@ const CertificationRequestsTable: React.FC = () => {
         </Modal>
       )}
 
-      {isDetailModalOpen && selectedRequest && (
+    {/* Detail Modal */}
+    {isDetailModalOpen && selectedRequest && (
         <Modal onClose={closeModal}>
-          <h2 className="text-xl font-bold mb-4">Detalles Completos de la Solicitud</h2>
-          <p><strong>Nombre del Estudiante:</strong> {selectedRequest.studentName}</p>
-          <p><strong>ID del Estudiante:</strong> {selectedRequest.studentIdentification}</p>
-          <p><strong>Email:</strong> {selectedRequest.email}</p>
-          <p><strong>Teléfono:</strong> {selectedRequest.phoneNumber}</p>
-          <p><strong>Fecha de Solicitud:</strong> {new Date(selectedRequest.requestDate).toLocaleDateString()}</p>
-          <p><strong>Fecha de Respuesta:</strong> {selectedRequest.responseDate ? new Date(selectedRequest.responseDate).toLocaleDateString() : 'Sin respuesta'}</p>
-          <p><strong>Estado:</strong> {getStatusText(selectedRequest.status)}</p>
+          <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
+
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Detalles de la Solicitud</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Nombre del Estudiante:</p>
+                <p className="text-gray-800 break-words">{(selectedRequest.studentName+" "+  selectedRequest.studentLastName1+" "+  selectedRequest.studentLastName2)}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">ID del Estudiante:</p>
+                <p className="text-gray-800 break-words">{selectedRequest.studentIdentification}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600 ">Email:</p>
+                <p className="text-gray-800 break-words">{selectedRequest.email}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Teléfono:</p>
+                <p className="text-gray-800 break-words">{selectedRequest.phoneNumber}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Fecha de Solicitud:</p>
+                <p className="text-gray-800 break-words">{new Date(selectedRequest.requestDate).toLocaleDateString()}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Fecha de Respuesta:</p>
+                <p className="text-gray-800 break-words">{selectedRequest.responseDate ? new Date(selectedRequest.responseDate).toLocaleDateString() : 'Sin respuesta'}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Estado:</p>
+                <p className={`text-gray-800 ${getStatusColor(selectedRequest.status)}`}>{getStatusText(selectedRequest.status)}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Nombre del Encargado:</p>
+                <p className="text-gray-800 break-words">{(selectedRequest.guardianName+" "+  selectedRequest.guardianLastName1+" "+  selectedRequest.guardianLastName2)}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Tipo de Certificación:</p>
+                <p className="text-gray-800">{getCertificationName(selectedRequest.certificationNameId)}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Método de envío 1= Digital 2= Físico:</p>
+                <p className="text-gray-800 break-words">{selectedRequest.deliveryMethod}</p>
+              </div>
+              
+            </div>
+            <div className="mt-6 flex justify-end">
+            </div>
+          </div>
         </Modal>
       )}
     </div>
