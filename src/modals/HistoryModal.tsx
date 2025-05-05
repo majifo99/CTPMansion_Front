@@ -41,29 +41,31 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
     setEndDateFilter('');
   };
 
-  // Filtrar las órdenes según los criterios
-  const filteredOrders = orders.filter((order) => {
-    // Filtrado por nombre del receptor
-    const nameMatch = order.receiver.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Filtrado por fecha
-    let dateMatch = true;
-    const orderDate = new Date(order.orderDate);
-    
-    if (startDateFilter) {
-      const filterStartDate = new Date(startDateFilter);
-      filterStartDate.setHours(0, 0, 0, 0);
-      dateMatch = dateMatch && orderDate >= filterStartDate;
-    }
-    
-    if (endDateFilter) {
-      const filterEndDate = new Date(endDateFilter);
-      filterEndDate.setHours(23, 59, 59, 999);
-      dateMatch = dateMatch && orderDate <= filterEndDate;
-    }
-    
-    return nameMatch && dateMatch;
-  });
+  // Filtrar y ordenar las órdenes (de más reciente a más antigua)
+  const filteredOrders = orders
+    .filter((order) => {
+      // Filtrado por nombre del receptor
+      const nameMatch = order.receiver.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Filtrado por fecha
+      let dateMatch = true;
+      const orderDate = new Date(order.orderDate);
+      
+      if (startDateFilter) {
+        const filterStartDate = new Date(startDateFilter);
+        filterStartDate.setHours(0, 0, 0, 0);
+        dateMatch = dateMatch && orderDate >= filterStartDate;
+      }
+      
+      if (endDateFilter) {
+        const filterEndDate = new Date(endDateFilter);
+        filterEndDate.setHours(23, 59, 59, 999);
+        dateMatch = dateMatch && orderDate <= filterEndDate;
+      }
+      
+      return nameMatch && dateMatch;
+    })
+    .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()); // Orden descendente por fecha
   
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;

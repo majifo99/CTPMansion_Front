@@ -21,6 +21,8 @@ const ManageRoomRequests: React.FC = () => {
   const [selectedRequest, setSelectedRequest] = useState<RoomRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(6);
 
   const notifySuccess = (message: string) => toast.success(message);
   const notifyError = (message: string) => toast.error(message);
@@ -83,11 +85,18 @@ const ManageRoomRequests: React.FC = () => {
     return dateB - dateA;
   });
 
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRequests = sortedRequests.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedRequests.length / itemsPerPage);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Gestión de Solicitudes de Sala</h2>
-
-      
 
       <div className="mb-4">
         <input
@@ -95,7 +104,10 @@ const ManageRoomRequests: React.FC = () => {
           className="border px-4 py-2 w-full rounded"
           placeholder="Buscar por gestor..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // Reset a la primera página al buscar
+          }}
         />
       </div>
       <div className="flex justify-end mb-4">
@@ -110,10 +122,10 @@ const ManageRoomRequests: React.FC = () => {
       {error && <p className="text-red-600">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedRequests.length === 0 ? (
+        {currentRequests.length === 0 ? (
           <p className="text-gray-600">No hay solicitudes disponibles</p>
         ) : (
-          sortedRequests.map((request) => (
+          currentRequests.map((request) => (
             <div
               key={request.id_RoomRequest}
               className="p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
@@ -135,6 +147,27 @@ const ManageRoomRequests: React.FC = () => {
           ))
         )}
       </div>
+
+      {/* Paginación */}
+      {sortedRequests.length > 0 && (
+        <div className="flex justify-center mt-6">
+          <nav className="inline-flex">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => paginate(index + 1)}
+                className={`px-4 py-2 mx-1 rounded-md ${
+                  currentPage === index + 1
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {selectedRequest && (
         <RoomRequestDetailsModal
