@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { addUserRole, getUserRoles, getUsers, removeUserRole, deleteUser, getUserById, PaginatedResponse } from '../../services/userService';
-import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -93,8 +93,6 @@ const RolesManagement: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [hasPrevious, setHasPrevious] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
   // Cargar usuarios y roles al iniciar
@@ -118,8 +116,6 @@ const RolesManagement: React.FC = () => {
         setUsers(detailedUsers);
         setTotalItems(paginatedResponse.totalItems);
         setTotalPages(paginatedResponse.totalPages);
-        setHasPrevious(paginatedResponse.hasPrevious);
-        setHasNext(paginatedResponse.hasNext);
       } else {
         // Respuesta no paginada (comportamiento anterior)
         const detailedUsers = Array.isArray(response) 
@@ -143,27 +139,6 @@ const RolesManagement: React.FC = () => {
       setIsLoadingUsers(false);
       setRolesLoading(false);
     }
-  };
-
-  // Navegar a la página anterior
-  const goToPreviousPage = () => {
-    if (hasPrevious) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  // Navegar a la página siguiente
-  const goToNextPage = () => {
-    if (hasNext) {
-      setCurrentPage(prev => prev + 1);
-    }
-  };
-
-  // Cambiar el tamaño de página
-  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSize = parseInt(e.target.value);
-    setPageSize(newSize);
-    setCurrentPage(1); // Volver a la primera página al cambiar el tamaño
   };
 
   // Manejar cambios de roles (añadir/eliminar)
@@ -266,6 +241,13 @@ const RolesManagement: React.FC = () => {
     if (!dateString) return "No disponible";
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  };
+
+  // Manejar cambio en el tamaño de página
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = parseInt(e.target.value);
+    setPageSize(newSize);
+    setCurrentPage(1); // Resetear a la primera página al cambiar el tamaño
   };
 
   return (

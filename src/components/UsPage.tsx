@@ -137,7 +137,7 @@ const UsPage = () => {
         <h2 className="font-bold text-xl sm:text-4xl text-center">Croquis de la Institución</h2>
         <div className="flex justify-center mt-6">
           <img
-            src="https://i.ibb.co/VY6ZK77d/Imagen-de-Whats-App-2025-03-12-a-las-14-38-18-9dc9b155.jpg"
+            src="https://i.ibb.co/Q7BHKCPz/Croquis.jpg"
             alt="Croquis de la Institución"
             className="w-full max-w-4xl rounded shadow-lg"
             loading="lazy"

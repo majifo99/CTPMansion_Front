@@ -27,7 +27,7 @@ const Footer = () => {
           {/* Sección de Información */}
           <div>
             <img
-              src="https://i.ibb.co/DDgrWtG7/CTPmnsn.webp"
+              src="https://i.ibb.co/j978RKxF/CTPmnsn.webp"
               className="mr-5 h-10"
               alt="Logo de la Institución"
             />
