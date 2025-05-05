@@ -32,38 +32,35 @@ const LabHistoryModal: React.FC<LabHistoryModalProps> = ({ isOpen, onClose, labR
     setEndDateFilter('');
   };
 
-  // Filtrar y ordenar las solicitudes (de más reciente a más antigua)
-  const filteredRequests = labRequests
-    .filter(request => {
-      // Filtrado por estado
-      const statusMatch = filter === 'All' 
-        ? request.status === RequestStatus.Approved || request.status === RequestStatus.Rejected
-        : request.status === filter;
-      
-      // Filtrado por nombre
-      const nameMatch = `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      
-      // Filtrado por fecha de inicio
-      let dateMatch = true;
-      const requestDate = new Date(request.startDate);
-      
-      if (startDateFilter) {
-        const filterStartDate = new Date(startDateFilter);
-        filterStartDate.setHours(0, 0, 0, 0);
-        dateMatch = dateMatch && requestDate >= filterStartDate;
-      }
-      
-      if (endDateFilter) {
-        const filterEndDate = new Date(endDateFilter);
-        filterEndDate.setHours(23, 59, 59, 999);
-        dateMatch = dateMatch && requestDate <= filterEndDate;
-      }
-      
-      return statusMatch && nameMatch && dateMatch;
-    })
-    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()); // Orden descendente por fecha
+  const filteredRequests = labRequests.filter(request => {
+    // Filtrado por estado
+    const statusMatch = filter === 'All' 
+      ? request.status === RequestStatus.Approved || request.status === RequestStatus.Rejected
+      : request.status === filter;
+    
+    // Filtrado por nombre
+    const nameMatch = `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    
+    // Filtrado por fecha de inicio
+    let dateMatch = true;
+    const requestDate = new Date(request.startDate);
+    
+    if (startDateFilter) {
+      const filterStartDate = new Date(startDateFilter);
+      filterStartDate.setHours(0, 0, 0, 0);
+      dateMatch = dateMatch && requestDate >= filterStartDate;
+    }
+    
+    if (endDateFilter) {
+      const filterEndDate = new Date(endDateFilter);
+      filterEndDate.setHours(23, 59, 59, 999);
+      dateMatch = dateMatch && requestDate <= filterEndDate;
+    }
+    
+    return statusMatch && nameMatch && dateMatch;
+  });
 
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;

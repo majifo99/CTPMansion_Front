@@ -21,41 +21,13 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Interfaz para la respuesta paginada
-export interface PaginatedResponse<T> {
-  currentPage: number;
-  pageSize: number;
-  totalItems: number;
-  totalPages: number;
-  items: T[];
-  hasPrevious: boolean;
-  hasNext: boolean;
-}
-
-// Obtener la lista de usuarios con soporte para paginación
-export const getUsers = async (pageNumber?: number, pageSize?: number): Promise<any> => {
+// Obtener la lista de usuarios
+export const getUsers = async (): Promise<any> => {
   try {
-    let url = '/User';
-    
-    // Añadir parámetros de paginación si se proporcionan
-    if (pageNumber !== undefined && pageSize !== undefined) {
-      url = `/User?PageNumber=${pageNumber}&PageSize=${pageSize}`;
-    }
-    
-    const response = await apiClient.get(url);
+    const response = await apiClient.get('/User');
     return response.data;
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
-    throw error;
-  }
-};
-
-// Eliminar un usuario
-export const deleteUser = async (userId: number): Promise<void> => {
-  try {
-    await apiClient.delete(`/User/${userId}`);
-  } catch (error) {
-    console.error(`Error al eliminar el usuario ${userId}:`, error);
     throw error;
   }
 };

@@ -121,10 +121,15 @@ const CertificationRequestsTable: React.FC = () => {
     }
   };
 
+  // Sort requests by requestDate (most recent to oldest)
+  const sortedRequests = [...requests].sort((a, b) => 
+    new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime()
+  );
+
   // Filter requests based on selected status
   const filteredRequests = filterStatus === 'all'
-    ? requests
-    : requests.filter(request => 
+    ? sortedRequests
+    : sortedRequests.filter(request => 
         (filterStatus === '0' && request.status === 0) ||
         (filterStatus === '1' && request.status === 1) ||
         (filterStatus === '2' && request.status === 2)
@@ -215,10 +220,10 @@ const CertificationRequestsTable: React.FC = () => {
             {currentRequests.length < itemsPerPage &&
               Array.from({ length: itemsPerPage - currentRequests.length }).map((_, index) => (
                 <tr key={`empty-${index}`} className="text-center">
-                  <td className="py-2 px-4 border-b">&nbsp;</td>
-                  <td className="py-2 px-4 border-b">&nbsp;</td>
-                  <td className="py-2 px-4 border-b">&nbsp;</td>
-                  <td className="py-2 px-4 border-b">&nbsp;</td>
+                  <td className="py-2 px-4 border-b"> </td>
+                  <td className="py-2 px-4 border-b"> </td>
+                  <td className="py-2 px-4 border-b"> </td>
+                  <td className="py-2 px-4 border-b"> </td>
                 </tr>
               ))}
           </tbody>
@@ -285,11 +290,10 @@ const CertificationRequestsTable: React.FC = () => {
         </Modal>
       )}
 
-    {/* Detail Modal */}
-    {isDetailModalOpen && selectedRequest && (
+      {/* Detail Modal */}
+      {isDetailModalOpen && selectedRequest && (
         <Modal onClose={closeModal}>
           <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
-
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Detalles de la Solicitud</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -329,10 +333,9 @@ const CertificationRequestsTable: React.FC = () => {
                 <p className="text-gray-800">{getCertificationName(selectedRequest.certificationNameId)}</p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-600">Método de envío 1= Digital 2= Físico:</p>
+                <p className="text-sm font-semibold text-gray-600">Método de envío 0= Digital 1= Físico:</p>
                 <p className="text-gray-800 break-words">{selectedRequest.deliveryMethod}</p>
               </div>
-              
             </div>
             <div className="mt-6 flex justify-end">
             </div>
