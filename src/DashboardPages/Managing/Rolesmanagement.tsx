@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { addUserRole, getUserRoles, getUsers, removeUserRole, deleteUser, getUserById, PaginatedResponse } from '../../services/userService';
 import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
@@ -82,6 +82,7 @@ const RolesManagement: React.FC = () => {
   const [roles, setRoles] = useState<{ [key: number]: Role[] }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [closingUser, setClosingUser] = useState<number | null>(null);
   const [userDetailsLoading, setUserDetailsLoading] = useState<{ [key: number]: boolean }>({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -214,11 +215,21 @@ const RolesManagement: React.FC = () => {
   const toggleUserDetails = async (userId: number) => {
     const user = users.find(u => u.id === userId);
     
-    if (user && !user.fullInfo) {
-      await loadUserDetails(userId);
+    if (selectedUser === userId) {
+      // Cerrando detalles - primero registramos el id para la animación de cierre
+      setClosingUser(userId);
+      // Esperamos a que termine la animación antes de ocultar realmente
+      setTimeout(() => {
+        setSelectedUser(null);
+        setClosingUser(null);
+      }, 400); // Tiempo de la animación (coincide con la duración CSS)
+    } else {
+      // Abriendo detalles
+      if (user && !user.fullInfo) {
+        await loadUserDetails(userId);
+      }
+      setSelectedUser(userId);
     }
-    
-    setSelectedUser(selectedUser === userId ? null : userId);
   };
 
   // Confirmar eliminación de usuario
@@ -319,7 +330,7 @@ const RolesManagement: React.FC = () => {
               <p className="text-gray-500 text-lg">No se encontraron usuarios con ese criterio de búsqueda</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto grid-flow-row-dense">
               {filteredUsers.map((user) => {
                 const userRoles = roles[user.id] || [];
                 const availableRoles = Object.keys(roleNames)
@@ -331,9 +342,9 @@ const RolesManagement: React.FC = () => {
                 return (
                   <div
                     key={user.id}
-                    className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
-                      isSelected ? 'ring-2 ring-blue-500' : 'hover:shadow-lg'
-                    }`}
+                    className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 
+                      ${isSelected ? 'ring-2 ring-blue-500 col-span-1 row-span-1' : 'hover:shadow-lg'}`}
+                    style={{ height: 'fit-content' }} 
                   >
                     {/* Cabecera del usuario */}
                     <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
@@ -374,15 +385,17 @@ const RolesManagement: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Detalles extendidos (condicional) */}
-                    {isSelected && (
-                      <div className="p-4 bg-gray-50 border-t border-gray-200">
+                    {/* Detalles extendidos (condicional) - CORRECCIÓN */}
+                    {(isSelected || closingUser === user.id) && (
+                      <div className={`border-t border-gray-200 bg-gray-50 ${
+                        closingUser === user.id ? 'animate-collapse' : 'animate-expand'
+                      }`}>
                         {userDetailsLoading[user.id] ? (
                           <div className="text-center py-4">
                             <p className="text-gray-500">Cargando información detallada...</p>
                           </div>
                         ) : (
-                          <>
+                          <div className="p-4">
                             <h3 className="font-semibold text-gray-700 mb-3">Información Detallada</h3>
                             <div className="space-y-2">
                               {user.identificationNumber && (
@@ -431,13 +444,13 @@ const RolesManagement: React.FC = () => {
                                 </div>
                               )}
                             </div>
-                          </>
+                          </div>
                         )}
                       </div>
                     )}
 
-                    {/* Sección de roles */}
-                    <div className="p-4 border-t border-gray-200">
+                    {/* Sección de roles - Mover dentro del card para que no haya espacio intermedio */}
+                    <div className={`p-4 ${isSelected ? 'border-t border-gray-200' : ''}`}>
                       {/* Sección de Roles Asignados */}
                       <h3 className="font-semibold text-gray-700 mb-2">Roles Asignados</h3>
                       <div className="flex flex-wrap gap-2 mb-4">
