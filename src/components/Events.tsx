@@ -2,15 +2,35 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import { useEvents } from '../hooks/useEvents';
 import 'aos/dist/aos.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AOS from 'aos';
 
 const EventsPage = () => {
   const { events, loading, error } = useEvents();
 
+  // Estado para almacenar la orientación de cada imagen
+  const [imageOrientations, setImageOrientations] = useState<Record<number, 'vertical' | 'horizontal'>>({});
+  // Estado para controlar el modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageOrientation, setSelectedImageOrientation] = useState<'vertical' | 'horizontal' | null>(null);
+
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
   }, []);
+
+  // Función para detectar la orientación de la imagen
+  const detectImageOrientation = (url: string, eventId: number) => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
+      const isVertical = img.height > img.width;
+      setImageOrientations(prev => ({
+        ...prev,
+        [eventId]: isVertical ? 'vertical' : 'horizontal',
+      }));
+    };
+  };
 
   // Filtrar eventos que ya han pasado
   const currentDate = new Date();
@@ -21,6 +41,29 @@ const EventsPage = () => {
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
+  // Detectar orientación de cada imagen al cargar los eventos
+  useEffect(() => {
+    sortedEvents.forEach(event => {
+      if (event.url_Image) {
+        detectImageOrientation(event.url_Image, event.id);
+      }
+    });
+  }, [events]);
+
+  // Función para abrir el modal
+  const openModal = (imageUrl: string, orientation: 'vertical' | 'horizontal') => {
+    setSelectedImage(imageUrl);
+    setSelectedImageOrientation(orientation);
+    setModalOpen(true);
+  };
+
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedImage(null);
+    setSelectedImageOrientation(null);
+  };
+
   if (loading) return <EventsSkeleton />;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
@@ -29,7 +72,6 @@ const EventsPage = () => {
       <Navbar />
       <section className="text-gray-700 body-font">
         <div className="container mx-auto px-5 py-24">
-          {/* Título con estilo formal y color en degradado */}
           <div className="flex justify-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r bg-[#34436B]">
               Próximos Eventos
@@ -37,7 +79,6 @@ const EventsPage = () => {
             </h2>
           </div>
 
-          {/* Mostrar mensaje si no hay eventos */}
           {sortedEvents.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center">
               <div className="text-6xl mb-4">📅</div>
@@ -45,11 +86,10 @@ const EventsPage = () => {
                 ¡No hay eventos próximos!
               </h3>
               <p className="text-gray-500">
-                En este momento no hay eventos programados. ¡Vuelve pronto para estar al tanto de nuestras próximas actividades!
+                En este momento no hay eventos programados. ¡Vuelve pronto enthusiasm para estar al tanto de nuestras próximas actividades!
               </p>
             </div>
           ) : (
-            // Línea de tiempo de eventos
             <div className="relative border-l-2 border-gray-300 pl-6">
               {sortedEvents.map((event, index) => (
                 <div
@@ -79,11 +119,26 @@ const EventsPage = () => {
                       {event.description}
                     </p>
                     <div className="mt-4">
-                      <img
-                        className="w-full h-40 object-cover rounded-lg shadow-md"
-                        src={event.url_Image}
-                        alt={event.title}
-                      />
+                      <div
+                        className={`relative w-full ${
+                          imageOrientations[event.id] === 'vertical'
+                            ? 'h-64'
+                            : 'h-40'
+                        } overflow-hidden rounded-lg shadow-md cursor-pointer`}
+                        onClick={() =>
+                          openModal(event.url_Image, imageOrientations[event.id])
+                        }
+                      >
+                        <img
+                          className={`w-full h-full ${
+                            imageOrientations[event.id] === 'vertical'
+                              ? 'object-contain'
+                              : 'object-cover'
+                          } hover:opacity-90 transition-opacity duration-300`}
+                          src={event.url_Image}
+                          alt={event.title}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -92,6 +147,36 @@ const EventsPage = () => {
           )}
         </div>
       </section>
+
+      {/* Modal para mostrar la imagen ampliada */}
+      {modalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
+          <div
+            className="relative max-w-4xl w-full mx-4"
+            onClick={e => e.stopPropagation()} // Evitar que el clic en la imagen cierre el modal
+          >
+            <button
+              className="absolute top-4 right-4 text-white text-3xl font-bold"
+              onClick={closeModal}
+            >
+              &times;
+            </button>
+            <img
+              className={`w-full max-h-[80vh] ${
+                selectedImageOrientation === 'vertical'
+                  ? 'object-contain'
+                  : 'object-contain'
+              } rounded-lg`}
+              src={selectedImage || ''}
+              alt="Imagen ampliada"
+            />
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );
@@ -109,14 +194,10 @@ const EventsSkeleton = () => (
       {[...Array(3)].map((_, index) => (
         <div key={index} className="p-4 w-full sm:w-1/2 md:w-1/3">
           <div className="h-full bg-gray-200 rounded-lg overflow-hidden shadow-md">
-            {/* Imagen de skeleton */}
             <div className="lg:h-48 md:h-36 w-full bg-gray-300"></div>
             <div className="p-6">
-              {/* Título de skeleton */}
               <div className="h-6 bg-gray-300 rounded w-1/2 mb-2"></div>
-              {/* Fecha de skeleton */}
               <div className="h-4 bg-gray-300 rounded w-1/3 mb-4"></div>
-              {/* Descripción de skeleton */}
               <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
               <div className="h-4 bg-gray-300 rounded w-5/6 mb-2"></div>
               <div className="h-4 bg-gray-300 rounded w-3/4 mb-3"></div>
