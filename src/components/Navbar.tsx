@@ -27,7 +27,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between w-full px-4">
         {/* Logo */}
         <img
-          src="https://i.ibb.co/DDgrWtG7/CTPmnsn.webp"
+          src="https://i.ibb.co/j978RKxF/CTPmnsn.webp"
           alt="Logo"
           className="h-12 w-12 object-cover"
         />

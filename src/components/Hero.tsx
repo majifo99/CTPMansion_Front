@@ -25,7 +25,7 @@ const Hero: React.FC = () => {
         <div
           className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
           style={{
-            backgroundImage: `url("https://i.ibb.co/1TLW24f/ctp-m.webp")`,
+            backgroundImage: `url("https://i.ibb.co/sJqhM07s/ctp-m.webp")`,
           }}
           aria-hidden="true"
         ></div>
