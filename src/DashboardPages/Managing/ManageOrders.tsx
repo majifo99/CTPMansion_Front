@@ -13,6 +13,8 @@ const ManageOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);  // Estado para la orden seleccionada
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);  // Estado del modal de detalles
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);  // Estado del modal de historial
+  const [currentPage, setCurrentPage] = useState<number>(1); // Estado para la paginación
+  const [itemsPerPage] = useState<number>(6); // Número de órdenes por página
 
   const notifySuccess = (message: string) => toast.success(message);
   const notifyError = (message: string) => toast.error(message);
@@ -60,6 +62,15 @@ const ManageOrders: React.FC = () => {
     order.receiver.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Gestión de Órdenes de Pedido</h2>
@@ -71,7 +82,10 @@ const ManageOrders: React.FC = () => {
           className="border px-4 py-2 w-full rounded"
           placeholder="Buscar por nombre del receptor..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // Reset a la primera página al buscar
+          }}
         />
       </div>
 
@@ -91,30 +105,49 @@ const ManageOrders: React.FC = () => {
 
       {/* Orders Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredOrders.length === 0 ? (
+        {currentOrders.length === 0 ? (
           <p>No hay órdenes disponibles</p>
         ) : (
-          filteredOrders.map((order) => {
+          currentOrders.map((order) => {
             return (
               <div key={order.orderId} className={`p-4 border border-gray-300 rounded-lg shadow-md`}>
                 <h3 className="text-lg font-semibold mb-2">{order.receiver}</h3>
                 <p><strong>Fecha de Orden:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
                 <p><strong>Área Solicitante:</strong> {order.requesterArea || 'No especificada'}</p>
 
-               
-
                 {/* Botón para ver detalles */}
                 <button
                   className="mt-4 w-full bg-blue-100 text-blue-700 px-4 py-2 rounded border hover:bg-blue-200 hover:text-blue-800"
                   onClick={() => openModal(order)}
                 >
-                  Ver más información
+                  Ver detalles
                 </button>
               </div>
             );
           })
         )}
       </div>
+
+      {/* Paginación */}
+      {filteredOrders.length > 0 && (
+        <div className="flex justify-center mt-6">
+          <nav className="inline-flex">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => paginate(index + 1)}
+                className={`px-4 py-2 mx-1 rounded-md ${
+                  currentPage === index + 1
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {/* Modal para mostrar los detalles del producto */}
       {selectedOrder && (
