@@ -62,6 +62,8 @@ export interface TransactionTypeChartData {
 export const getUDPBalanceHistory = async (udpId: number): Promise<UDPBalanceTransaction[]> => {
   try {
     const response = await api.get(`/UDPBalanceHistory/${udpId}`);
+    // Log para ver los datos de transacciones
+    console.log(`Historial de transacciones para UDP ${udpId}:`, response.data);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener el historial de balance para la UDP ${udpId}:`, error);
@@ -110,8 +112,27 @@ export const getUDPBalanceMonthlyChartData = async (
     if (year) {
       url += `?year=${year}`;
     }
+    console.log(`Solicitando datos mensuales para UDP ${udpId}, año: ${year || 'actual'}`);
     const response = await api.get(url);
-    return response.data;
+    
+    // Registro detallado de la respuesta para debug
+    console.log(`Datos mensuales recibidos para UDP ${udpId}:`, response.data);
+    
+    // Verificar y corregir datos si es necesario
+    const processedData = response.data.map((item: MonthlyChartData) => {
+      // Si expenses está en 0 pero hay transacciones negativas, esto podría indicar un problema
+      console.log(`Mes ${item.month}: Ingresos=${item.income}, Gastos=${item.expenses}, Neto=${item.net}`);
+      
+      return {
+        ...item,
+        // Asegurar que expenses siempre sea un número
+        expenses: item.expenses || 0,
+        // Recalcular el balance neto por si acaso
+        net: item.income - Math.abs(item.expenses || 0)
+      };
+    });
+    
+    return processedData;
   } catch (error) {
     console.error(`Error al obtener datos para gráfica mensual de la UDP ${udpId}:`, error);
     throw error;
@@ -125,7 +146,12 @@ export const getUDPBalanceTypeChartData = async (
 ): Promise<TransactionTypeChartData[]> => {
   try {
     const url = `/UDPBalanceHistory/${udpId}/chart/bytype?isExpense=${isExpense}`;
+    console.log(`Solicitando datos por tipo para UDP ${udpId}, isExpense=${isExpense}`);
     const response = await api.get(url);
+    
+    // Log para debugging
+    console.log(`Datos por tipo recibidos para UDP ${udpId} (${isExpense ? 'gastos' : 'ingresos'}):`, response.data);
+    
     return response.data;
   } catch (error) {
     console.error(`Error al obtener datos para gráfica por tipo de la UDP ${udpId}:`, error);
