@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { addUserRole, getUserRoles, getUsers, removeUserRole, deleteUser, getUserById, PaginatedResponse } from '../../services/userService';
-import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner } from 'react-icons/fa';
+import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -149,10 +149,10 @@ const RolesManagement: React.FC = () => {
 
       if (isAssigned) {
         await removeUserRole(userId, roleId);
-        toast.success(Rol eliminado correctamente);
+        toast.success("Rol eliminado correctamente");
       } else {
         await addUserRole(userId, roleId);
-        toast.success(Rol asignado correctamente);
+        toast.success("Rol asignado correctamente");
       }
 
       const updatedRoles = await getUserRoles(userId);
@@ -179,7 +179,7 @@ const RolesManagement: React.FC = () => {
         )
       );
     } catch (error) {
-      console.error(Error al cargar detalles del usuario ${userId}:, error);
+      console.error(`Error al cargar detalles del usuario ${userId}:`, error);
       toast.error('Error al cargar los detalles del usuario');
     } finally {
       setUserDetailsLoading(prev => ({...prev, [userId]: false}));
@@ -220,18 +220,18 @@ const RolesManagement: React.FC = () => {
     try {
       await deleteUser(userToDelete.id);
       setUsers(prevUsers => prevUsers.filter(user => user.id !== userToDelete.id));
-      toast.success(Usuario ${userToDelete.name} eliminado correctamente);
+      toast.success(`Usuario ${userToDelete.name} eliminado correctamente`);
       setShowDeleteModal(false);
       setUserToDelete(null);
     } catch (error) {
-      console.error(Error al eliminar el usuario ${userToDelete.id}:, error);
+      console.error(`Error al eliminar el usuario ${userToDelete.id}:`, error);
       toast.error('Error al eliminar el usuario');
     }
   };
 
   // Filtrar usuarios según término de búsqueda
   const filteredUsers = users.filter((user) =>
-    ${user.name} ${user.lastName} ${user.lastName2} ${user.email}
+    `${user.name} ${user.lastName} ${user.lastName2} ${user.email}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
@@ -432,7 +432,7 @@ const RolesManagement: React.FC = () => {
                     )}
 
                     {/* Sección de roles - Mover dentro del card para que no haya espacio intermedio */}
-                    <div className={p-4 ${isSelected ? 'border-t border-gray-200' : ''}}>
+                    <div className={`p-4 ${isSelected ? 'border-t border-gray-200' : ''}`}>
                       {/* Sección de Roles Asignados */}
                       <h3 className="font-semibold text-gray-700 mb-2">Roles Asignados</h3>
                       <div className="flex flex-wrap gap-2 mb-4">
@@ -527,7 +527,7 @@ const RolesManagement: React.FC = () => {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteUser}
         title="Confirmar eliminación"
-        message={¿Está seguro que desea eliminar a ${userToDelete?.name} ${userToDelete?.lastName}? Esta acción no se puede deshacer.}
+        message={`¿Está seguro que desea eliminar a ${userToDelete?.name} ${userToDelete?.lastName}? Esta acción no se puede deshacer.`}
       />
 
       {/* Contenedor de notificaciones Toast */}
