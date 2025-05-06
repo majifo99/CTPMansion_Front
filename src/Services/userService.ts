@@ -21,13 +21,41 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Obtener la lista de usuarios
-export const getUsers = async (): Promise<any> => {
+// Interfaz para la respuesta paginada
+export interface PaginatedResponse<T> {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  items: T[];
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+
+// Obtener la lista de usuarios con soporte para paginación
+export const getUsers = async (pageNumber?: number, pageSize?: number): Promise<any> => {
   try {
-    const response = await apiClient.get('/User');
+    let url = '/User';
+    
+    // Añadir parámetros de paginación si se proporcionan
+    if (pageNumber !== undefined && pageSize !== undefined) {
+      url = `/User?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+    }
+    
+    const response = await apiClient.get(url);
     return response.data;
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
+    throw error;
+  }
+};
+
+// Eliminar un usuario
+export const deleteUser = async (userId: number): Promise<void> => {
+  try {
+    await apiClient.delete(`/User/${userId}`);
+  } catch (error) {
+    console.error(`Error al eliminar el usuario ${userId}:`, error);
     throw error;
   }
 };
@@ -46,11 +74,9 @@ export const getUserRoles = async (userId: number): Promise<any> => {
 // Agregar rol a un usuario
 export const addUserRole = async (userId: number, roleId: number): Promise<void> => {
   try {
-    await apiClient.post('/UserRole/add', null, {
-      params: {
-        userId,
-        roleId,
-      },
+    await apiClient.post('/UserRole/add', {
+      userId,
+      roleId
     });
   } catch (error) {
     console.error(`Error al agregar rol ${roleId} al usuario ${userId}:`, error);
@@ -61,11 +87,9 @@ export const addUserRole = async (userId: number, roleId: number): Promise<void>
 // Quitar rol a un usuario
 export const removeUserRole = async (userId: number, roleId: number): Promise<void> => {
   try {
-    await apiClient.post('/UserRole/remove', null, {
-      params: {
-        userId,
-        roleId,
-      },
+    await apiClient.post('/UserRole/remove', {
+      userId,
+      roleId
     });
   } catch (error) {
     console.error(`Error al quitar rol ${roleId} del usuario ${userId}:`, error);
