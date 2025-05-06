@@ -22,6 +22,7 @@ import { IoIosConstruct } from 'react-icons/io';
 import { BsJournal } from 'react-icons/bs';
 import { FaCog } from 'react-icons/fa';
 import { FiUsers } from 'react-icons/fi';
+import { DocumentTextIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 
 // Define los nombres de políticas para validar roles - igual que en AppRouter.tsx
@@ -169,6 +170,10 @@ const Sidebar: React.FC = () => {
 
   const hasRole = (requiredRoles: string[]) => {
     return user?.roles?.some((role) => requiredRoles.includes(role));
+  };
+
+  const hasAnyRole = (roles: string[]) => {
+    return roles.some((role) => user?.roles?.includes(role));
   };
 
   // Renderiza el contenido común para ambas versiones
@@ -367,6 +372,19 @@ const Sidebar: React.FC = () => {
     )}
   </div>
 )}
+
+        {/* Nuevo enlace para Documentos - Todos los Managers */}
+        {hasAnyRole(policies.allManagers) && (
+          <Link
+            to="/dashboard/documents"
+            className={`flex items-center px-4 py-2 mt-2 text-gray-600 transition-colors duration-300 transform hover:bg-gray-100 hover:text-gray-700 ${
+              location.pathname === '/dashboard/documents' ? 'bg-gray-100 text-gray-700' : ''
+            }`}
+          >
+            <DocumentTextIcon className="w-5 h-5" />
+            <span className="mx-4 font-medium">Documentos</span>
+          </Link>
+        )}
       </>
     );
   };

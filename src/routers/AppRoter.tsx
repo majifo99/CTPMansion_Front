@@ -42,6 +42,8 @@ const OrdenesDePedido = React.lazy(() => import('../DashboardPages/Managing/Mana
 const GalleryPage = React.lazy(() => import('../pages/GalleryPage'));
 // Gestión de galería admin
 const GalleryAdminPage = React.lazy(() => import('../DashboardPages/CRUD/GalleryCategory/GalleryPage'));
+// Gestión de documentos y manuales
+const GuidePage = React.lazy(() => import('../DashboardPages/Guide/GuidePage'));
 
 // Define los nombres de políticas para usarlos en las rutas
 const policies = {
@@ -293,6 +295,16 @@ const AppRouter: React.FC = () => {
                 element={
                   <ProtectedRoute requiredRoles={policies.requester}>
                     <OrderComponent />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Documentos y Manuales - Para todos los managers */}
+              <Route
+                path="documents"
+                element={
+                  <ProtectedRoute requiredRoles={policies.allManagers}>
+                    <GuidePage />
                   </ProtectedRoute>
                 }
               />
