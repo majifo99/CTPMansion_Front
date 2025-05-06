@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { addUserRole, getUserRoles, getUsers, removeUserRole, deleteUser, getUserById, PaginatedResponse } from '../../services/userService';
-import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaUserCircle, FaPhone, FaEnvelope, FaIdCard, FaTrash, FaInfoCircle, FaTimesCircle, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ClipLoader from 'react-spinners/ClipLoader';
