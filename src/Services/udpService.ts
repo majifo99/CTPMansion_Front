@@ -88,6 +88,24 @@ export const patchUDPBalance = async (id: number, newBalance: number): Promise<U
   }
 };
 
+// Interfaces para actualizar el balance
+export interface BalanceUpdateDto {
+  amount: number;
+  description: string;
+  transactionType: string;
+}
+
+// Actualizar el balance de una UDP con el nuevo endpoint (POST)
+export const updateUDPBalance = async (id: number, balanceUpdate: BalanceUpdateDto): Promise<UDP> => {
+  try {
+    const response = await api.post(`/UDP/${id}/balance`, balanceUpdate);
+    return response.data;
+  } catch (error) {
+    console.error(`Error al actualizar el balance de la UDP con ID ${id}:`, error);
+    throw error;
+  }
+};
+
 // Crear nueva UDP
 export const addUDP = async (udp: Omit<UDP, 'id_UDP'>): Promise<UDP> => {
   try {

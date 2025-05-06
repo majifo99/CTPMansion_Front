@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { UDP } from '../types/Types';
-import { addUDP, deleteUDP, editUDP, getUDPs, getUDPById, patchUDPBalance } from '../services/udpService';
+import { addUDP, deleteUDP, editUDP, getUDPs, getUDPById, patchUDPBalance, updateUDPBalance as updateUDPBalanceWithTransaction, BalanceUpdateDto } from '../services/udpService';
 
 export const useUDPs = () => {
   const [udps, setUdps] = useState<UDP[]>([]);
   const [selectedUdp, setSelectedUdp] = useState<UDP | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  
 
   useEffect(() => {
     fetchUDPsData();
@@ -29,6 +27,7 @@ export const useUDPs = () => {
       setError('Error al obtener la UDP');
     }
   };
+  
   const fetchUDPsData = async () => {
     setLoading(true);
     try {
@@ -42,10 +41,6 @@ export const useUDPs = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchUDPsData();
-  }, []);
 
   // Función para añadir una nueva UDP
   const handleAddUDP = async (newUDP: Omit<UDP, 'id_UDP'>) => {
@@ -81,7 +76,7 @@ export const useUDPs = () => {
     }
   };
 
-  // Actualizar el balance de una UDP específica
+  // Método antiguo - Actualizar el balance de una UDP específica con PATCH
   const updateUDPBalance = async (id: number, newBalance: number) => {
     try {
       setLoading(true);
@@ -95,6 +90,22 @@ export const useUDPs = () => {
     }
   };
 
+  // NUEVO MÉTODO - Actualizar el balance con transacción completa
+  const addBalanceTransaction = async (id: number, transaction: BalanceUpdateDto) => {
+    try {
+      setLoading(true);
+      await updateUDPBalanceWithTransaction(id, transaction);
+      await fetchUdpById(id); // Actualizar `selectedUdp` después de modificar el balance
+      return true;
+    } catch (error) {
+      console.error('Error al registrar la transacción:', error);
+      setError('Error al registrar la transacción');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     udps,
     selectedUdp,
@@ -102,6 +113,7 @@ export const useUDPs = () => {
     error,
     fetchUdpById,
     updateUDPBalance,
+    addBalanceTransaction, // Nuevo método para transacciones
     handleAddUDP,
     handleEditUDP,
     handleDeleteUDP,
