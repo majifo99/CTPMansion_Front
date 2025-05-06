@@ -74,10 +74,7 @@ export const getUserRoles = async (userId: number): Promise<any> => {
 // Agregar rol a un usuario
 export const addUserRole = async (userId: number, roleId: number): Promise<void> => {
   try {
-    await apiClient.post('/UserRole/add', {
-      userId,
-      roleId
-    });
+    await apiClient.post(`/UserRole/add?userId=${userId}&roleId=${roleId}`);
   } catch (error) {
     console.error(`Error al agregar rol ${roleId} al usuario ${userId}:`, error);
     throw error;
@@ -87,10 +84,7 @@ export const addUserRole = async (userId: number, roleId: number): Promise<void>
 // Quitar rol a un usuario
 export const removeUserRole = async (userId: number, roleId: number): Promise<void> => {
   try {
-    await apiClient.post('/UserRole/remove', {
-      userId,
-      roleId
-    });
+    await apiClient.post(`/UserRole/remove?userId=${userId}&roleId=${roleId}`);
   } catch (error) {
     console.error(`Error al quitar rol ${roleId} del usuario ${userId}:`, error);
     throw error;
