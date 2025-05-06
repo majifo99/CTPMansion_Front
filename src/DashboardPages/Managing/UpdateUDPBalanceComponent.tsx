@@ -27,13 +27,10 @@ const UpdateUDPBalanceComponent: React.FC = () => {
   // Estado para determinar si es ingreso o deducción
   const [transactionMode, setTransactionMode] = useState<'ingreso' | 'deduccion'>('ingreso');
 
-  const [selectedUdpId, setSelectedUdpId] = useState<number | null>(null);
-
   const handleSelectUdp = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const udpId = parseInt(e.target.value);
     if (!isNaN(udpId)) {
       await fetchUdpById(udpId);
-      setSelectedUdpId(udpId);
     }
   };
 
