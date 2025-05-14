@@ -218,6 +218,7 @@ const OrderComponent: React.FC = () => {
             onChange={(e) => handleSearchTermChange(e.target.value)}
             onFocus={() => searchTerm.length > 0 && setShowProductDropdown(true)}
             className="p-2 border rounded w-full"
+            maxLength={100}
           />
           {showProductDropdown && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
@@ -252,6 +253,8 @@ const OrderComponent: React.FC = () => {
           onChange={(e) => setQuantity(e.target.value)}
           className="p-2 border rounded col-span-1"
           min="1"
+          max="999" 
+          maxLength={3}
         />
         
         {/* Unit of measure DROPDOWN REPLACEMENT */}
@@ -307,6 +310,7 @@ const OrderComponent: React.FC = () => {
                       value={product.product.name}
                       onChange={(e) => handleProductChange(index, 'name', e.target.value)}
                       className="p-1 border rounded w-full"
+                      maxLength={100}
                     />
                   </td>
                   <td className="border border-gray-300 p-2">
@@ -316,6 +320,7 @@ const OrderComponent: React.FC = () => {
                       onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
                       className="p-1 border rounded w-full"
                       min="1"
+                      max="999"
                     />
                   </td>
                   <td className="border border-gray-300 p-2">
@@ -351,27 +356,39 @@ const OrderComponent: React.FC = () => {
 
       {/* Otros campos del formulario de orden */}
       <div className="grid grid-cols-1 gap-4">
-        <input
-          type="text"
-          placeholder="Área Solicitante"
-          value={requesterArea}
-          onChange={(e) => setRequesterArea(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          placeholder="Receptor"
-          value={receiver}
-          onChange={(e) => setReceiver(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <textarea
-          placeholder="Comentarios"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          className="w-full p-2 border rounded"
-          rows={3}
-        />
+        <div>
+          <input
+            type="text"
+            placeholder="Área Solicitante"
+            value={requesterArea}
+            onChange={(e) => setRequesterArea(e.target.value)}
+            className="w-full p-2 border rounded"
+            maxLength={100}
+          />
+          <p className="text-xs text-gray-500 mt-1">Máximo 100 caracteres</p>
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="Receptor"
+            value={receiver}
+            onChange={(e) => setReceiver(e.target.value)}
+            className="w-full p-2 border rounded"
+            maxLength={100}
+          />
+          <p className="text-xs text-gray-500 mt-1">Máximo 100 caracteres</p>
+        </div>
+        <div>
+          <textarea
+            placeholder="Comentarios"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            className="w-full p-2 border rounded"
+            rows={3}
+            maxLength={500}
+          />
+          <p className="text-xs text-gray-500 mt-1">Máximo 500 caracteres ({500 - comments.length} restantes)</p>
+        </div>
       </div>
 
       <button 
