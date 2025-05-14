@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useState } from 'react';
+import { useState, KeyboardEvent, ChangeEvent } from 'react';
 
 type FormData = {
     studentName: string;
@@ -35,6 +35,27 @@ const CertificatesPage = () => {
     const notifySuccess = () => toast.success('Solicitud realizada correctamente!');
     const notifyError = () => toast.error('Error al realizar la solicitud.');
 
+    // Patrones de validación
+    const namePattern = {
+        value: /^[A-Za-zÀ-ÿ\s]+$/,
+        message: 'Solo se permiten letras y espacios'
+    };
+    
+    const idPattern = {
+        value: /^[0-9]{9}$/,
+        message: 'La cédula debe tener exactamente 9 dígitos numéricos'
+    };
+    
+    const phonePattern = {
+        value: /^[0-9]{8}$/,
+        message: 'El número telefónico debe tener exactamente 8 dígitos numéricos'
+    };
+    
+    const emailPattern = {
+        value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        message: 'Introduce un correo electrónico válido'
+    };
+
     const onSubmit = (data: FormData) => {
         const requestData = {
             studentName: data.studentName,
@@ -63,7 +84,35 @@ const CertificatesPage = () => {
             });
     };
 
-    const renderInputField = (
+    // Función para prevenir caracteres no numéricos en el teléfono
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+        // Permitir: backspace, delete, tab, escape, enter y .
+        if ([46, 8, 9, 27, 13, 110].indexOf(e.keyCode) !== -1 ||
+            // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+            (e.keyCode === 65 && e.ctrlKey === true) ||
+            (e.keyCode === 67 && e.ctrlKey === true) ||
+            (e.keyCode === 86 && e.ctrlKey === true) ||
+            (e.keyCode === 88 && e.ctrlKey === true) ||
+            // Permitir: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            return;
+        }
+        // Bloquear cualquier tecla que no sea número
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    };
+
+    // Función para filtrar caracteres no numéricos en cambios de input
+    const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        const value = e.target.value;
+        e.target.value = value.replace(/[^\d]/g, '').slice(0, 8);
+    };    // Función para filtrar caracteres no numéricos en campos de IDs
+    const handleIdChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        const value = e.target.value;
+        e.target.value = value.replace(/[^\d]/g, '').slice(0, 9);
+    };
+      const renderInputField = (
         id: keyof FormData,
         label: string,
         placeholder: string,
@@ -71,14 +120,30 @@ const CertificatesPage = () => {
         type: string = 'text'
     ) => (
         <div>
-            <label htmlFor={id} className="block mb-1 text-sm font-semibold text-gray-700">
-                {label}
-            </label>
+            <div className="flex justify-between items-center mb-1">
+                <label htmlFor={id} className="text-sm font-semibold text-gray-700">
+                    {label}
+                </label>
+                {(id === 'studentId' || id === 'EncargadoId') && (
+                    <span className="text-xs text-green-600">Solo números (9 dígitos)</span>
+                )}
+                {type === 'tel' && (
+                    <span className="text-xs text-green-600">Solo números (8 dígitos)</span>
+                )}
+            </div>
             <input
                 type={type}
                 id={id}
                 placeholder={placeholder}
                 {...register(id, validation)}
+                onKeyDown={(id === 'studentId' || id === 'EncargadoId' || type === 'tel') ? handleKeyDown : undefined}
+                onChange={
+                    type === 'tel' 
+                    ? handlePhoneChange 
+                    : (id === 'studentId' || id === 'EncargadoId') 
+                        ? handleIdChange 
+                        : undefined
+                }
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-600 focus:border-green-600 text-gray-900 text-sm transition-all duration-200"
             />
             {errors[id]?.message && <p className="mt-1 text-xs text-red-500">{errors[id]?.message as string}</p>}
@@ -104,10 +169,29 @@ const CertificatesPage = () => {
                                     Información del Estudiante
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    {renderInputField('studentId', 'Cédula del Estudiante', '102340567', { required: 'La cédula del estudiante es requerida' })}
-                                    {renderInputField('studentName', 'Nombre del Estudiante', 'Juan', { required: 'El nombre del estudiante es requerido' })}
-                                    {renderInputField('studentLastName1', 'Primer Apellido del Estudiante', 'Pérez', { required: 'El primer apellido es requerido' })}
-                                    {renderInputField('studentLastName2', 'Segundo Apellido del Estudiante', 'Rodríguez', { required: 'El segundo apellido es requerido' })}
+                                    {renderInputField('studentId', 'Cédula del Estudiante', '102340567', { 
+                                        required: 'La cédula del estudiante es requerida',
+                                        pattern: idPattern,
+                                        maxLength: { value: 9, message: 'La cédula no puede tener más de 9 dígitos' }
+                                    }, 'text')}
+                                    
+                                    {renderInputField('studentName', 'Nombre del Estudiante', 'Juan', { 
+                                        required: 'El nombre del estudiante es requerido',
+                                        pattern: namePattern,
+                                        maxLength: { value: 20, message: 'El nombre no puede exceder los 20 caracteres' }
+                                    })}
+                                    
+                                    {renderInputField('studentLastName1', 'Primer Apellido del Estudiante', 'Pérez', { 
+                                        required: 'El primer apellido es requerido',
+                                        pattern: namePattern,
+                                        maxLength: { value: 20, message: 'El apellido no puede exceder los 20 caracteres' }
+                                    })}
+                                    
+                                    {renderInputField('studentLastName2', 'Segundo Apellido del Estudiante', 'Rodríguez', { 
+                                        required: 'El segundo apellido es requerido',
+                                        pattern: namePattern,
+                                        maxLength: { value: 20, message: 'El apellido no puede exceder los 20 caracteres' }
+                                    })}
                                 </div>
                             </div>
 
@@ -119,10 +203,25 @@ const CertificatesPage = () => {
                                     <p className="text-m text-gray-500 italic">*Opcional para estudiantes egresados</p>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    {renderInputField('EncargadoId', 'Cédula del Encargado', '102340567', {})}
-                                    {renderInputField('guardianName', 'Nombre del Encargado', 'Luis', {})}
-                                    {renderInputField('guardianLastName1', 'Primer Apellido del Encargado', 'Pérez', {})}
-                                    {renderInputField('guardianLastName2', 'Segundo Apellido del Encargado', 'Rodríguez', {})}
+                                    {renderInputField('EncargadoId', 'Cédula del Encargado', '102340567', {
+                                        pattern: idPattern,
+                                        maxLength: { value: 9, message: 'La cédula no puede tener más de 9 dígitos' }
+                                    }, 'text')}
+                                    
+                                    {renderInputField('guardianName', 'Nombre del Encargado', 'Luis', {
+                                        pattern: namePattern,
+                                        maxLength: { value: 50, message: 'El nombre no puede exceder los 50 caracteres' }
+                                    })}
+                                    
+                                    {renderInputField('guardianLastName1', 'Primer Apellido del Encargado', 'Pérez', {
+                                        pattern: namePattern,
+                                        maxLength: { value: 50, message: 'El apellido no puede exceder los 50 caracteres' }
+                                    })}
+                                    
+                                    {renderInputField('guardianLastName2', 'Segundo Apellido del Encargado', 'Rodríguez', {
+                                        pattern: namePattern,
+                                        maxLength: { value: 50, message: 'El apellido no puede exceder los 50 caracteres' }
+                                    })}
                                 </div>
                             </div>
 
@@ -131,8 +230,16 @@ const CertificatesPage = () => {
                                     Información de Contacto
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    {renderInputField('email', 'Email', 'name@gmail.com', { required: 'El e-mail es requerido' }, 'email')}
-                                    {renderInputField('phoneNumber', 'Teléfono', '123456789', { required: 'El teléfono es requerido' }, 'tel')}
+                                    {renderInputField('email', 'Email', 'name@gmail.com', { 
+                                        required: 'El e-mail es requerido',
+                                        pattern: emailPattern,
+                                        maxLength: { value: 100, message: 'El correo no puede exceder los 100 caracteres' }
+                                    }, 'email')}
+                                    
+                                    {renderInputField('phoneNumber', 'Teléfono', '12345678', { 
+                                        required: 'El teléfono es requerido',
+                                        pattern: phonePattern
+                                    }, 'tel')}
                                 </div>
                             </div>
 

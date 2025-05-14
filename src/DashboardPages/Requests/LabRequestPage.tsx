@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLabsAndRequests } from '../../hooks/useLabs';
 import { useForm, RegisterOptions } from 'react-hook-form';
@@ -42,8 +42,33 @@ const LabRequestPage: React.FC = () => {
   const [selectedLab, setSelectedLab] = useState<Laboratory | null>(null);
   const [activeModal, setActiveModal] = useState<"form" | "calendar" | "reservationDetails" | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<LabRequest | null>(null);
-  const { register, handleSubmit, reset } = useForm<LabRequestFormField>();
+  const { register, handleSubmit, reset, watch } = useForm<LabRequestFormField>();
   const { isSubmitting, submitLabRequest } = useLabRequest();
+  
+  // Estados para el contador de caracteres
+  const [charCounts, setCharCounts] = useState({
+    activityDescription: 0,
+    needs: 0
+  });
+  
+  // Observar campos para el contador de caracteres
+  const activityDescription = watch('activityDescription');
+  const needs = watch('needs');
+  
+  // Actualizar contadores cuando cambien los valores
+  React.useEffect(() => {
+    setCharCounts(prev => ({
+      ...prev,
+      activityDescription: activityDescription?.length || 0
+    }));
+  }, [activityDescription]);
+  
+  React.useEffect(() => {
+    setCharCounts(prev => ({
+      ...prev,
+      needs: needs?.length || 0
+    }));
+  }, [needs]);
 
   const today = moment().format("YYYY-MM-DD");
   const minTime = moment().set({ hour: 6, minute: 0, second: 0 }).format("HH:mm");
@@ -121,7 +146,6 @@ const LabRequestPage: React.FC = () => {
       notifyError('Error al enviar la solicitud.');
     }
   };
-
   const renderInputField = (
     id: keyof LabRequestFormField,
     label: string,
@@ -129,7 +153,8 @@ const LabRequestPage: React.FC = () => {
     validation: RegisterOptions<LabRequestFormField>,
     type = 'text',
     min?: string,
-    max?: string
+    max?: string,
+    maxLength?: number
   ) => (
     <div className="flex flex-col mb-4 w-full md:w-1/2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
@@ -139,9 +164,11 @@ const LabRequestPage: React.FC = () => {
         placeholder={placeholder}
         min={min}
         max={max}
-        {...register(id, validation)}
+        maxLength={maxLength}
+        {...register(id, { ...validation, maxLength: maxLength ? { value: maxLength, message: `Máximo ${maxLength} caracteres` } : undefined })}
         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
       />
+      {maxLength && <p className="text-xs text-gray-500 mt-1">Máximo {maxLength} caracteres</p>}
     </div>
   );
 
@@ -172,15 +199,15 @@ const LabRequestPage: React.FC = () => {
         <h3 className="text-lg font-semibold mb-4 text-center">Solicitud para {selectedLab?.name}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap mt-4">
           <div className="w-full flex flex-wrap">
-            {renderInputField('managerName', 'Nombre del Encargado', 'Juan', { required: 'El nombre es obligatorio' })}
-            {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', { required: 'El primer apellido es obligatorio' })}
+            {renderInputField('managerName', 'Nombre del Encargado', 'Juan', { required: 'El nombre es obligatorio' }, 'text', undefined, undefined, 50)}
+            {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', { required: 'El primer apellido es obligatorio' }, 'text', undefined, undefined, 50)}
           </div>
           <div className="w-full flex flex-wrap">
-            {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez', { required: 'El segundo apellido es obligatorio' })}
-            {renderInputField('course', 'Curso', 'Matemáticas', { required: 'El curso es obligatorio' })}
+            {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez', { required: 'El segundo apellido es obligatorio' }, 'text', undefined, undefined, 50)}
+            {renderInputField('course', 'Curso', 'Matemáticas', { required: 'El curso es obligatorio' }, 'text', undefined, undefined, 100)}
           </div>
           <div className="w-full flex flex-wrap">
-            {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de laboratorio', { required: 'La descripción es obligatoria' })}
+            {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de laboratorio', { required: 'La descripción es obligatoria' }, 'text', undefined, undefined, 200)}
             {renderDropdownField(
               'numberOfAttendees',
               'Número de Asistentes',
@@ -194,15 +221,16 @@ const LabRequestPage: React.FC = () => {
           <div className="w-full flex flex-wrap">
             {renderInputField('endDate', 'Fecha de Fin', '', { required: 'La fecha de fin es obligatoria' }, 'date', today)}
             {renderInputField('endTime', 'Hora de Fin', '', { required: 'La hora de fin es obligatoria' }, 'time', minTime, maxTime)}
-          </div>
-          <div className="w-full px-2 mb-4">
+          </div>          <div className="w-full px-2 mb-4">
             <label htmlFor="needs" className="block text-sm font-medium text-gray-900">Necesidades</label>
             <textarea
               id="needs"
               placeholder="Equipo de sonido, proyector, etc."
+              maxLength={500}
               {...register('needs')}
               className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 h-24"
             ></textarea>
+            <p className="text-xs text-gray-500 mt-1">Máximo 500 caracteres</p>
           </div>
           <div className="w-full px-2 flex justify-end">
             <button

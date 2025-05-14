@@ -10,6 +10,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'moment/locale/es';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { RoomRequest } from '../../types/RoomRequestType';
 
 // Configurar moment en español
 moment.locale('es');
@@ -52,7 +53,7 @@ const RoomRequestPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedRoom, setSelectedRoom] = useState<{ id_Room: number; name: string; capacity: number; url_Image: string; description: string } | null>(null);
   const [activeModal, setActiveModal] = useState<"form" | "calendar" | "reservationDetails" | null>(null);
-  const [selectedReservation, setSelectedReservation] = useState<any>(null);
+  const [selectedReservation, setSelectedReservation] = useState<RoomRequest | null>(null);
   const { register, handleSubmit, reset } = useForm<RoomRequestFormField>();
   const { isSubmitting, submitRoomRequest } = useRoomRequest();
 
@@ -116,13 +117,14 @@ const RoomRequestPage: React.FC = () => {
       notifyError('Error al enviar la solicitud.');
     }
   };
-
   const renderInputField = (
     id: keyof RoomRequestFormField,
     label: string,
     placeholder: string,
     type = 'text',
-    min?: string
+    min?: string,
+    max?: string,
+    maxLength?: number
   ) => (
     <div className="flex flex-col mb-4 w-full md:w-1/2 px-2">
       <label htmlFor={id} className="block text-sm font-medium text-gray-900">{label}</label>
@@ -131,9 +133,15 @@ const RoomRequestPage: React.FC = () => {
         id={id}
         placeholder={placeholder}
         min={min}
-        {...register(id, { required: `${label} es obligatorio` })}
+        max={max}
+        maxLength={maxLength}
+        {...register(id, { 
+          required: `${label} es obligatorio`,
+          maxLength: maxLength ? { value: maxLength, message: `Máximo ${maxLength} caracteres` } : undefined 
+        })}
         className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2"
       />
+      {maxLength && <p className="text-xs text-gray-500 mt-1">Máximo {maxLength} caracteres</p>}
     </div>
   );
 
@@ -162,39 +170,38 @@ const RoomRequestPage: React.FC = () => {
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 relative z-10 overflow-y-auto max-h-screen">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 text-2xl font-bold">&times;</button>
         <h3 className="text-lg font-semibold mb-4 text-center">Solicitud para {selectedRoom?.name}</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap mt-4">
-          <div className="w-full flex flex-wrap">
-            {renderInputField('managerName', 'Nombre del Encargado', 'Juan')}
-            {renderInputField('managerLastName', 'Primer Apellido', 'Pérez')}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap mt-4">          <div className="w-full flex flex-wrap">
+            {renderInputField('managerName', 'Nombre del Encargado', 'Juan', 'text', undefined, undefined, 50)}
+            {renderInputField('managerLastName', 'Primer Apellido', 'Pérez', 'text', undefined, undefined, 50)}
           </div>
           <div className="w-full flex flex-wrap">
-            {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez')}
-            {renderInputField('course', 'Curso', 'Matemáticas')}
+            {renderInputField('managerLastName2', 'Segundo Apellido', 'Rodríguez', 'text', undefined, undefined, 50)}
+            {renderInputField('course', 'Curso', 'Matemáticas', 'text', undefined, undefined, 100)}
           </div>
           <div className="w-full flex flex-wrap">
-            {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de laboratorio')}
+            {renderInputField('activityDescription', 'Descripción de la Actividad', 'Clase de laboratorio', 'text', undefined, undefined, 200)}
             {renderDropdownField(
               'numberOfAttendees',
               'Número de Asistentes',
               Array.from({ length: selectedRoom?.capacity || 10 }, (_, i) => i + 1)
             )}
-          </div>
-          <div className="w-full flex flex-wrap">
+          </div>          <div className="w-full flex flex-wrap">
             {renderInputField('startDate', 'Fecha de Inicio', '', 'date', today)}
             {renderInputField('startTime', 'Hora de Inicio', '', 'time')}
           </div>
           <div className="w-full flex flex-wrap">
             {renderInputField('endDate', 'Fecha de Fin', '', 'date', today)}
             {renderInputField('endTime', 'Hora de Fin', '', 'time')}
-          </div>
-          <div className="w-full px-2 mb-4">
+          </div><div className="w-full px-2 mb-4">
             <label htmlFor="needs" className="block text-sm font-medium text-gray-900">Necesidades</label>
             <textarea
               id="needs"
               placeholder="Equipo de sonido, proyector, etc."
+              maxLength={500}
               {...register('needs')}
               className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 h-24"
             ></textarea>
+            <p className="text-xs text-gray-500 mt-1">Máximo 500 caracteres</p>
           </div>
           <div className="w-full px-2 flex justify-end">
             <button
@@ -210,7 +217,7 @@ const RoomRequestPage: React.FC = () => {
     </div>
   );
 
-  const ReservationDetailsModal = ({ reservation, onClose }: { reservation: any, onClose: () => void }) => (
+  const ReservationDetailsModal = ({ reservation, onClose }: { reservation: RoomRequest, onClose: () => void }) => (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 relative z-10">
