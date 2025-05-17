@@ -39,6 +39,7 @@ interface ConfirmationModalProps {
 
 const roleNames: { [key: number]: string } = {
   1: "Admin",
+  2: "Editor de perfil",
   3: "Encarg. UDP",
   4: "Encarg. Certificados",
   5: "Encarg. Labs",
@@ -87,7 +88,7 @@ const RolesManagement: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [rolesLoading, setRolesLoading] = useState(true);
-  
+
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -106,20 +107,20 @@ const RolesManagement: React.FC = () => {
       setRolesLoading(true);
 
       const response = await getUsers(currentPage, pageSize);
-      
+
       // Verificar si la respuesta está paginada
       if (response.items && response.totalItems !== undefined) {
         // Respuesta paginada
         const paginatedResponse = response as PaginatedResponse<User>;
-        const detailedUsers = paginatedResponse.items.map(user => ({...user, fullInfo: false}));
-        
+        const detailedUsers = paginatedResponse.items.map(user => ({ ...user, fullInfo: false }));
+
         setUsers(detailedUsers);
         setTotalItems(paginatedResponse.totalItems);
         setTotalPages(paginatedResponse.totalPages);
       } else {
         // Respuesta no paginada (comportamiento anterior)
-        const detailedUsers = Array.isArray(response) 
-          ? response.map(user => ({...user, fullInfo: false})) 
+        const detailedUsers = Array.isArray(response)
+          ? response.map(user => ({ ...user, fullInfo: false }))
           : [];
         setUsers(detailedUsers);
       }
@@ -168,13 +169,13 @@ const RolesManagement: React.FC = () => {
   // Cargar detalles completos del usuario
   const loadUserDetails = async (userId: number) => {
     try {
-      setUserDetailsLoading(prev => ({...prev, [userId]: true}));
-      
+      setUserDetailsLoading(prev => ({ ...prev, [userId]: true }));
+
       const userDetails = await getUserById(userId);
-      setUsers(prevUsers => 
-        prevUsers.map(user => 
-          user.id === userId 
-            ? {...user, ...userDetails, fullInfo: true} 
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === userId
+            ? { ...user, ...userDetails, fullInfo: true }
             : user
         )
       );
@@ -182,14 +183,14 @@ const RolesManagement: React.FC = () => {
       console.error(`Error al cargar detalles del usuario ${userId}:`, error);
       toast.error('Error al cargar los detalles del usuario');
     } finally {
-      setUserDetailsLoading(prev => ({...prev, [userId]: false}));
+      setUserDetailsLoading(prev => ({ ...prev, [userId]: false }));
     }
   };
 
   // Manejar la visualización de detalles del usuario
   const toggleUserDetails = async (userId: number) => {
     const user = users.find(u => u.id === userId);
-    
+
     if (selectedUser === userId) {
       // Cerrando detalles - primero registramos el id para la animación de cierre
       setClosingUser(userId);
@@ -216,7 +217,7 @@ const RolesManagement: React.FC = () => {
   // Eliminar usuario
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
-    
+
     try {
       await deleteUser(userToDelete.id);
       setUsers(prevUsers => prevUsers.filter(user => user.id !== userToDelete.id));
@@ -326,7 +327,7 @@ const RolesManagement: React.FC = () => {
                     key={user.id}
                     className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 
                       ${isSelected ? 'ring-2 ring-blue-500 col-span-1 row-span-1' : 'hover:shadow-lg'}`}
-                    style={{ height: 'fit-content' }} 
+                    style={{ height: 'fit-content' }}
                   >
                     {/* Cabecera del usuario */}
                     <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
@@ -369,9 +370,8 @@ const RolesManagement: React.FC = () => {
 
                     {/* Detalles extendidos (condicional) - CORRECCIÓN */}
                     {(isSelected || closingUser === user.id) && (
-                      <div className={`border-t border-gray-200 bg-gray-50 ${
-                        closingUser === user.id ? 'animate-collapse' : 'animate-expand'
-                      }`}>
+                      <div className={`border-t border-gray-200 bg-gray-50 ${closingUser === user.id ? 'animate-collapse' : 'animate-expand'
+                        }`}>
                         {userDetailsLoading[user.id] ? (
                           <div className="text-center py-4">
                             <p className="text-gray-500">Cargando información detallada...</p>
@@ -442,17 +442,19 @@ const RolesManagement: React.FC = () => {
                             <span>Cargando roles...</span>
                           </div>
                         ) : userRoles.length > 0 ? (
-                          userRoles.map((role) => (
-                            <button
-                              key={role.id}
-                              onClick={() => handleRoleChange(user.id, role.id, true)}
-                              disabled={rolesLoading}
-                              className={`px-2 py-1 text-xs bg-red-100 text-red-600 font-medium rounded-full flex items-center
-                                ${rolesLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600 hover:text-white'}`}
-                            >
-                              {roleNames[role.id]} <FaTimesCircle className="ml-1" />
-                            </button>
-                          ))
+                          userRoles
+                            .filter((role) => role.id !== 2)
+                            .map((role) => (
+                              <button
+                                key={role.id}
+                                onClick={() => handleRoleChange(user.id, role.id, true)}
+                                disabled={rolesLoading}
+                                className={`px-2 py-1 text-xs bg-green-100 text-green-600 font-medium rounded-full flex items-center
+                                ${rolesLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-500 hover:text-white'}`}
+                              >
+                                {roleNames[role.id]} <  FaCheckCircle className="ml-1" />
+                              </button>
+                            ))
                         ) : (
                           <p className="text-sm text-gray-500">No hay roles asignados</p>
                         )}
@@ -468,10 +470,10 @@ const RolesManagement: React.FC = () => {
                                 key={roleId}
                                 onClick={() => handleRoleChange(user.id, roleId, false)}
                                 disabled={rolesLoading}
-                                className={`px-2 py-1 text-xs bg-green-100 text-green-600 font-medium rounded-full flex items-center
-                                  ${rolesLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600 hover:text-white'}`}
+                                className={`px-2 py-1 text-xs bg-red-100 text-red-600 font-medium rounded-full flex items-center
+            ${rolesLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500 hover:text-white'}`}
                               >
-                                {roleNames[roleId]} <FaCheckCircle className="ml-1" />
+                                {roleNames[roleId]} <FaTimesCircle className="ml-1" />
                               </button>
                             ))}
                           </div>
@@ -500,16 +502,15 @@ const RolesManagement: React.FC = () => {
                   } else {
                     pageNum = currentPage - 2 + i;
                   }
-                  
+
                   return (
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`h-8 w-8 mx-1 flex items-center justify-center rounded ${
-                        currentPage === pageNum
+                      className={`h-8 w-8 mx-1 flex items-center justify-center rounded ${currentPage === pageNum
                           ? 'bg-blue-500 text-white'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>

@@ -36,13 +36,13 @@ const ManageLabRequests: React.FC = () => {
     }
   };
 
-  const approveRequest = (id: number) => 
+  const approveRequest = (id: number) =>
     handleRequestAction(
       () => handleApproveLabRequest(id),
       'Solicitud aprobada exitosamente'
     );
 
-  const rejectRequest = (id: number) => 
+  const rejectRequest = (id: number) =>
     handleRequestAction(
       () => handleRejectLabRequest(id),
       'Solicitud rechazada exitosamente'
@@ -50,7 +50,7 @@ const ManageLabRequests: React.FC = () => {
 
   const openModal = (request: LabRequest) => {
     const lab = labs.find(l => l.id_Laboratory === request.laboratoryId);
-    
+
     if (!lab && labs.length === 0) {
       notifyError('Error cargando información del laboratorio');
       return;
@@ -62,7 +62,7 @@ const ManageLabRequests: React.FC = () => {
       labIsActive: lab?.isActive || false,
       labCapacity: lab?.capacity || 0
     });
-    
+
     setIsModalOpen(true);
   };
 
@@ -71,9 +71,18 @@ const ManageLabRequests: React.FC = () => {
     setSelectedRequest(null);
   };
 
-  // Mostrar solo solicitudes pendientes
+  // 📅 Hoy sin hora
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 📋 Filtrar solicitudes pendientes y con fecha de inicio >= hoy
   const filteredRequests = labRequests
     .filter(request => request.status === RequestStatus.Pending)
+    .filter(request => {
+      const requestDate = new Date(request.startDate);
+      requestDate.setHours(0, 0, 0, 0);
+      return requestDate >= today;
+    })
     .filter(request =>
       `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
         .toLowerCase()
@@ -81,20 +90,14 @@ const ManageLabRequests: React.FC = () => {
     );
 
   const sortedRequests = filteredRequests.sort((a, b) => {
-    if (a.status === RequestStatus.Pending && b.status !== RequestStatus.Pending) return -1;
-    if (a.status === RequestStatus.Approved && b.status === RequestStatus.Rejected) return -1;
-    
     const dateA = new Date(a.startDate).getTime();
     const dateB = new Date(b.startDate).getTime();
-    
     return dateB - dateA;
   });
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Gestión de Solicitudes de Laboratorio</h2>
-
-      
 
       <div className="mb-4">
         <input
@@ -131,7 +134,7 @@ const ManageLabRequests: React.FC = () => {
               <p className="text-gray-600 mt-2">
                 Laboratorio: {labs.find(l => l.id_Laboratory === request.laboratoryId)?.name || 'Desconocido'}
               </p>
-              
+
               <button
                 className="mt-4 w-full bg-blue-50 text-blue-700 px-4 py-2 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors"
                 onClick={() => openModal(request)}

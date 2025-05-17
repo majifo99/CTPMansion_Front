@@ -121,7 +121,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <a
             className="hover:text-teal-400"
-            href="https://www.facebook.com/profile.php?id=100057725107781&locale=es_LA"
+            href="https://www.facebook.com/share/18momtuckC/"
             target="_blank"
             rel="noreferrer"
             aria-label="Facebook"

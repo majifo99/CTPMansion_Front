@@ -3,7 +3,7 @@ import axios from 'axios';
 
 type ImageUploaderProps = {
   onImageUpload: (url: string) => void;
-  initialImage?: string; // Nueva prop para imágenes existentes
+  initialImage?: string;
 };
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, initialImage }) => {
@@ -11,7 +11,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, initialIma
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Utilizar la imagen inicial como vista previa si está disponible
   useEffect(() => {
     if (initialImage) {
       setPreview(initialImage);
@@ -28,7 +27,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, initialIma
     }
 
     setError(null);
-    setPreview(URL.createObjectURL(file)); // Mostrar vista previa
+    setPreview(URL.createObjectURL(file));
 
     const formData = new FormData();
     formData.append('image', file);
@@ -56,14 +55,16 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, initialIma
   };
 
   return (
-    <div className="image-uploader flex flex-col items-center">
-      <label className="block mb-2 font-semibold text-lg">Subir Imagen</label>
+    <div className="w-full max-w-sm mx-auto image-uploader flex flex-col items-center gap-3 p-4 bg-white shadow rounded-lg">
+      <label className="text-center font-semibold text-base sm:text-lg text-gray-800">
+        Subir Imagen
+      </label>
 
       {preview && (
         <img
           src={preview}
           alt="Vista previa"
-          className="w-24 h-24 object-cover rounded-lg mb-3"
+          className="w-full max-w-[120px] aspect-square object-cover rounded-lg shadow"
         />
       )}
 
@@ -71,12 +72,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload, initialIma
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
-        className="border border-gray-300 p-2 rounded-md"
+        className="w-full text-sm border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
         disabled={loading}
       />
 
-      {loading && <p className="text-blue-500 mt-2">Subiendo imagen...</p>}
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {loading && <p className="text-blue-500 text-sm">Subiendo imagen...</p>}
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
     </div>
   );
 };
