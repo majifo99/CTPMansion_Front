@@ -1,10 +1,11 @@
-import { FaFacebookF } from 'react-icons/fa';
-import useLocation from '../hooks/useLocation'; // Ajusta la ruta según sea necesario
+import { FaFacebookF, FaInstagram, FaWhatsapp } from 'react-icons/fa';
+import useLocation from '../hooks/useLocation';
 
 const Footer = () => {
   const { location } = useLocation();
 
-  // Valores predeterminados en caso de que no haya datos
+  const currentYear = new Date().getFullYear();
+
   const defaultLocation = {
     address: "Dirección no disponible",
     schedule: "Horario no disponible",
@@ -12,7 +13,6 @@ const Footer = () => {
     phoneNumber: "+506 0000-0000",
   };
 
-  // Combinar datos del backend con valores predeterminados
   const contactInfo = {
     address: location?.addres || defaultLocation.address,
     schedule: location?.schedule || defaultLocation.schedule,
@@ -32,39 +32,53 @@ const Footer = () => {
               alt="Logo de la Institución"
             />
             <p className="mt-4 text-sm text-gray-300">
-              Somos una institución dedicada a brindar la mejor educación para nuestros estudiantes, comprometidos con la excelencia y el crecimiento integral.
+              En el CTP la Mansión trabajamos para ser mejores cada día.
             </p>
             <div className="flex mt-8 space-x-6">
               <a
                 className="hover:opacity-75"
-                href="https://www.facebook.com/profile.php?id=100057725107781&locale=es_LA"
+                href="https://www.facebook.com/share/18momtuckC/"
                 target="_blank"
                 rel="noreferrer"
               >
                 <span className="sr-only">Facebook</span>
                 <FaFacebookF className="w-6 h-6 text-gray-300" />
               </a>
-              {/* Otros iconos de redes sociales */}
+              <a
+                className="hover:opacity-75"
+                href="https://www.instagram.com/ctplm1976/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="sr-only">Instagram</span>
+                <FaInstagram className="w-6 h-6 text-gray-300" />
+              </a>
+              <a
+                className="hover:opacity-75"
+                href="https://wa.me/50689894646"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="sr-only">WhatsApp</span>
+                <FaWhatsapp className="w-6 h-6 text-gray-300" />
+              </a>
             </div>
           </div>
 
           {/* Sección de Dirección y Horario */}
           <div className="lg:col-span-2 grid grid-cols-2 gap-8">
-            {/* Dirección */}
             <div>
               <h3 className="font-semibold text-lg text-gray-200">Nuestra Dirección</h3>
               <p className="mt-4 text-sm text-gray-400">
                 {contactInfo.address}
               </p>
             </div>
-            {/* Horario */}
             <div>
               <h3 className="font-semibold text-lg text-gray-200">Horario</h3>
               <p className="mt-4 text-sm text-gray-400">
                 {contactInfo.schedule}
               </p>
             </div>
-            {/* Contacto */}
             <div className="lg:col-span-2">
               <h3 className="font-semibold text-lg text-gray-200">Contacto</h3>
               <p className="mt-4 text-sm text-gray-400">
@@ -74,7 +88,7 @@ const Footer = () => {
                   className="hover:underline text-gray-300"
                 >
                   {contactInfo.email}
-                </a>{" "}
+                </a>
                 <br />
                 Teléfono:{" "}
                 <a
@@ -87,9 +101,10 @@ const Footer = () => {
             </div>
           </div>
         </div>
+
         {/* Línea de Separación y Derechos Reservados */}
         <div className="mt-12 border-t border-gray-700 pt-8 text-center text-xs text-gray-400">
-          <p>© 2024 Colegio Técnico Profesional La Mansión. Todos los derechos reservados.</p>
+          <p>© {currentYear} Colegio Técnico Profesional La Mansión. Casi todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

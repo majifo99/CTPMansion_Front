@@ -43,7 +43,7 @@ const Hero: React.FC = () => {
           La Mansión
         </h2>
         <p className="mt-4 text-base md:text-lg text-gray-200 font-light max-w-xl px-4">
-          Formación técnica de excelencia para el desarrollo integral de nuestros estudiantes.
+          En el CTP la Mansión trabajamos para ser mejores cada día.
         </p>
         <div className="mt-8 h-1 w-1/2 bg-gradient-to-r from-[#34436B] to-[#1D2238] rounded-full"></div>
       </div>

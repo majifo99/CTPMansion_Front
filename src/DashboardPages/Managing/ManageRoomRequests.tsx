@@ -37,16 +37,10 @@ const ManageRoomRequests: React.FC = () => {
   };
 
   const approveRequest = (id: number) =>
-    handleRequestAction(
-      () => handleApproveRequest(id),
-      'Solicitud aprobada exitosamente'
-    );
+    handleRequestAction(() => handleApproveRequest(id), 'Solicitud aprobada exitosamente');
 
   const rejectRequest = (id: number) =>
-    handleRequestAction(
-      () => handleRejectRequest(id),
-      'Solicitud rechazada exitosamente'
-    );
+    handleRequestAction(() => handleRejectRequest(id), 'Solicitud rechazada exitosamente');
 
   const openModal = (request: RoomRequest) => {
     const room = rooms.find((r) => r.id_Room === request.roomId);
@@ -68,9 +62,18 @@ const ManageRoomRequests: React.FC = () => {
     setSelectedRequest(null);
   };
 
-  // Filtrar solo pendientes en vista principal
+  // 📅 Hoy sin hora
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 🧹 Filtrar solicitudes pendientes con fecha actual o futura
   const filteredRequests = roomRequests
     .filter(request => request.status === RequestStatus.Pending)
+    .filter(request => {
+      const requestDate = new Date(request.startDate);
+      requestDate.setHours(0, 0, 0, 0);
+      return requestDate >= today;
+    })
     .filter(request =>
       `${request.managerName} ${request.managerLastName} ${request.managerLastName2}`
         .toLowerCase()
@@ -86,8 +89,6 @@ const ManageRoomRequests: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Gestión de Solicitudes de Sala</h2>
-
-      
 
       <div className="mb-4">
         <input
@@ -106,6 +107,7 @@ const ManageRoomRequests: React.FC = () => {
           Ver Historial de Solicitudes
         </button>
       </div>
+
       {loading && <p className="text-gray-600">Cargando solicitudes...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
