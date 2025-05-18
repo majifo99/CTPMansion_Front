@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CertificationRequest } from '../../types/Types';
 import useCertificationRequests from '../../hooks/useCertificationRequests';
 import Modal from '../../modals/ModalRequest';
+import CertificationRequestResponseModal from '../../modals/CertificationRequestResponseModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
@@ -27,6 +28,8 @@ const CertificationRequestsTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(5);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isResponseModalOpen, setIsResponseModalOpen] = useState<boolean>(false);
+  const [responseAction, setResponseAction] = useState<'approve' | 'reject' | null>(null);
 
   const openDeliveryModal = (request: CertificationRequest) => {
     setSelectedRequest(request);
@@ -40,9 +43,16 @@ const CertificationRequestsTable: React.FC = () => {
     setIsDetailModalOpen(true);
   };
 
+  const openResponseModal = (request: CertificationRequest, action: 'approve' | 'reject') => {
+    setSelectedRequest(request);
+    setResponseAction(action);
+    setIsResponseModalOpen(true);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setIsDetailModalOpen(false);
+    setIsResponseModalOpen(false);
     setSelectedRequest(null);
   };
 
@@ -62,24 +72,27 @@ const CertificationRequestsTable: React.FC = () => {
 
   const handleApprove = async () => {
     if (selectedRequest && isDeliveryDaysSaved) {
-      try {
-        await handleApproveRequest(selectedRequest.id);
-        closeModal();
-        toast.success('Solicitud aprobada.');
-      } catch {
-        toast.error('Error al aprobar la solicitud.');
-      }
+      setResponseAction('approve');
+      setIsResponseModalOpen(true);
     } else {
       toast.error('Por favor, guarde primero los días límite.');
     }
   };
 
-  const handleReject = async (request: CertificationRequest) => {
+  const handleResponseConfirm = async (message: string) => {
+    if (!selectedRequest || !responseAction) return;
+    
     try {
-      await handleRejectRequest(request.id);
-      toast.success('Solicitud rechazada.');
-    } catch {
-      toast.error('Error al rechazar la solicitud.');
+      if (responseAction === 'approve') {
+        await handleApproveRequest(selectedRequest.id, message);
+        toast.success('Solicitud aprobada exitosamente.');
+      } else {
+        await handleRejectRequest(selectedRequest.id, message);
+        toast.success('Solicitud rechazada exitosamente.');
+      }
+      closeModal();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ha ocurrido un error');
     }
   };
 
@@ -194,18 +207,22 @@ const CertificationRequestsTable: React.FC = () => {
                 </td>
                 <td className="py-2 px-4 border-b">
                   <div className="flex justify-center gap-2">
-                    <button
-                      className="bg-green-500 text-white px-3 py-1 rounded-full hover:bg-green-600"
-                      onClick={() => openDeliveryModal(request)}
-                    >
-                      <IoMdCheckmarkCircleOutline size={20} />
-                    </button>
-                    <button
-                      className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600"
-                      onClick={() => handleReject(request)}
-                    >
-                      <CgCloseO size={20} />
-                    </button>
+                    {request.status === 0 && (
+                      <>
+                        <button
+                          className="bg-green-500 text-white px-3 py-1 rounded-full hover:bg-green-600"
+                          onClick={() => openDeliveryModal(request)}
+                        >
+                          <IoMdCheckmarkCircleOutline size={20} />
+                        </button>
+                        <button
+                          className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600"
+                          onClick={() => openResponseModal(request, 'reject')}
+                        >
+                          <CgCloseO size={20} />
+                        </button>
+                      </>
+                    )}
                     <button
                       className="bg-gray-500 text-white px-3 py-1 rounded-full hover:bg-gray-600"
                       onClick={() => openDetailModal(request)}
@@ -342,6 +359,17 @@ const CertificationRequestsTable: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* Modal de Respuesta (Aprobar/Rechazar) */}
+      <CertificationRequestResponseModal
+        isOpen={isResponseModalOpen}
+        title={responseAction === 'approve' ? 'Aprobar Solicitud' : 'Rechazar Solicitud'}
+        action={responseAction || 'reject'}
+        onConfirm={handleResponseConfirm}
+        onCancel={closeModal}
+        requestName={selectedRequest ? `${selectedRequest.studentName} (${selectedRequest.studentIdentification})` : ''}
+        isMessageRequired={responseAction === 'reject'}
+      />
     </div>
   );
 };

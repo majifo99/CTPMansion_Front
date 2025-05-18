@@ -47,11 +47,10 @@ export const useLabsAndRequests = () => {
   }, []);
 
   // Función de recarga con retraso opcional
-
   // Aprobar solicitud de laboratorio
-  const handleApproveLabRequest = async (id: number) => {
+  const handleApproveLabRequest = async (id: number, message?: string) => {
     try {
-      await approveLabRequest(id);
+      await approveLabRequest(id, message);
       fetchLabRequestsData(); // Recarga inmediatamente después de aprobar
     } catch (error) {
       console.error('Error al aprobar la solicitud:', error);
@@ -60,13 +59,16 @@ export const useLabsAndRequests = () => {
   };
 
   // Rechazar solicitud de laboratorio
-  const handleRejectLabRequest = async (id: number) => {
+  const handleRejectLabRequest = async (id: number, message: string) => {
     try {
-      await rejectLabRequest(id);
+      if (!message || message.trim() === '') {
+        throw new Error('Es necesario proporcionar un motivo para rechazar la solicitud');
+      }
+      await rejectLabRequest(id, message);
       fetchLabRequestsData(); // Recarga inmediatamente después de rechazar
     } catch (error) {
       console.error('Error al rechazar la solicitud:', error);
-      setError('Error al rechazar la solicitud');
+      setError(error instanceof Error ? error.message : 'Error al rechazar la solicitud');
     }
   };
 

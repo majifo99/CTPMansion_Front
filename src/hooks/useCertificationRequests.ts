@@ -29,11 +29,13 @@ const useCertificationRequests = () => {
   useEffect(() => {
     fetchRequestsAndNames();
   }, []);
-
   // Función para rechazar una solicitud
-  const handleRejectRequest = async (id: number) => {
+  const handleRejectRequest = async (id: number, message: string) => {
     try {
-      await rejectRequest(id);
+      if (!message || message.trim() === '') {
+        throw new Error('Es necesario proporcionar un motivo para rechazar la solicitud');
+      }
+      await rejectRequest(id, message);
       fetchRequestsAndNames(); // Refrescar solicitudes después de la acción
     } catch (err: any) {
       setError(err.message || 'Error al rechazar la solicitud');
@@ -41,9 +43,9 @@ const useCertificationRequests = () => {
   };
 
   // Función para aprobar una solicitud
-  const handleApproveRequest = async (id: number) => {
+  const handleApproveRequest = async (id: number, message?: string) => {
     try {
-      await approveRequest(id);
+      await approveRequest(id, message);
       fetchRequestsAndNames(); // Refrescar solicitudes después de la acción
     } catch (err: any) {
       setError(err.message || 'Error al aprobar la solicitud');

@@ -149,10 +149,9 @@ export const useOrders = (
       setLoading(false);
     }
   }, [initialStatus, loadInitialData]);
-
-  const handleApproveOrder = async (id: number) => {
+  const handleApproveOrder = async (id: number, message?: string) => {
     try {
-      await approveOrder(id);
+      await approveOrder(id, message);
       if (loadInitialData) {
         fetchOrdersData(initialStatus);  // Refresh orders after approval only if we're loading data
       }
@@ -162,15 +161,18 @@ export const useOrders = (
     }
   };
 
-  const handleRejectOrder = async (id: number) => {
+  const handleRejectOrder = async (id: number, message: string) => {
     try {
-      await rejectOrder(id);
+      if (!message || message.trim() === '') {
+        throw new Error('Es necesario proporcionar un motivo para rechazar la orden');
+      }
+      await rejectOrder(id, message);
       if (loadInitialData) {
         fetchOrdersData(initialStatus);  // Refresh orders after rejection only if we're loading data
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al rechazar la orden:', err);
-      setError('Error al rechazar la orden');
+      setError(err instanceof Error ? err.message : 'Error al rechazar la orden');
     }
   };
 
