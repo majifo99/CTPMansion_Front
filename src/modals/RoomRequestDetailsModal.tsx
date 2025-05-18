@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RequestStatus, RoomRequest } from '../types/RoomRequestType';
+import RoomRequestResponseModal from './RoomRequestResponseModal';
 
 interface RoomRequestDetailsModalProps {
   isOpen: boolean;
@@ -7,48 +8,11 @@ interface RoomRequestDetailsModalProps {
   request: RoomRequest & {
     roomName?: string;
   };
-  onApprove: (id: number) => void;
-  onReject: (id: number) => void;
+  onApprove: (id: number, message?: string) => void;
+  onReject: (id: number, message: string) => void;
 }
 
-const ConfirmationModal: React.FC<{
-  isOpen: boolean;
-  message: string;
-  confirmButtonText: string;
-  variant?: 'success' | 'danger';
-  onConfirm: () => void;
-  onCancel: () => void;
-}> = ({ isOpen, message, confirmButtonText, variant = 'danger', onConfirm, onCancel }) => {
-  if (!isOpen) return null;
 
-  const buttonColor = variant === 'success' 
-    ? 'bg-green-600 hover:bg-green-700' 
-    : 'bg-red-600 hover:bg-red-700';
-
-  return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirmar acción</h2>
-        <p className="mb-6 text-gray-600">{message}</p>
-        
-        <div className="flex justify-end space-x-3">
-          <button
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
-            onClick={onCancel}
-          >
-            Volver
-          </button>
-          <button
-            className={`px-4 py-2 ${buttonColor} text-white rounded-md transition-colors`}
-            onClick={onConfirm}
-          >
-            {confirmButtonText}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const TableRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <tr className="border-b border-gray-200 hover:bg-gray-50">
@@ -64,7 +28,7 @@ const RoomRequestDetailsModal: React.FC<RoomRequestDetailsModalProps> = ({
   onApprove,
   onReject,
 }) => {
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [isResponseModalOpen, setIsResponseModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'approve' | 'reject' | null>(null);
 
   const statusStyles = {
@@ -82,21 +46,31 @@ const RoomRequestDetailsModal: React.FC<RoomRequestDetailsModalProps> = ({
       year: 'numeric',
     });
 
-  const handleConfirmAction = () => {
+  const handleApproveClick = () => {
+    setPendingAction('approve');
+    setIsResponseModalOpen(true);
+  };
+
+  const handleRejectClick = () => {
+    setPendingAction('reject');
+    setIsResponseModalOpen(true);
+  };
+
+  const handleConfirmAction = (message: string) => {
     if (!pendingAction) return;
     
     const id = request.id_RoomRequest;
     if (pendingAction === 'approve') {
-      onApprove(id);
+      onApprove(id, message);
     } else {
-      onReject(id);
+      onReject(id, message);
     }
-    setIsConfirmationModalOpen(false);
+    setIsResponseModalOpen(false);
     setPendingAction(null);
   };
 
   const handleCancelAction = () => {
-    setIsConfirmationModalOpen(false);
+    setIsResponseModalOpen(false);
     setPendingAction(null);
   };
 
@@ -180,26 +154,18 @@ const RoomRequestDetailsModal: React.FC<RoomRequestDetailsModalProps> = ({
                 </tr>
               </tbody>
             </table>
-          </div>
-
-          {/* Botones Fijos */}
+          </div>          {/* Botones Fijos */}
           {isPending && (
             <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-300 flex justify-end gap-3 p-3">
               <button
                 className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 transition-colors"
-                onClick={() => {
-                  setPendingAction('approve');
-                  setIsConfirmationModalOpen(true);
-                }}
+                onClick={handleApproveClick}
               >
                 Aprobar
               </button>
               <button
                 className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 transition-colors"
-                onClick={() => {
-                  setPendingAction('reject');
-                  setIsConfirmationModalOpen(true);
-                }}
+                onClick={handleRejectClick}
               >
                 Rechazar
               </button>
@@ -208,18 +174,15 @@ const RoomRequestDetailsModal: React.FC<RoomRequestDetailsModalProps> = ({
         </div>
       </div>
 
-      {/* Modal de confirmación */}
-      <ConfirmationModal
-        isOpen={isConfirmationModalOpen}
-        message={
-          pendingAction === 'approve'
-            ? '¿Estás seguro que deseas aprobar esta solicitud de sala?'
-            : '¿Estás seguro que deseas rechazar esta solicitud de sala? Esta acción no se puede deshacer.'
-        }
-        confirmButtonText={pendingAction === 'approve' ? 'Confirmar aprobación' : 'Confirmar rechazo'}
-        variant={pendingAction === 'approve' ? 'success' : 'danger'}
+      {/* Modal de respuesta (aprobación/rechazo) */}
+      <RoomRequestResponseModal
+        isOpen={isResponseModalOpen}
+        title={pendingAction === 'approve' ? 'Aprobar Solicitud' : 'Rechazar Solicitud'}
+        action={pendingAction || 'reject'}
         onConfirm={handleConfirmAction}
         onCancel={handleCancelAction}
+        requestName={request.roomName || `Sala #${request.roomId}`}
+        isMessageRequired={pendingAction === 'reject'}
       />
     </>
   );
