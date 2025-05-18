@@ -87,13 +87,14 @@ export const createLabRequest = async (labRequest: LabRequest): Promise<void> =>
 export const fetchLabRequests = async (): Promise<LabRequest[]> => handleResponse<LabRequest[]>(`/LaboratoryRequest`);
 
 // Aprobar una solicitud de laboratorio
-export const approveLabRequest = async (id: number): Promise<void> => {
+export const approveLabRequest = async (id: number, message?: string): Promise<void> => {
   if (!id) throw new Error("El ID de la solicitud es requerido.");
-  await apiClient.post(`/LaboratoryRequest/${id}/approve`);
+  await apiClient.post(`/LaboratoryRequest/${id}/approve`, { message });
 };
 
 // Rechazar una solicitud de laboratorio
-export const rejectLabRequest = async (id: number): Promise<void> => {
+export const rejectLabRequest = async (id: number, message: string): Promise<void> => {
   if (!id) throw new Error("El ID de la solicitud es requerido.");
-  await apiClient.post(`/LaboratoryRequest/${id}/reject`);
+  if (!message) throw new Error("Se requiere un mensaje para rechazar la solicitud");
+  await apiClient.post(`/LaboratoryRequest/${id}/reject`, { message });
 };

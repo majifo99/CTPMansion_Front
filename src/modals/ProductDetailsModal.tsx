@@ -10,45 +10,6 @@ interface ProductDetailsModalProps {
   onReject: (id: number) => void;
 }
 
-const ConfirmationModal: React.FC<{
-  isOpen: boolean;
-  message: string;
-  confirmButtonText: string;
-  variant?: 'success' | 'danger';
-  onConfirm: () => void;
-  onCancel: () => void;
-}> = ({ isOpen, message, confirmButtonText, variant = 'danger', onConfirm, onCancel }) => {
-  if (!isOpen) return null;
-
-  const buttonColor = variant === 'success' 
-    ? 'bg-green-600 hover:bg-green-700' 
-    : 'bg-red-600 hover:bg-red-700';
-
-  return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Confirmar acción</h2>
-        <p className="mb-6 text-gray-600">{message}</p>
-        
-        <div className="flex justify-end space-x-3">
-          <button
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
-            onClick={onCancel}
-          >
-            Volver
-          </button>
-          <button
-            className={`px-4 py-2 ${buttonColor} text-white rounded-md transition-colors`}
-            onClick={onConfirm}
-          >
-            {confirmButtonText}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
   isOpen,
   onClose,
@@ -59,8 +20,6 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
   const { handleGetOrderById } = useOrders();
   const [currentOrder, setCurrentOrder] = useState<Order>(order);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<'approve' | 'reject' | null>(null);
   
   const hasFetchedRef = React.useRef(false);
 
@@ -105,23 +64,7 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
       if (!isOpen) {
         hasFetchedRef.current = false;
       }
-    };
-  }, [isOpen, order?.orderId, handleGetOrderById]);
-
-  const handleConfirmAction = () => {
-    if (!pendingAction) return;
-    
-    const action = pendingAction === 'approve' ? onApprove : onReject;
-    action(currentOrder.orderId);
-    setIsConfirmationModalOpen(false);
-    setPendingAction(null);
-    onClose();
-  };
-
-  const handleCancelAction = () => {
-    setIsConfirmationModalOpen(false);
-    setPendingAction(null);
-  };
+    };  }, [isOpen, order?.orderId, handleGetOrderById]);
 
   const getUnitOfMeasureName = (detail: any): string => {
     if (detail.unitOfMeasure && detail.unitOfMeasure.name) {
@@ -262,26 +205,18 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                     </tbody>
                   </table>
                 </div>
-              </div>
-
-              {/* Botones de acción - solo mostrar si la orden está pendiente */}
+              </div>              {/* Botones de acción - solo mostrar si la orden está pendiente */}
               {isPending && (
                 <div className="flex justify-center mt-8 space-x-4">
                   <button
                     className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-                    onClick={() => {
-                      setPendingAction('approve');
-                      setIsConfirmationModalOpen(true);
-                    }}
+                    onClick={() => onApprove(currentOrder.orderId)}
                   >
                     Aprobar
                   </button>
                   <button
                     className="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                    onClick={() => {
-                      setPendingAction('reject');
-                      setIsConfirmationModalOpen(true);
-                    }}
+                    onClick={() => onReject(currentOrder.orderId)}
                   >
                     Rechazar
                   </button>
@@ -291,20 +226,6 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           )}
         </div>
       </div>
-
-      {/* Modal de confirmación */}
-      <ConfirmationModal
-        isOpen={isConfirmationModalOpen}
-        message={
-          pendingAction === 'approve'
-            ? '¿Estás seguro que deseas aprobar esta orden de productos?'
-            : '¿Estás seguro que deseas rechazar esta orden de productos? Esta acción no se puede deshacer.'
-        }
-        confirmButtonText={pendingAction === 'approve' ? 'Confirmar aprobación' : 'Confirmar rechazo'}
-        variant={pendingAction === 'approve' ? 'success' : 'danger'}
-        onConfirm={handleConfirmAction}
-        onCancel={handleCancelAction}
-      />
     </>
   );
 };

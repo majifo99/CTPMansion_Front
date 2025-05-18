@@ -65,13 +65,14 @@ export const getOrdersByStatus = async (status?: RequestStatus): Promise<Order[]
 };
 
 // PATCH /api/Order/{id}/approve - Aprobar una orden
-export const approveOrder = async (id: number): Promise<void> => {
-  await api.patch(`/${id}/approve`);
+export const approveOrder = async (id: number, message?: string): Promise<void> => {
+  await api.patch(`/${id}/approve`, { message });
 };
 
 // PATCH /api/Order/{id}/reject - Rechazar una orden
-export const rejectOrder = async (id: number): Promise<void> => {
-  await api.patch(`/${id}/reject`);
+export const rejectOrder = async (id: number, message: string): Promise<void> => {
+  if (!message) throw new Error("Se requiere un mensaje para rechazar la orden");
+  await api.patch(`/${id}/reject`, { message });
 };
 
 // GET /api/Order/udp/{udpId} - Obtener órdenes asociadas a un UDP específico

@@ -35,16 +35,15 @@ const ManageLabRequests: React.FC = () => {
       notifyError(`Error: ${error instanceof Error ? error.message : 'Ocurrió un error'}`);
     }
   };
-
-  const approveRequest = (id: number) =>
+  const approveRequest = (id: number, message?: string) =>
     handleRequestAction(
-      () => handleApproveLabRequest(id),
+      () => handleApproveLabRequest(id, message),
       'Solicitud aprobada exitosamente'
     );
 
-  const rejectRequest = (id: number) =>
+  const rejectRequest = (id: number, message: string) =>
     handleRequestAction(
-      () => handleRejectLabRequest(id),
+      () => handleRejectLabRequest(id, message),
       'Solicitud rechazada exitosamente'
     );
 

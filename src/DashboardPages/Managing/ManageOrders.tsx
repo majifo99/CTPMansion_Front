@@ -5,6 +5,7 @@ import { useOrders } from '../../hooks/useOrders';
 import { RequestStatus, Order } from '../../types/OrderTypes';
 import ProductDetailsModal from '../../modals/ProductDetailsModal';
 import HistoryModal from '../../modals/HistoryModal'; // Modal de historial
+import OrderRequestResponseModal from '../../modals/OrderRequestResponseModal'; // Modal para respuestas
 
 const ManageOrders: React.FC = () => {
   const { orders, loading, error, handleApproveOrder, handleRejectOrder } = useOrders(RequestStatus.Pending);
@@ -13,26 +14,58 @@ const ManageOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);  // Estado para la orden seleccionada
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);  // Estado del modal de detalles
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);  // Estado del modal de historial
-
+  const [isResponseModalOpen, setIsResponseModalOpen] = useState<boolean>(false); // Estado para el modal de respuesta
+  const [pendingAction, setPendingAction] = useState<'approve' | 'reject' | null>(null); // Acción pendiente
   const notifySuccess = (message: string) => toast.success(message);
   const notifyError = (message: string) => toast.error(message);
+  
+  // Función para abrir el modal de respuesta para aprobar
+  const openApproveModal = (order: Order) => {
+    setSelectedOrder(order);
+    setPendingAction('approve');
+    setIsResponseModalOpen(true);
+  };
+  
+  // Función para abrir el modal de respuesta para rechazar
+  const openRejectModal = (order: Order) => {
+    setSelectedOrder(order);
+    setPendingAction('reject');
+    setIsResponseModalOpen(true);
+  };
 
-  const approveOrder = async (id: number) => {
+  // Función para confirmar la acción con mensaje
+  const handleConfirmAction = async (message: string) => {
+    if (!selectedOrder || !pendingAction) return;
+    
     try {
-      await handleApproveOrder(id);
-      notifySuccess('Orden aprobada con éxito');
-    } catch {
-      notifyError('Error al aprobar la orden');
+      if (pendingAction === 'approve') {
+        await handleApproveOrder(selectedOrder.orderId, message);
+        notifySuccess('Orden aprobada con éxito');
+      } else {
+        await handleRejectOrder(selectedOrder.orderId, message);
+        notifySuccess('Orden rechazada con éxito');
+      }
+    } catch (error) {
+      notifyError(`Error al ${pendingAction === 'approve' ? 'aprobar' : 'rechazar'} la orden`);
+    } finally {
+      setIsResponseModalOpen(false);
+      setPendingAction(null);
+      closeModal();
     }
+  };
+  
+  // Función para cancelar la acción
+  const handleCancelAction = () => {
+    setIsResponseModalOpen(false);
+    setPendingAction(null);
+  };
+  // Estas funciones son para la compatibilidad con ProductDetailsModal
+  const approveOrder = async (id: number) => {
+    openApproveModal({...selectedOrder!, orderId: id});
   };
 
   const rejectOrder = async (id: number) => {
-    try {
-      await handleRejectOrder(id);
-      notifySuccess('Orden rechazada con éxito');
-    } catch {
-      notifyError('Error al rechazar la orden');
-    }
+    openRejectModal({...selectedOrder!, orderId: id});
   };
 
   // Abrir modal de detalles
@@ -97,11 +130,8 @@ const ManageOrders: React.FC = () => {
           filteredOrders.map((order) => {
             return (
               <div key={order.orderId} className={`p-4 border border-gray-300 rounded-lg shadow-md`}>
-                <h3 className="text-lg font-semibold mb-2">{order.receiver}</h3>
-                <p><strong>Fecha de Orden:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
+                <h3 className="text-lg font-semibold mb-2">{order.receiver}</h3>                <p><strong>Fecha de Orden:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
                 <p><strong>Área Solicitante:</strong> {order.requesterArea || 'No especificada'}</p>
-
-               
 
                 {/* Botón para ver detalles */}
                 <button
@@ -114,9 +144,7 @@ const ManageOrders: React.FC = () => {
             );
           })
         )}
-      </div>
-
-      {/* Modal para mostrar los detalles del producto */}
+      </div>      {/* Modal para mostrar los detalles del producto */}
       {selectedOrder && (
         <ProductDetailsModal
           isOpen={isModalOpen}
@@ -126,6 +154,17 @@ const ManageOrders: React.FC = () => {
           onReject={rejectOrder}
         />
       )}
+
+      {/* Modal de respuesta (aprobación/rechazo) */}
+      <OrderRequestResponseModal
+        isOpen={isResponseModalOpen}
+        title={pendingAction === 'approve' ? 'Aprobar Orden' : 'Rechazar Orden'}
+        action={pendingAction || 'reject'}
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelAction}
+        requestName={selectedOrder?.receiver ? `Orden para: ${selectedOrder.receiver}` : 'Orden'}
+        isMessageRequired={pendingAction === 'reject'}
+      />
 
       {/* Modal de historial */}
       <HistoryModal isOpen={isHistoryModalOpen} onClose={closeHistoryModal} />

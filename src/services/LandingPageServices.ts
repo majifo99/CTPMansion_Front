@@ -265,17 +265,20 @@ export const getRequests = async () => {
   }
 };
 
-export const rejectRequest = async (id: number) => {
+export const rejectRequest = async (id: number, message: string) => {
   try {
-    await apiClient.post(`/CertificationRequests/${id}/reject`);
+    if (!message) {
+      throw new Error('Se requiere un mensaje para rechazar la solicitud');
+    }
+    await apiClient.post(`/CertificationRequests/${id}/reject`, { message });
   } catch (error) {
     throw new Error('Error al rechazar la solicitud');
   }
 };
 
-export const approveRequest = async (id: number) => {
+export const approveRequest = async (id: number, message?: string) => {
   try {
-    await apiClient.post(`/CertificationRequests/${id}/approve`);
+    await apiClient.post(`/CertificationRequests/${id}/approve`, { message });
   } catch (error) {
     throw new Error('Error al aprobar la solicitud');
   }
