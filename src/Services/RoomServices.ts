@@ -64,12 +64,15 @@ export const fetchRoomRequests = async (): Promise<RoomRequest[]> => {
   return response.data;
 };
 
-// Aprobar una solicitud de sala
-export const approveRoomRequest = async (id: number): Promise<void> => {
-  await apiClient.post(`/RoomRequest/${id}/approve`);
+// Aprobar una solicitud de sala (mensaje opcional)
+export const approveRoomRequest = async (id: number, message?: string): Promise<void> => {
+  await apiClient.post(`/RoomRequest/${id}/approve`, { message });
 };
 
-// Rechazar una solicitud de sala
-export const rejectRoomRequest = async (id: number): Promise<void> => {
-  await apiClient.post(`/RoomRequest/${id}/reject`);
+// Rechazar una solicitud de sala (mensaje obligatorio)
+export const rejectRoomRequest = async (id: number, message: string): Promise<void> => {
+  if (!message) {
+    throw new Error('Se requiere un mensaje para rechazar la solicitud');
+  }
+  await apiClient.post(`/RoomRequest/${id}/reject`, { message });
 };

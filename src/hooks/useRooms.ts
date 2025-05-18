@@ -76,11 +76,10 @@ export const useRoomsAndRequests = () => {
       setError('Error al eliminar la sala');
     }
   };
-
-  // Aprobar una solicitud de sala
-  const handleApproveRequest = async (id: number) => {
+  // Aprobar una solicitud de sala con mensaje opcional
+  const handleApproveRequest = async (id: number, message?: string) => {
     try {
-      await approveRoomRequest(id);
+      await approveRoomRequest(id, message);
       delayedFetchData(); // Recargar los datos tras aprobar
     } catch (error) {
       console.error('Error al aprobar la solicitud:', error);
@@ -88,14 +87,17 @@ export const useRoomsAndRequests = () => {
     }
   };
 
-  // Rechazar una solicitud de sala
-  const handleRejectRequest = async (id: number) => {
+  // Rechazar una solicitud de sala con mensaje obligatorio
+  const handleRejectRequest = async (id: number, message: string) => {
     try {
-      await rejectRoomRequest(id);
+      if (!message || message.trim() === '') {
+        throw new Error('Es necesario proporcionar un motivo para rechazar la solicitud');
+      }
+      await rejectRoomRequest(id, message);
       delayedFetchData(); // Recargar los datos tras rechazar
     } catch (error) {
       console.error('Error al rechazar la solicitud:', error);
-      setError('Error al rechazar la solicitud');
+      setError(error instanceof Error ? error.message : 'Error al rechazar la solicitud');
     }
   };
 

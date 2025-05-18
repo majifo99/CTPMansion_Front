@@ -35,12 +35,11 @@ const ManageRoomRequests: React.FC = () => {
       notifyError(`Error: ${error instanceof Error ? error.message : 'Ocurrió un error'}`);
     }
   };
+  const approveRequest = (id: number, message?: string) =>
+    handleRequestAction(() => handleApproveRequest(id, message), 'Solicitud aprobada exitosamente');
 
-  const approveRequest = (id: number) =>
-    handleRequestAction(() => handleApproveRequest(id), 'Solicitud aprobada exitosamente');
-
-  const rejectRequest = (id: number) =>
-    handleRequestAction(() => handleRejectRequest(id), 'Solicitud rechazada exitosamente');
+  const rejectRequest = (id: number, message: string) =>
+    handleRequestAction(() => handleRejectRequest(id, message), 'Solicitud rechazada exitosamente');
 
   const openModal = (request: RoomRequest) => {
     const room = rooms.find((r) => r.id_Room === request.roomId);
