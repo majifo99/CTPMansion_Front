@@ -208,8 +208,7 @@ const OrderComponent: React.FC = () => {
       <h2 className="text-2xl font-semibold mb-4">Crear Orden de Compra</h2>
 
       {/* Formulario para añadir productos */}
-      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
-        {/* Product search with dropdown */}
+      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">        {/* Product search with dropdown */}
         <div className="relative col-span-1 md:col-span-2" ref={productDropdownRef}>
           <input
             type="text"
@@ -220,6 +219,7 @@ const OrderComponent: React.FC = () => {
             className="p-2 border rounded w-full"
             maxLength={100}
           />
+          <p className="text-xs text-gray-500 mt-1">Máx. 100 caracteres ({100 - searchTerm.length} restantes)</p>
           {showProductDropdown && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
               {localSearchLoading || searchLoading ? (
@@ -244,18 +244,20 @@ const OrderComponent: React.FC = () => {
             </div>
           )}
         </div>
-        
-        {/* Quantity input */}
-        <input
-          type="number"
-          placeholder="Cantidad"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          className="p-2 border rounded col-span-1"
-          min="1"
-          max="999" 
-          maxLength={3}
-        />
+          {/* Quantity input */}
+        <div>
+          <input
+            type="number"
+            placeholder="Cantidad"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="p-2 border rounded w-full"
+            min="1"
+            max="999"
+            maxLength={3}
+          />
+          <p className="text-xs text-gray-500 mt-1">Máx. 999</p>
+        </div>
         
         {/* Unit of measure DROPDOWN REPLACEMENT */}
         <div>
@@ -303,25 +305,30 @@ const OrderComponent: React.FC = () => {
             </thead>
             <tbody>
               {selectedProducts.map((product, index) => (
-                <tr key={index}>
-                  <td className="border border-gray-300 p-2">
-                    <input
-                      type="text"
-                      value={product.product.name}
-                      onChange={(e) => handleProductChange(index, 'name', e.target.value)}
-                      className="p-1 border rounded w-full"
-                      maxLength={100}
-                    />
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    <input
-                      type="number"
-                      value={product.quantity}
-                      onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
-                      className="p-1 border rounded w-full"
-                      min="1"
-                      max="999"
-                    />
+                <tr key={index}>                  <td className="border border-gray-300 p-2">
+                    <div>
+                      <input
+                        type="text"
+                        value={product.product.name}
+                        onChange={(e) => handleProductChange(index, 'name', e.target.value)}
+                        className="p-1 border rounded w-full"
+                        maxLength={100}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Máx. 100 caracteres</p>
+                    </div>
+                  </td><td className="border border-gray-300 p-2">
+                    <div>
+                      <input
+                        type="number"
+                        value={product.quantity}
+                        onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
+                        className="p-1 border rounded w-full"
+                        min="1"
+                        max="999"
+                        maxLength={3}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Máx. 999</p>
+                    </div>
                   </td>
                   <td className="border border-gray-300 p-2">
                     <select
