@@ -84,24 +84,26 @@ const RegisterForm: React.FC = () => {
           {/* Nombre y Apellidos */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="name" className="block mb-1 text-sm">Nombre</label>
-              <input
+              <label htmlFor="name" className="block mb-1 text-sm">Nombre</label>              <input
                 type="text"
                 {...register("name", { 
                   required: "El nombre es requerido",
                   minLength: {
                     value: 2,
                     message: "El nombre debe tener al menos 2 caracteres"
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "El nombre no puede exceder 50 caracteres"
                   }
                 })}
                 id="name"
+                maxLength={50}
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="Juan"
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-            </div>
-
-            <div>
+            </div>            <div>
               <label htmlFor="lastName" className="block mb-1 text-sm">Primer Apellido</label>
               <input
                 type="text"
@@ -110,16 +112,20 @@ const RegisterForm: React.FC = () => {
                   minLength: {
                     value: 2,
                     message: "El apellido debe tener al menos 2 caracteres"
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "El apellido no puede exceder 50 caracteres"
                   }
                 })}
                 id="lastName"
+                maxLength={50}
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="Pérez"
               />
               {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
-            </div>
-
-            <div>
+              <p className="text-gray-500 text-xs mt-1">Máx. 50 caracteres</p>
+            </div>            <div>
               <label htmlFor="lastName2" className="block mb-1 text-sm">Segundo Apellido</label>
               <input
                 type="text"
@@ -128,72 +134,95 @@ const RegisterForm: React.FC = () => {
                   minLength: {
                     value: 2,
                     message: "El apellido debe tener al menos 2 caracteres"
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "El apellido no puede exceder 50 caracteres"
                   }
                 })}
                 id="lastName2"
+                maxLength={50}
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="Gómez"
               />
               {errors.lastName2 && <p className="text-red-500 text-xs mt-1">{errors.lastName2.message}</p>}
+              <p className="text-gray-500 text-xs mt-1">Máx. 50 caracteres</p>
             </div>
           </div>
 
           {/* Teléfonos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">            <div>
               <label htmlFor="phoneNumber" className="block mb-1 text-sm">Número de Teléfono</label>
               <input
-                type="text"
+                type="tel"
                 {...register("phoneNumber", { 
                   required: "El número de teléfono es requerido",
                   pattern: {
-                    value: /^[0-9\-]{8,15}$/,
+                    value: /^[0-9-]{8,15}$/,
                     message: "Formato inválido. Ejemplo: 8888-8888"
                   }
                 })}
                 id="phoneNumber"
+                maxLength={15}
+                onKeyPress={(e) => {
+                  const key = e.key;
+                  if (!/[0-9-]/.test(key)) {
+                    e.preventDefault();
+                  }
+                }}
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="8888-8888"
               />
               {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
-            </div>
-
-            <div>
+              <p className="text-gray-500 text-xs mt-1">Máx. 15 caracteres (números y guiones)</p>
+            </div>            <div>
               <label htmlFor="emergencyPhoneNumber" className="block mb-1 text-sm">Teléfono de Emergencia</label>
               <input
-                type="text"
+                type="tel"
                 {...register("emergencyPhoneNumber", { 
                   required: "El teléfono de emergencia es requerido",
                   pattern: {
-                    value: /^[0-9\-]{8,15}$/,
+                    value: /^[0-9-]{8,15}$/,
                     message: "Formato inválido. Ejemplo: 8888-8888"
                   }
                 })}
                 id="emergencyPhoneNumber"
+                maxLength={15}
+                onKeyPress={(e) => {
+                  const key = e.key;
+                  if (!/[0-9-]/.test(key)) {
+                    e.preventDefault();
+                  }
+                }}
                 className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
                 placeholder="8888-8888"
               />
               {errors.emergencyPhoneNumber && <p className="text-red-500 text-xs mt-1">{errors.emergencyPhoneNumber.message}</p>}
+              <p className="text-gray-500 text-xs mt-1">Máx. 15 caracteres (números y guiones)</p>
             </div>
           </div>
 
-          {/* Correo Electrónico */}
-          <div>
-            <label htmlFor="email" className="block mb-1 text-sm">Correo Electrónico</label>
-            <input
-              type="email"
-              {...register("email", { 
-                required: "El correo electrónico es requerido",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Dirección de correo inválida"
-                }
-              })}
-              id="email"
-              className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
-              placeholder="nombre@empresa.com"
-            />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          {/* Correo Electrónico */}          <div>
+            <label htmlFor="email" className="block mb-1 text-sm">Correo Electrónico</label>              <input
+                type="email"
+                {...register("email", { 
+                  required: "El correo electrónico es requerido",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Dirección de correo inválida"
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "El correo no puede exceder 50 caracteres"
+                  }
+                })}
+                id="email"
+                maxLength={50}
+                className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
+                placeholder="nombre@empresa.com"
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+              <p className="text-gray-500 text-xs mt-1">Máx. 50 caracteres</p>
           </div>
 
           {/* Contraseñas */}
@@ -242,8 +271,7 @@ const RegisterForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Dirección */}
-          <div>
+          {/* Dirección */}          <div>
             <label htmlFor="address" className="block mb-1 text-sm">Dirección</label>
             <input
               type="text"
@@ -252,13 +280,19 @@ const RegisterForm: React.FC = () => {
                 minLength: {
                   value: 5,
                   message: "La dirección debe tener al menos 5 caracteres"
+                },
+                maxLength: {
+                  value: 200,
+                  message: "La dirección no puede exceder 200 caracteres"
                 }
               })}
               id="address"
+              maxLength={200}
               className="w-full border rounded-md py-1 px-2 bg-gray-100 border-gray-300 text-sm text-gray-800 focus:border-blue-500 focus:outline-none"
               placeholder="Dirección completa"
             />
             {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
+            <p className="text-gray-500 text-xs mt-1">Máx. 200 caracteres</p>
           </div>
 
           {/* Fechas */}
